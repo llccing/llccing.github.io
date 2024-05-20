@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "astro dev --host",
     "start": "astro dev",
-    "build": "astro check && astro build && jampack ./dist && cp .nojekyll dist/.nojekyll",
+    "build": "astro check && astro build && jampack ./dist",
+    "postbuild": "cp .nojekyll dist/.nojekyll",
+    "predeploy": "npm run build",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
@@ -12,9 +14,7 @@
     "format": "prettier --write . --plugin=prettier-plugin-astro",
     "cz": "cz",
     "prepare": "husky install",
-    "lint": "eslint .",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@astrojs/check": "^0.7.0",
@@ -43,7 +43,6 @@
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.56.0",
     "eslint-plugin-astro": "^0.31.3",
-    "gh-pages": "^6.1.1",
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
     "prettier": "^3.2.4",
