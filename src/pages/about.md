@@ -3,34 +3,31 @@ layout: ../layouts/AboutLayout.astro
 title: "About"
 ---
 
-AstroPaper is a minimal, responsive and SEO-friendly Astro blog theme. I designed and crafted this based on [my personal blog](https://satnaing.dev/blog).
+**Hi 你好, 我是 Rowan liu**
 
-This theme is aimed to be accessible out of the box. Light and dark mode are supported by
-default and additional color schemes can also be configured.
-
-This theme is self-documented \_ which means articles/posts in this theme can also be considered as documentations. So, see the documentation for more info.
+8年经验的开发，一点点打怪升级，小公司、互联网大厂、伪外企、真外企，都经历过，职业经历非常丰富。
 
 <div>
   <img src="/assets/dev.svg" class="sm:w-1/2 mx-auto" alt="coding dev illustration">
 </div>
 
-## Tech Stack
+## 自我介绍
 
-This theme is written in vanilla JavaScript (+ TypeScript for type checking) and a little bit of ReactJS for some interactions. TailwindCSS is used for styling; and Markdown is used for blog contents.
+- **要写代码写到老**
+- **新进奶爸**, **女儿奴**、**WLB**
 
-## Features
+## 爱好
 
-Here are certain features of this site.
+- 电子设备，包括不限于 鼠标，键盘，耳机，Apple 设备
+- 蛙泳，爬山，美剧
 
-- fully responsive and accessible
-- SEO-friendly
-- light & dark mode
-- fuzzy search
-- super fast performance
-- draft posts
-- pagination
-- sitemap & rss feed
-- highly customizable
+## 工作经历
 
-If you like this theme, you can star/contribute to the [repo](https://github.com/satnaing/astro-paper).  
-Or you can even give any feedback via my [email](mailto:contact@satnaing.dev).
+| 时间          | 公司           | 职位                           | 城市 |
+|----------------|-------------|---------------------------------| ---- |
+| 2022.04 ~ 2024.10 | Rocket Software  | 全栈开发工程师(Java)     | 大连 |
+| 2020.07 ~ 2022.04 | innoCellence     | 全栈开发工程师(Nodejs)   | 大连 |
+| 2019.11 ~ 2020.07 | 北京嘀嘀无限      | 高级前端研发工程师       | 北京  |
+| 2017.09 ~ 2019-11 | 北京京东尚科      | 前端开发工程师           | 北京 |
+| 2016.03 ~ 2017.08 | 北京博图纵横      | 前端开发工程师           | 北京 |
+
