@@ -5,7 +5,7 @@ slug: annual-summary-19-23
 featured: false 
 draft: false
 tags:
-  - blog
+  - annual
 description:
   我的5家公司，我曾经走过的路，虽有坎坷，但总算收获不少。
 ---
