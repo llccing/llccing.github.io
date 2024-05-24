@@ -1,5 +1,5 @@
 ---
-pubDatetime: 2024-01-23T10:32:00Z
+pubDatetime: 2024-01-23T10:32:00+08:00
 title: 探索 Astro：2024 年前端开发社区的魅力 
 slug: known-astro
 featured: false 
