@@ -1,0 +1,14 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Main from '@layouts/Main.astro';
+import {ALL_COMPANY} from './company-data';
+---
+
+<!-- https://www.kzix.com/luohu/4576.html -->
+<Layout title="Shagnhai Company">
+  <Main pageTitle="Shanghai" pageDesc="Companies in Shanghai">
+    <div>
+      {ALL_COMPANY.map((item, idx) => <div>{idx+1}. {item}</div>)}
+    </div>
+  </Main>
+</Layout>
