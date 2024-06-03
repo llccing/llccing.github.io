@@ -17,7 +17,7 @@ import { ALL_COMPANY } from './company-data';
       <div id="companyList">
         {ALL_COMPANY.map((item, idx) => (
           <div key={idx} class="p-2 border-b border-gray-200">
-            {idx + 1}. {item}
+            {idx + 1}. {item.name}
           </div>
         ))}
       </div>
