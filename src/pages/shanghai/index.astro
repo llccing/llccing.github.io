@@ -5,9 +5,36 @@ import { ALL_COMPANY } from './company-data';
 ---
 
 <!-- https://www.kzix.com/luohu/4576.html -->
-<Layout title="Shanghai Company">
+<Layout title="上海重点企业 415家">
   <Main pageTitle="Shanghai" pageDesc="Companies in Shanghai">
-    <div class="p-4">
+    <p class="text-gray-400">数据源 https://www.kzix.com/luohu/4576.html</p>
+
+    <nav class="flex flex-col text-bold mt-2">
+      <a href="#session1">-- #欧洲公司 -- </a>
+      <a href="#session2">-- #美国公司 -- </a>
+      <a href="#session3">-- #全部公司 -- </a>
+    </nav>
+
+    <div class="mt-8">
+      <h3 id="sesson1">欧洲公司</h3>
+       {ALL_COMPANY.filter(item => item.tag.includes('eu')).map((item, idx) => (
+          <div class="p-2 border-b border-gray-200">
+            {idx + 1}. {item.name}
+          </div>
+        ))}
+    </div>
+
+    <div class="mt-8">
+      <h3 id="session2">美国公司</h3>
+       {ALL_COMPANY.filter(item => item.tag.includes('us')).map((item, idx) => (
+          <div class="p-2 border-b border-gray-200">
+            {idx + 1}. {item.name}
+          </div>
+        ))}
+    </div>
+
+    <div class="mt-8 p-4">
+      <h3 id="session3">全部415家</h3>
       <input 
         type="text" 
         id="searchInput" 
@@ -22,6 +49,7 @@ import { ALL_COMPANY } from './company-data';
         ))}
       </div>
     </div>
+
   </Main>
 </Layout>
 
