@@ -1,14 +1,45 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import Main from '@layouts/Main.astro';
-import {ALL_COMPANY} from './company-data';
+import { ALL_COMPANY } from './company-data';
 ---
 
 <!-- https://www.kzix.com/luohu/4576.html -->
-<Layout title="Shagnhai Company">
+<Layout title="Shanghai Company">
   <Main pageTitle="Shanghai" pageDesc="Companies in Shanghai">
-    <div>
-      {ALL_COMPANY.map((item, idx) => <div>{idx+1}. {item}</div>)}
+    <div class="p-4">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search companies..." 
+        class="w-full p-2 mb-4 border border-gray-300 rounded text-slate-950"
+      />
+      <div id="companyList">
+        {ALL_COMPANY.map((item, idx) => (
+          <div key={idx} class="p-2 border-b border-gray-200">
+            {idx + 1}. {item}
+          </div>
+        ))}
+      </div>
     </div>
   </Main>
 </Layout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    const searchInput = document.getElementById('searchInput');
+    const companyList = document.getElementById('companyList');
+    const companies = companyList.querySelectorAll('div');
+
+    searchInput.addEventListener('input', () => {
+      const searchQuery = searchInput.value.toLowerCase();
+      companies.forEach((company) => {
+        if (company.textContent.toLowerCase().includes(searchQuery)) {
+          company.style.display = '';
+        } else {
+          company.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
