@@ -16,7 +16,7 @@ import { ALL_COMPANY } from './company-data';
       />
       <div id="companyList">
         {ALL_COMPANY.map((item, idx) => (
-          <div key={idx} class="p-2 border-b border-gray-200">
+          <div class="p-2 border-b border-gray-200">
             {idx + 1}. {item.name}
           </div>
         ))}
@@ -26,7 +26,7 @@ import { ALL_COMPANY } from './company-data';
 </Layout>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener('DOMContentLoaded', (_event) => {
     const searchInput = document.getElementById('searchInput');
     const companyList = document.getElementById('companyList');
     const companies = companyList.querySelectorAll('div');
