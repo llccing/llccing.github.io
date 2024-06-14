@@ -2,7 +2,7 @@
 pubDatetime: 2023-12-30T12:12:12Z
 title: Annual Summary 19-23
 slug: annual-summary-19-23
-featured: false 
+featured: true
 draft: false
 tags:
   - annual
