@@ -11,6 +11,8 @@ title: "About"
 
 展望未来，我希望能够一直写代码到老，保持对编程的热爱和激情。
 
+详细的工作经历请 >>> <a href="/assets/resume.pdf" target="_blank">查看PDF简历</a> <<<。
+
 ## History Blogs
 - <a href="https://rowanliu.com/FrontEnd" target="_blank"><strong>知识点总结</strong></a>
 - <a href="https://juejin.cn/user/3227821867281079" target="_blank"><strong>掘金</strong></a>
