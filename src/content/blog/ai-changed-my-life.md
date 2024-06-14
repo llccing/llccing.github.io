@@ -1,7 +1,7 @@
 ---
 pubDatetime: 2024-06-14T19:34:43Z
-title: AI Changed My Life
-slug: ai-changed-my-life
+title: Changed My Life AI
+slug: changed-my-life AI
 featured: true
 draft: false
 tags:
