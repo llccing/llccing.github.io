@@ -10,7 +10,7 @@ description:
   ChatGPT彻底的改变了我的工作流程，成为了我的得力助手。
 ---
 
-![xiaoxin](@assets/images/xiaoxin-head4-tiny.png)
+<!-- ![xiaoxin](@assets/images/xiaoxin-head4-tiny.png) -->
 
 
 如图所见，这个充满科幻感觉的图片来自ChatGPT，用的prompt是 “生成一张充满科技感的蜡笔小新的头像”，这个非常简单的prompt，生成的图片却非常专业，细致。
