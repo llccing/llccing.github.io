@@ -1,7 +1,7 @@
 ---
-pubDatetime: 2024-06-14T19:34:43Z
-title: Changed My Life AI
-slug: changed-my-life AI
+pubDatetime: 2024-05-13T19:34:43Z
+title: AI Changed My Life
+slug: ai-changed-my-life 
 featured: true
 draft: false
 tags:
@@ -10,7 +10,7 @@ description:
   ChatGPT彻底的改变了我的工作流程，成为了我的得力助手。
 ---
 
-<!-- ![xiaoxin](@assets/images/xiaoxin-head4-tiny.png) -->
+![xiaoxin](@assets/images/xiaoxin-head4-tiny.png)
 
 
 如图所见，这个充满科幻感觉的图片来自ChatGPT，用的prompt是 “生成一张充满科技感的蜡笔小新的头像”，这个非常简单的prompt，生成的图片却非常专业，细致。
