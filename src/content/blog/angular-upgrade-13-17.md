@@ -2,12 +2,11 @@
 pubDatetime: 2024-07-14T20:23:19Z
 title: Angular Upgrade from 13 to 17
 slug: angular-upgrade-from-13-to-17
-featured: true
+featured: false
 draft: false
 tags:
   - blog
-description:
-  复杂的事情可以拆分小的任务，这样更具有可行性。
+description: 复杂的事情可以拆分小的任务，这样更具有可行性。
 ---
 
 ## 背景

@@ -2,12 +2,11 @@
 pubDatetime: 2023-12-30T12:12:12Z
 title: Annual Summary 19-23
 slug: annual-summary-19-23
-featured: true
+featured: false
 draft: false
 tags:
   - annual
-description:
-  我的5家公司，我曾经走过的路，虽有坎坷，但总算收获不少。
+description: 我的5家公司，我曾经走过的路，虽有坎坷，但总算收获不少。
 ---
 
 - 博图纵横

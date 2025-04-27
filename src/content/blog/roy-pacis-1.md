@@ -1,13 +1,12 @@
 ---
 pubDatetime: 2023-12-01T10:09:00Z
 title: English Teacher 1
-slug: english-teacher-1 
-featured: true 
+slug: english-teacher-1
+featured: false
 draft: false
 tags:
   - english
-description:
-  有的时候过来人的一句话，就会对你的生活产生巨大的改变，感恩每个遇到的人。
+description: 有的时候过来人的一句话，就会对你的生活产生巨大的改变，感恩每个遇到的人。
 ---
 
 My English teacher is about fifty years old and comes from the Philippines. He has three children. “Filipino” refers to a man. and “Filipina” refers to a woman. He considers himself a Filipino and it seems like he doesn’t like being called a “native English speaker”.
