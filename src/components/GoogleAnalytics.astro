@@ -1,11 +1,11 @@
 ---
-const GA_ID = import.meta.env.PUBLIC_GA_ID ?? 'G-1X5E9W6VJ2';
+const GA_ID = 'G-1X5E9W6VJ2';
 ---
 {GA_ID && (
-  <>
+  <> 
     <!-- Google tag (gtag.js) -->
-    <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-    <script>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+    <script is:inline>
       {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
