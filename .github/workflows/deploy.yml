@@ -26,24 +26,6 @@ jobs:
           # IMPORTANT: set this to the pnpm version you used locally to generate pnpm-lock.yaml
           version: '9'
 
-      - name: Debug: show workspace & lockfile
-        run: |
-          echo "=== pwd ==="
-          pwd
-          echo "=== list root files ==="
-          ls -la
-          echo "=== list . (recursive, up to 3 levels) ==="
-          ls -la --recursive | sed -n '1,200p'
-          echo "=== pnpm version ==="
-          pnpm -v || true
-          echo "=== show lockfile if present ==="
-          if [ -f pnpm-lock.yaml ]; then
-            echo "pnpm-lock.yaml exists, head:"
-            head -n 40 pnpm-lock.yaml
-          else
-            echo "pnpm-lock.yaml NOT FOUND at repo root"
-          fi
-
       - name: Cache pnpm store
         uses: actions/cache@v4
         with:
