@@ -12,20 +12,38 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Setup Node (without cache: 'pnpm' — that requires pnpm to already exist)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # Install pnpm so 'pnpm' is available for the following steps
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: '8'
+          # IMPORTANT: set this to the pnpm version you used locally to generate pnpm-lock.yaml
+          version: '9'
 
-      # Cache pnpm store to speed up installs (key includes lockfile)
+      - name: Debug: show workspace & lockfile
+        run: |
+          echo "=== pwd ==="
+          pwd
+          echo "=== list root files ==="
+          ls -la
+          echo "=== list . (recursive, up to 3 levels) ==="
+          ls -la --recursive | sed -n '1,200p'
+          echo "=== pnpm version ==="
+          pnpm -v || true
+          echo "=== show lockfile if present ==="
+          if [ -f pnpm-lock.yaml ]; then
+            echo "pnpm-lock.yaml exists, head:"
+            head -n 40 pnpm-lock.yaml
+          else
+            echo "pnpm-lock.yaml NOT FOUND at repo root"
+          fi
+
       - name: Cache pnpm store
         uses: actions/cache@v4
         with:
