@@ -2,6 +2,7 @@
 import { LOCALE, SITE } from "@config";
 import "@styles/base.css";
 import { ViewTransitions } from "astro:transitions";
+import GoogleAnalytics from "@components/GoogleAnalytics.astro";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
@@ -35,7 +36,7 @@ const socialImageURL = new URL(
 
 <!doctype html>
 <html
-  lang=`${LOCALE.lang ?? "en"}`
+  lang={`${LOCALE.lang ?? "en"}`}
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>
@@ -104,6 +105,9 @@ const socialImageURL = new URL(
         />
       )
     }
+
+    <!-- Google Analytics (gtag) -->
+    <GoogleAnalytics />
 
     <ViewTransitions />
 
