@@ -17,6 +17,9 @@ module.exports = {
         parser: "@typescript-eslint/parser",
         extraFileExtensions: [".astro"],
       },
+      globals: {
+        dataLayer: "readonly",
+      },
       rules: {},
     },
   ],

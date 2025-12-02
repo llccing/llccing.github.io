@@ -16,7 +16,7 @@ import { ALL_COMPANY } from "./company-data";
     </nav>
 
     <div class="mt-8">
-      <h3 id="sesson1">欧洲公司</h3>
+      <h3 id="session1">欧洲公司</h3>
       {
         ALL_COMPANY.filter(item => item.tag.includes("eu")).map((item, idx) => (
           <div class="border-b border-gray-200 p-2">
@@ -29,7 +29,7 @@ import { ALL_COMPANY } from "./company-data";
             <div class="flex gap-4">
               {item.link ? (
                 <div class="flex">
-                  <div class="pr-2">link => </div>
+                  <div class="pr-2">link =&gt; </div>
                   <div>
                     <a
                       href={item.link}
@@ -44,7 +44,7 @@ import { ALL_COMPANY } from "./company-data";
 
               {item.boss ? (
                 <div class="flex">
-                  <div class="pr-2">Bosses=> </div>
+                  <div class="pr-2">Bosses =&gt; </div>
                   <div>
                     {item.boss.map((itemBoss, itemIdx) => (
                       <a
@@ -98,7 +98,7 @@ import { ALL_COMPANY } from "./company-data";
 </Layout>
 
 <script is:inline>
-  document.addEventListener("DOMContentLoaded", _event => {
+  document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("searchInput");
     const companyList = document.getElementById("companyList");
     const companies = companyList.querySelectorAll("div");
