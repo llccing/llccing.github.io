@@ -1,84 +1,17 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
-import { TheHouseOnMangoStreet } from "./radio-data";
+import RadioPlayer from "@components/RadioPlayer";
+import { defaultCategoryId, radioLibrary } from "./radio-data";
 ---
 
 <!-- eslint-disable -->
 <Layout title="Radio">
-  <Main pageTitle="Radio" pageDesc="Radio">
-    <div class="audio-links pb-40">
-      {
-        TheHouseOnMangoStreet.map(item => (
-          <div class="audio-link">
-            <span>{item.title}</span>
-            <button class="item-play-btn ml-2" data-src={item.src}>
-              <svg
-                class="icon"
-                viewBox="0 0 1024 1024"
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                p-id="5910"
-                width="200"
-                height="200"
-              >
-                <path
-                  d="M512 74.666667C270.933333 74.666667 74.666667 270.933333 74.666667 512S270.933333 949.333333 512 949.333333 949.333333 753.066667 949.333333 512 753.066667 74.666667 512 74.666667z m0 810.666666c-204.8 0-373.333333-168.533333-373.333333-373.333333S307.2 138.666667 512 138.666667 885.333333 307.2 885.333333 512 716.8 885.333333 512 885.333333z"
-                  fill="#666666"
-                />
-                <path
-                  d="M708.266667 465.066667l-234.666667-134.4c-8.533333-4.266667-17.066667-6.4-25.6-6.4-29.866667 0-53.333333 23.466667-53.333333 53.333333v268.8c0 8.533333 2.133333 19.2 6.4 25.6 10.666667 17.066667 27.733333 27.733333 46.933333 27.733333 8.533333 0 17.066667-2.133333 25.6-6.4l234.666667-134.4c8.533333-4.266667 14.933333-10.666667 19.2-19.2 6.4-12.8 8.533333-27.733333 4.266666-40.533333-2.133333-14.933333-10.666667-25.6-23.466666-34.133333z m-249.6 162.133333V396.8L661.333333 512l-202.666666 115.2z"
-                  fill="#666666"
-                />
-              </svg>
-            </button>
-          </div>
-        ))
-      }
-    </div>
-    <div
-      class="audio-player fixed bottom-0 left-0 right-0 flex hidden items-center justify-between bg-white p-5 text-black"
-    >
-      <div class="audio-player-title">Playing...</div>
-      <div class="audio-player-controls">
-        <button
-          class="global-play-btn rounded-full border-2 border-black p-2 px-4 text-xl"
-          >Play/Pause</button
-        >
-      </div>
-    </div>
+  <Main>
+    <RadioPlayer
+      client:load
+      categories={radioLibrary}
+      initialCategoryId={defaultCategoryId}
+    />
   </Main>
 </Layout>
-
-<script
-  src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"
-  integrity="sha256-c2wzlETIi6rVk+JK/fHW6PV0AZtON6EQ7LRT/3Rf/UE="
-  crossorigin="anonymous"></script>
-<script>
-  // after page loaded, init sound
-  let sound: any = null;
-  document.querySelectorAll(".item-play-btn").forEach(button => {
-    button.addEventListener("click", () => {
-      const src = button.getAttribute("data-src");
-      if (sound) {
-        sound.stop();
-      }
-      sound = new (window as any).Howl({
-        src: [src],
-        html5: true,
-      });
-      sound.play();
-      document.querySelector(".audio-player")?.classList.remove("hidden");
-
-      document.querySelector(".audio-player-title")!.classList.remove("hidden");
-    });
-  });
-
-  document.querySelector(".global-play-btn")!.addEventListener("click", () => {
-    if (sound.playing()) {
-      sound.pause();
-    } else {
-      sound.play();
-    }
-  });
-</script>
