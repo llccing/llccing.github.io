@@ -185,11 +185,125 @@ const theHouseOnMangoStreetSources = [
   },
 ];
 
+const flippedSources = [
+  {
+    title: 'Diving Under 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/001%20Diving%20Under%201.m4a'
+  },
+  {
+    title: 'Diving Under 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/002%20Diving%20Under%202.m4a'
+  },
+  {
+    title: 'Flipped 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/003%20Flipped%201.m4a',
+  },
+  {
+    title: 'Flipped 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/004%20Flipped%202.m4a',
+  },
+  {
+    title: 'Buddy, Beware! 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/005%20Buddy%2C%20Beware%21%201.m4a',
+  },
+  {
+    title: 'Buddy, Beware! 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/006%20Buddy%2C%20Beware%21%202.m4a',
+  },
+  {
+    title: 'The Sycamore Tree 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/007%20The%20Sycamore%20Tree%201.m4a',
+  },
+  {
+    title: 'The Sycamore Tree 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/008%20The%20Sycamore%20Tree%202.m4a',
+  },
+  {
+    title: 'Brawk-Brawk-Brawk 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/009%20Brawk-Brawk-Brawk%201.m4a',
+  },
+  {
+    title: 'Brawk-Brawk-Brawk 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/010%20Break-Brawk-Brawk%202.m4a',
+  },
+  {
+    title: 'The Eggs 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/011%20The%20Eggs%201.m4a',
+  },
+  {
+    title: 'The Eggs 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/012%20The%20Eggs%202.m4a',
+  },
+  {
+    title: 'Get a Grip, Man 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/013%20Get%20a%20Grip%2C%20Man%201.m4a',
+  },
+  {
+    title: 'Get a Grip, Man 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/014%20Get%20a%20Grip%2C%20Man%202.m4a',
+  },
+  {
+    title: 'Get a Grip, Man 3',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/015%20Get%20a%20Grip%2C%20Man%203.m4a',
+  },
+  {
+    title: 'The Yard 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/016%20The%20Yard%201.m4a',
+  },
+  {
+    title: 'The Yard 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/017%20The%20Yard%202.m4a',
+  },
+  {
+    title: 'Looming Large and Smelly',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/018%20Looming%20Large%20and%20Smelly.m4a',
+  },
+  {
+    title: 'The Visit 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/019%20The%20Visit%201.m4a',
+  },
+  {
+    title: 'The Visit 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/020%20The%20Visit%202.m4a',
+  },
+  {
+    title: 'The Serious Willies 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/021%20The%20Serious%20Willies%201.m4a',
+  },
+  {
+    title: 'The Serious Willies 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/022%20The%20Serious%20Willies%202.m4a',
+  },
+  {
+    title: 'The Dinner 1',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/023%20The%20Dinner%201.m4a',
+  },
+  {
+    title: 'The Dinner 2',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/024%20The%20Dinner%202.m4a',
+  },
+  {
+    title: 'Flipped',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/025%20Flipped.m4a',
+  },
+  {
+    title: 'The Basket Boys',
+    src: 'https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/Flipped/026%20The%20Basket%20Boys.m4a',
+  }
+]
+
 const theHouseOnMangoStreetTracks: RadioTrack[] =
   theHouseOnMangoStreetSources.map((track, index) => ({
     id: `mango-street-${String(index + 1).padStart(3, "0")}`,
     ...track,
   }));
+
+const flippedTracks: RadioTrack[] =
+  flippedSources.map((track, index) => ({
+    id: `flipped${String(index + 1).padStart(3, "0")}`,
+    ...track,
+  }));
+ 
 
 export const radioLibrary: RadioCategory[] = [
   {
@@ -200,6 +314,13 @@ export const radioLibrary: RadioCategory[] = [
       "Personal read-aloud project capturing each vignette from Sandra Cisneros’s coming-of-age classic.",
     tracks: theHouseOnMangoStreetTracks,
   },
+  {
+    id: 'flipped',
+    title: 'Flipped',
+    author: '',
+    description: 'A adoable story',
+
+  }
 ];
 
 export const defaultCategoryId = radioLibrary[0]?.id;
