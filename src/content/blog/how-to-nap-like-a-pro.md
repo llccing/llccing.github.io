@@ -12,13 +12,18 @@ description:
   GQ Wellness: 午睡可以极大地提高你下午的工作效率。专业医生教你如何科学午睡。
 ---
 
-<!-- 英文音频 -->
+<!-- 英文原文音频 (TTS) -->
+<h3>🎧 英文原文朗读 (TTS)</h3>
 <audio controls>
-  <source src="/assets/audio/how_to_nap.mp3" type="audio/mpeg">
+  <source src="https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/audio/original/how_to_nap.mp3" type="audio/mpeg">
   您的浏览器不支持 audio 元素。
 </audio>
 
-_🎧 点击上方播放按钮听英文朗读_
+---
+
+<!-- 用户朗读音频 (待上传) -->
+<h3>🎤 Rowan's 朗读</h3>
+<p>⏳ 期待你的朗读录音～</p>
 
 ---
 
