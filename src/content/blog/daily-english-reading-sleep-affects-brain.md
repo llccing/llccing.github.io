@@ -15,7 +15,7 @@ description: Today's B2 level English reading article about how sleep affects yo
 <!-- English Original Audio (TTS) -->
 <h3>🎧 English Original Audio (TTS)</h3>
 <audio controls>
-  <source src="https://lightai.cloud.tencent.com/cosmanager/getFileStream?filePath=1773877557708/voice-1773877526374.mp3" type="audio/mpeg">
+  <source src="https://reading-audios-1308187607.cos.ap-shanghai.myqcloud.com/audio/2026-03-19-sleep-article.mp3" type="audio/mpeg">
   Your browser does not support the audio element.
 </audio>
 
