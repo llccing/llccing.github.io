@@ -15,18 +15,24 @@ export interface Props {
     | CollectionEntry<"blog">
     | CollectionEntry<"short-stories">
   )[];
+  collection?: "blog" | "short-stories";
 }
 
-const { currentPage, totalPages, paginatedPosts } = Astro.props;
+const { currentPage, totalPages, paginatedPosts, collection = "blog" } = Astro.props;
+
+const basePath = collection === "short-stories" ? "/short-stories" : "/posts";
 ---
 
-<Layout title={`Posts | ${SITE.title}`}>
-  <Header activeNav="posts" />
-  <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
+<Layout title={`${collection === "short-stories" ? "Short Stories" : "Posts"} | ${SITE.title}`}>
+  <Header activeNav={collection === "short-stories" ? "short-stories" : "posts"} />
+  <Main 
+    pageTitle={collection === "short-stories" ? "Short Stories" : "Posts"} 
+    pageDesc={collection === "short-stories" ? "All the short stories I've written." : "All the articles I've posted."}
+  >
     <ul>
       {
         paginatedPosts.map(({ data, slug }) => (
-          <Card href={`/posts/${slug}/`} frontmatter={data} />
+          <Card href={`${basePath}/${slug}/`} frontmatter={data} />
         ))
       }
     </ul>
@@ -35,8 +41,8 @@ const { currentPage, totalPages, paginatedPosts } = Astro.props;
   <Pagination
     {currentPage}
     {totalPages}
-    prevUrl={`/posts${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
-    nextUrl={`/posts/${currentPage + 1}/`}
+    prevUrl={`${basePath}${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
+    nextUrl={`${basePath}/${currentPage + 1}/`}
   />
 
   <Footer noMarginTop={totalPages > 1} />
