@@ -34,7 +34,6 @@ const shortStories = defineCollection({
     draft: z.boolean().optional(),
     tags: z.array(z.string()).default(["short-story"]),
     description: z.string(),
-    slug: z.string().optional(),
   }),
 });
 
