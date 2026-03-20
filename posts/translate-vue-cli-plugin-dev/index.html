@@ -1,0 +1,705 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://llccing.github.io/posts/translate-vue-cli-plugin-dev/"><meta name="generator" content="Astro v4.16.19"><!-- General Meta Tags --><title>[译] Vue CLI 插件开发指南 | Rowan's Blog</title><meta name="title" content="[译] Vue CLI 插件开发指南 | Rowan's Blog"><meta name="description" content="已经提了 merge request [https://github.com/vuejs/vue-cli/pull/5345](https://github.com/vuejs/vue-cli/pull/5345)"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="[译] Vue CLI 插件开发指南 | Rowan's Blog"><meta property="og:description" content="已经提了 merge request [https://github.com/vuejs/vue-cli/pull/5345](https://github.com/vuejs/vue-cli/pull/5345)"><meta property="og:url" content="https://llccing.github.io/posts/translate-vue-cli-plugin-dev/"><meta property="og:image" content="https://llccing.github.io/posts/%E8%AF%91-vue-cli-%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2019-10-15T00:00:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://llccing.github.io/posts/translate-vue-cli-plugin-dev/"><meta property="twitter:title" content="[译] Vue CLI 插件开发指南 | Rowan's Blog"><meta property="twitter:description" content="已经提了 merge request [https://github.com/vuejs/vue-cli/pull/5345](https://github.com/vuejs/vue-cli/pull/5345)"><meta property="twitter:image" content="https://llccing.github.io/posts/%E8%AF%91-vue-cli-%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><!-- Google tag (gtag.js) --><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1X5E9W6VJ2"></script> <script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-1X5E9W6VJ2");
+</script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.DFCSbKw3.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (width>=640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.7fT1jKMC.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (width>=640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (width>=640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:译-vue-cli-插件开发指南}@layer astro{::view-transition-old(译-vue-cli-插件开发指南){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(译-vue-cli-插件开发指南){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(译-vue-cli-插件开发指南){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(译-vue-cli-插件开发指南){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:translation}@layer astro{::view-transition-old(translation){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(translation){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(translation){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(translation){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:vue}@layer astro{::view-transition-old(vue){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(vue){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(vue){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(vue){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex justify-start max-w-3xl mx-auto px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">[译] Vue CLI 插件开发指南</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2019-10-15T00:00:00.000Z">Oct 15, 2019</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">08:00 AM</span></span></div> <article id="article" role="article" class="astro-vj4tpspi max-w-3xl mx-auto mt-8 prose"> <h1 id="vue-cli-插件开发指南">Vue CLI 插件开发指南</h1>
+<blockquote>
+<p>原文 <a href="https://cli.vuejs.org/dev-guide/plugin-dev.html">https://cli.vuejs.org/dev-guide/plugin-dev.html</a></p>
+</blockquote>
+<p>已经提了 merge request <a href="https://github.com/vuejs/vue-cli/pull/5345">https://github.com/vuejs/vue-cli/pull/5345</a></p>
+<h2 id="开始">开始</h2>
+<p>一个 CLI 插件是一个 npm 包，它能够为 Vue CLI 创建的项目添加额外的功能，这些功能包括：</p>
+<ul>
+<li>修改项目的 webpack 配置 - 例如，如果你的插件希望去针对某种类型的文件工作，你可以为这个特定的文件扩展名添加新的 webpack 加载规则。你可以看 <code>@vue/cli-plugin-typescript</code> 这个插件，添加这样的规则去载入 <code>.ts</code> 和 <code>.tsx</code> 的扩展文件；</li>
+<li>添加新的 vue-cli-service 命令 - 例如，<code>@vue/cli-plugin-unit-jest</code> 添加了 <code>test:unit</code> 命令，允许开发者运行单元测试；</li>
+<li>扩展 <code>package.json</code> - 当你的插件添加了一些依赖到项目中，你需要将他们添加到package 的 dependencies 部分时，这是一个有用的选项；</li>
+<li>在项目中创建新文件、或者修改老文件。有时创建一个示例组件或者通过给入口文件（main.js）添加导入（imports）是一个好的主意；</li>
+<li>提示用户选择一个特定的选项 - 例如，你可以询问用户是否创建我们前面提到的示例组件。</li>
+</ul>
+<p>:::tip
+不要过度使用 vue-cli 插件！如果你仅希望包函特定的插件，例如，<a href="https://lodash.com/">Lodash</a> - 相比创建一个特定的插件，通过 npm 手动安装更加简单。
+:::</p>
+<p>CLI 插件应该总是包函一个 <a href="#service-plugin">service 插件</a> 做为主的导出，并且他能够选择性的包含 <a href="#generator">generator</a>, <a href="#prompts">prompt 文件</a> 和 <a href="#ui-integration">Vue UI 集成</a>。</p>
+<p>作为一个 npm 包，CLI 插件必须有一个 <code>package.json</code> 文件。通常建议在 <code>README.md</code> 中包含插件的描述，来帮助其他人在 npm 上发现你的插件。</p>
+<p>所以，通常的 CLI 插件目录结构看起来像下面这样：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#56B6C2">.</span></span>
+<span class="line"><span style="color:#61AFEF">├──</span><span style="color:#98C379"> README.md</span></span>
+<span class="line"><span style="color:#61AFEF">├──</span><span style="color:#98C379"> generator.js</span><span style="color:#7F848E;font-style:italic">  # generator（可选）</span></span>
+<span class="line"><span style="color:#61AFEF">├──</span><span style="color:#98C379"> index.js</span><span style="color:#7F848E;font-style:italic">      # service 插件</span></span>
+<span class="line"><span style="color:#61AFEF">├──</span><span style="color:#98C379"> package.json</span></span>
+<span class="line"><span style="color:#61AFEF">├──</span><span style="color:#98C379"> prompts.js</span><span style="color:#7F848E;font-style:italic">    # prompt 文件（可选）</span></span>
+<span class="line"><span style="color:#61AFEF">└──</span><span style="color:#98C379"> ui.js</span><span style="color:#7F848E;font-style:italic">         # Vue UI 集成（可选）</span></span>
+<span class="line"></span></code></pre>
+<h2 id="命名和可发现性">命名和可发现性</h2>
+<p>对于一个能够在 Vue CLI 项目中使用的 CLI 插件来说，他必须以下的命名惯例 <code>vue-cli-plugin-&lt;name&gt;</code> 或者 <code>@scope/vue-cli-plugin-&lt;name&gt;</code>。这样你的插件就能够：</p>
+<ul>
+<li>被 <code>@vue/cli-service</code> 发现；</li>
+<li>被其他开发者通过搜索发现；</li>
+<li>通过 <code>vue add &lt;name&gt;</code> 或者 <code>vue invoke &lt;name&gt;</code> 安装。</li>
+</ul>
+<p>:::warning Warning
+确保插件的名字是正确的，否则他将不能通过 <code>vue add</code> 安装并且不能在 UI 插件中搜索的到！
+:::</p>
+<p>为了能够被用户在搜索时更好的发现，可以将插件的关键描述放到 <code>package.json</code> 文件的 <code>description</code> 字段中。</p>
+<p>例如：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "name"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"vue-cli-plugin-apollo"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  "version"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"0.7.7"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  "description"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"vue-cli plugin to add Apollo and GraphQL"</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>你应该在 <code>homepage</code> 或者 <code>repository</code> 字段添加创建插件的官网地址或者仓库的地址，这样 <code>更多信息</code> 的按钮将展示你的插件描述信息：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "repository"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "type"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"git"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "url"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"git+https://github.com/Akryum/vue-cli-plugin-apollo.git"</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#E06C75">  "homepage"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"https://github.com/Akryum/vue-cli-plugin-apollo#readme"</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><img src="https://cli.vuejs.org/plugin-search-item.png" alt="Plugin search item" loading="lazy" decoding="async"></p>
+<h2 id="generator">Generator</h2>
+<p>插件的 Generator 部分通常在你想要为项目扩展包依赖，创建新的文件或者编辑已经存在的文件时需要。</p>
+<p>在 CLI 插件内部，generator 应该放在 <code>generator.js</code> 或者 <code>generator/index.js</code> 文件中。它将在以下两个场景被引用：</p>
+<ul>
+<li>
+<p>项目初始创建期间，CLI 插件被作为项目创建 preset 的一部分被安装。</p>
+</li>
+<li>
+<p>当插件在项目创建完成和通过 <code>vue add</code> 或者 <code>vue invoke</code> 单独调用被安装时。</p>
+</li>
+</ul>
+<p>一个 generator 应该导出一个接收三个参数的函数：</p>
+<ol>
+<li>
+<p>一个 <a href="generator-api.md">GeneratorAPI</a> 实例；</p>
+</li>
+<li>
+<p>插件的 generator 选项。这些选项在项目创建，或者从 <code>~/.vuerc</code> 载入预设时被解析。例如：如果保存的 <code>~/.vuerc</code> 像这样：</p>
+</li>
+</ol>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "presets"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "foo"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "plugins"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "@vue/cli-plugin-foo"</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">"option"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"bar"</span><span style="color:#ABB2BF"> }</span></span>
+<span class="line"><span style="color:#ABB2BF">      }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>如果用户使用 preset <code>foo</code> 创建了一个项目，那么 <code>@vue/cli-plugin-foo</code> 的 generator 就会收到 <code>{ option: 'bar' }</code> 作为第二个参数。</p>
+<p>对于第三方插件，这个选项将在用户执行 <code>vue invoke</code> (详见 <a href="#prompts">Prompts</a>).时，从提示或者命令行参数中被解析。</p>
+<ol start="3">
+<li>整个 preset (presets.foo) 将会作为第三个参数传入。</li>
+</ol>
+<h3 id="创建新的模板">创建新的模板</h3>
+<p>当你调用 <code>api.render('./template')</code> 时，该 generator 将会使用 <a href="https://github.com/mde/ejs">EJS</a> 渲染 <code>./template</code> 中的文件 (相对于 generator 中的文件路径进行解析)</p>
+<p>想象我们正在创建 <a href="https://github.com/ktsn/vue-cli-plugin-auto-routing">vue-cli-auto-routing</a> 插件，我们希望当插件在项目中被引用时做以下的改变：</p>
+<ul>
+<li>创建一个 <code>layouts</code> 文件夹包函默认布局文件；</li>
+<li>创建一个 <code>pages</code> 文件夹包函 <code>about</code> 和 <code>home</code> 页面；</li>
+<li>在 <code>src</code> 文件夹中添加 <code>router.js</code> 文件</li>
+</ul>
+<p>为了渲染这个结构，你需要在 <code>generator/template</code> 文件夹内创建它：</p>
+<p><img src="https://cli.vuejs.org/generator-template.png" alt="Generator structure" loading="lazy" decoding="async"></p>
+<p>模板创建完之后，你应该在 <code>generator/index.js</code> 文件中添加 <code>api.render</code> 调用：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> api</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">render</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"./template"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<h3 id="编辑已经存在的模板">编辑已经存在的模板</h3>
+<p>此外，你可以使用 YAML 前置元信息继承并替换已有的模板文件的一部分（即使来自另一个包）：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>---</span></span>
+<span class="line"><span>extend: '@vue/cli-service/generator/template/src/App.vue'</span></span>
+<span class="line"><span>replace: !!js/regexp /&lt;script&gt;[^]*?&lt;\/script&gt;/</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>&lt;script&gt;</span></span>
+<span class="line"><span>export default {</span></span>
+<span class="line"><span>  // 替换默认脚本</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>&lt;/script&gt;</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>也可以替换多处，只不过你需要将替换的字符串包裹在 <code>&lt;%# REPLACE %&gt;</code> 和 <code>&lt;%# END_REPLACE %&gt;</code> 块中：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>---</span></span>
+<span class="line"><span>extend: '@vue/cli-service/generator/template/src/App.vue'</span></span>
+<span class="line"><span>replace:</span></span>
+<span class="line"><span>  - !!js/regexp /Welcome to Your Vue\.js App/</span></span>
+<span class="line"><span>  - !!js/regexp /&lt;script&gt;[^]*?&lt;\/script&gt;</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>&lt;%# REPLACE %&gt;</span></span>
+<span class="line"><span>替换欢迎信息</span></span>
+<span class="line"><span>&lt;%# END_REPLACE %&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>&lt;%# REPLACE %&gt;</span></span>
+<span class="line"><span>&lt;script&gt;</span></span>
+<span class="line"><span>export default {</span></span>
+<span class="line"><span>  // 替换默认脚本</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>&lt;/script&gt;</span></span>
+<span class="line"><span>&lt;%# END_REPLACE %&gt;</span></span>
+<span class="line"><span></span></span></code></pre>
+<h3 id="文件名的边界情况">文件名的边界情况</h3>
+<p>如果你想要渲染一个以点开头的模板文件 (例如 <code>.env</code>)，则需要遵循一个特殊的命名约定，因为以点开头的文件会在插件发布到 npm 的时候被忽略：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#7F848E;font-style:italic"># 以点开头的模板需要使用下划线取代那个点：</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">/generator/template/_env</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 当调用 api.render('./template') 时，它在项目文件夹中将被渲染为：</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">/generator/template/.env</span></span>
+<span class="line"></span></code></pre>
+<p>同时这也意味着当你想渲染以下划线开头的文件时，同样需要遵循一个特殊的命名约定：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#7F848E;font-style:italic"># 这种模板需要使用两个下划线来取代单个下划线：</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">/generator/template/__variables.scss</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 当调用 api.render('./template') 时，它在项目文件夹中将被渲染为：</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">/generator/template/_variable.scss</span></span>
+<span class="line"></span></code></pre>
+<h3 id="扩展包">扩展包</h3>
+<p>如果你需要向项目中添加额外的依赖，创建一个 npm 脚本或者用任何其他方式修改 <code>package.json</code>，你可以使用 API <code>extendPackage</code> 方法。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// generator/index.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> api</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">extendPackage</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">    dependencies</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#98C379">      "vue-router-layout"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"^0.1.2"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>在上面这个例子中，我们添加了一个依赖：<code>vue-router-layout</code>。在插件调用时，这个 npm 模块将被安装，这个依赖将被添加到用户项目的 <code>package.json</code> 文件。</p>
+<p>同样使用这个 API 我们可以添加新的 npm 任务到项目中。为了实现这个，我们需要定义一个任务名和一个命令，这样他才能够在 用户 <code>package.json</code> 文件的 <code>scripts</code> 部分运行：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// generator/index.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> api</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">extendPackage</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">    scripts</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      greet</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"vue-cli-service greet"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>在上面这个例子中，我们添加了一个新的 <code>greet</code> 任务来执行一个创建在<a href="#add-a-new-cli-service-command">Service 部分</a>的自定义 vue-cli 服务命令。</p>
+<h3 id="修改主文件">修改主文件</h3>
+<p>通过 generator 方法你能够修改项目中的文件。最有用的场景是针对 <code>main.js</code> 或 <code>main.ts</code> 文件的一些修改：新的导入，新的 <code>Vue.use()</code> 调用等。</p>
+<p>让我们来思考一个场景，当我们通过 <a href="#creating-new-templates">模板</a> 创建了一个 <code>router.js</code> 文件，现在我们希望导入这个路由到主文件中。我们将用到两个 generator API 方法： <code>entryFile</code> 将返回项目的主文件（<code>main.js</code> 或 <code>main.ts</code>）内容，<code>injectImports</code> 注入服务将添加新的导入到主文件中：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// generator/index.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">injectImports</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">entryFile</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">`import router from './router'`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span></code></pre>
+<p>现在，当我们路由被导入时，我们能够在主文件中将这个路由注入到 Vue 实例。我们能够使用 <code>afterInvoke</code> 钩子，这个钩子将在文件被写入硬盘之后被调用。</p>
+<p>首先，我们需要通过 Node 的 <code>fs</code> 模块（提供了文件交互 API）读取文件内容，将内容拆分</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// generator/index.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">hooks</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> api</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">afterInvoke</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> fs</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> require</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"fs"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> contentMain</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> fs</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">readFileSync</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">resolve</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">entryFile</span><span style="color:#ABB2BF">), {</span></span>
+<span class="line"><span style="color:#E06C75">      encoding</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"utf-8"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> lines</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> contentMain</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">split</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">/\r</span><span style="color:#D19A66">?</span><span style="color:#E06C75">\n/</span><span style="color:#C678DD">g</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>然后我们需要找到包函 <code>render</code> 单词的字符串（它通常是 Vue 实例的一部分），<code>router</code> 就是下一个字符串：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>// generator/index.js</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>module.exports.hooks = (api) =&gt; {</span></span>
+<span class="line"><span>  api.afterInvoke(() =&gt; {</span></span>
+<span class="line"><span>    const fs = require('fs')</span></span>
+<span class="line"><span>    const contentMain = fs.readFileSync(api.resolve(api.entryFile), { encoding: 'utf-8' })</span></span>
+<span class="line"><span>    const lines = contentMain.split(/\r?\n/g)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    const renderIndex = lines.findIndex(line =&gt; line.match(/render/))</span></span>
+<span class="line"><span>    lines[renderIndex] + = `\n router,`</span></span>
+<span class="line"><span>  })</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>最后，你需要将内容写入主文件：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>// generator/index.js</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>module.exports.hooks = (api) =&gt; {</span></span>
+<span class="line"><span>  api.afterInvoke(() =&gt; {</span></span>
+<span class="line"><span>    const { EOL } = require('os')</span></span>
+<span class="line"><span>    const fs = require('fs')</span></span>
+<span class="line"><span>    const contentMain = fs.readFileSync(api.resolve(api.entryFile), { encoding: 'utf-8' })</span></span>
+<span class="line"><span>    const lines = contentMain.split(/\r?\n/g)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    const renderIndex = lines.findIndex(line =&gt; line.match(/render/))</span></span>
+<span class="line"><span>    lines[renderIndex] += `${EOL}  router,`</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    fs.writeFileSync(api.entryFile, line.join(EOL), { encoding: 'utf-8' })</span></span>
+<span class="line"><span>  })</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<h3 id="service-插件">Service 插件</h3>
+<p>Service 插件可以修改 webpack 配置，创建新的 vue-cli service 命令或者修改已经存在的命令（即 <code>serve</code> 和 <code>build</code>）。</p>
+<p>Service 插件在 Service 实例被创建后自动加载 - 例如，每次 <code>vue-cli-service</code> 命令在项目中被调用的时候。它位于 CLI 插件根目录的 <code>index.js</code> 文件。</p>
+<p>一个 service 插件应该导出一个函数，这个函数接受两个参数：</p>
+<ul>
+<li>
+<p>一个 [PluginAPI][plugin-api] 实例</p>
+</li>
+<li>
+<p>一个包含 <code>vue.config.js</code> 内指定的项目本地选项的对象，或者在 <code>package.json</code> 内的 <code>vue</code> 字段。</p>
+</li>
+</ul>
+<p>一个 service 插件应该包含的最少的代码如下：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {};</span></span>
+<span class="line"></span></code></pre>
+<h3 id="修改-webpack-配置">修改 webpack 配置</h3>
+<p>这个 API 允许 service 插件针对不同的环境扩展/修改内部的 webpack 配置。例如，这里我们在 webpack-chain 中包含 <code>vue-auto-routing</code> 这个 webpack 插件，使用给定的参数来修改webpack的配置：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> VueAutoRoutingPlugin</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> require</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"vue-auto-routing/lib/webpack-plugin"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> (</span><span style="color:#E06C75;font-style:italic">api</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">options</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">chainWebpack</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">webpackConfig</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">    webpackConfig</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">plugin</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"vue-auto-routing"</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">use</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">VueAutoRoutingPlugin</span><span style="color:#ABB2BF">, [</span></span>
+<span class="line"><span style="color:#ABB2BF">      {</span></span>
+<span class="line"><span style="color:#E06C75">        pages</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"src/pages"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        nested</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    ]);</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>你也可以使用 <code>configureWebpack</code> 方法修改 webpack 配置或者使用 webpack-merge 来合并一个返回的对象。</p>
+<h3 id="添加一个新的-cli-service-命令">添加一个新的 cli-service 命令</h3>
+<p>通过 service 插件你可以注册一个新的 cli-service 命令，除了标准的命令（即 <code>serve</code> 和 <code>build</code>）。你可以使用 <code>registerCommand</code> API 方法实现。</p>
+<p>这里是个例子，通过创建一个简单地新命令，将向开发控制台打印问候语：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">registerCommand</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#98C379">  'greet'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    description</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'Write a greeting to the console'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    usage</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'vue-cli-service greet'</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">  () </span><span style="color:#56B6C2">=</span><span style="color:#56B6C2"> &gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">    console.log(</span><span style="color:#98C379">`👋  Hello`</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#E06C75">  }</span></span>
+<span class="line"><span style="color:#E06C75">)</span></span>
+<span class="line"></span></code></pre>
+<p>在这个例子中，我们提供了名字是（<code>'greet'</code>）的命令，一个有 <code>description</code> 和 <code>usage</code> 选项的对象，和一个在执行 <code>vue-cli-service greet</code> 命令时会调用的函数。</p>
+<p>:::tip
+你可以 <a href="#extending-package">通过 Generator</a> 添加一个新的命令到项目 <code>package.json</code> 文件的 npm 脚本列表中。
+:::</p>
+<p>如果你想在已经安装了插件的项目中运行新命令，你将看到下面的输出：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">$</span><span style="color:#98C379"> vue-cli-service</span><span style="color:#98C379"> greet</span></span>
+<span class="line"><span style="color:#61AFEF">👋</span><span style="color:#98C379"> Hello!</span></span>
+<span class="line"></span></code></pre>
+<p>你也可以给新命令定义一系列可能的选项。让我们添加 <code>--name</code> 选项，当提供了 name 参数的时候修改函数打印内容。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">registerCommand</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#98C379">  "greet"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    description</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Writes a greeting to the console"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    usage</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"vue-cli-service greet [options]"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    options</span><span style="color:#ABB2BF">: { </span><span style="color:#98C379">"--name"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"specifies a name for greeting"</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">  args</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">args</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E5C07B">      console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`👋 Hello, </span><span style="color:#C678DD">${</span><span style="color:#E5C07B">args</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">name</span><span style="color:#C678DD">}</span><span style="color:#98C379">!`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    } </span><span style="color:#C678DD">else</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">      console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`👋 Hello!`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span></code></pre>
+<p>现在，如果 <code>greet</code> 命令携带了特定的 <code>--name</code> 选项，这个 name 被添加到消息控制台：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">$</span><span style="color:#98C379"> vue-cli-service</span><span style="color:#98C379"> greet</span><span style="color:#D19A66"> --name</span><span style="color:#98C379"> 'John Doe'</span></span>
+<span class="line"><span style="color:#61AFEF">👋</span><span style="color:#98C379"> Hello,</span><span style="color:#98C379"> John</span><span style="color:#98C379"> Doe!</span></span>
+<span class="line"></span></code></pre>
+<h3 id="修改已经存在的-cli-service-命令">修改已经存在的 cli-service 命令</h3>
+<p>如果你想修改一个已经存在的 cli-service 命令，你可以使用 <code>api.service.commands</code> 覆盖（retrieve）它并且做些改变。我们将在应用程序运行的端口打印一条信息到控制台：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#C678DD">const</span><span style="color:#ABB2BF"> { </span><span style="color:#E5C07B">serve</span><span style="color:#ABB2BF"> } </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> api</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">service</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">commands</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> serveFn</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> serve</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">fn</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">serve</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">fn</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> (...</span><span style="color:#E06C75;font-style:italic">args</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#61AFEF"> serveFn</span><span style="color:#ABB2BF">(...</span><span style="color:#E06C75">args</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">then</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">res</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#ABB2BF"> (</span><span style="color:#E06C75">res</span><span style="color:#56B6C2"> &amp;&amp;</span><span style="color:#E5C07B"> res</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">url</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E5C07B">      console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`Project is running now at </span><span style="color:#C678DD">${</span><span style="color:#E5C07B">res</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">url</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>在上面的这个例子中，我们从已经存在的命令列表中覆盖了 <code>serve</code> 命令；然后我们修改了他的 <code>fn</code> 部分（<code>fn</code> 是创建这个新命令时传入的第三个参数；它定义了在执行这个命令时要执行的函数）。修改完后，这个控制台消息将在 <code>serve</code> 命令成功运行后打印。</p>
+<h3 id="为命令指定模式">为命令指定模式</h3>
+<p>如果一个已注册的插件命令需要运行在特定的默认模式下，则该插件需要通过 <code>module.exports.defaultModes</code> 以 <code>{ [commandName]: mode }</code> 的形式来暴露：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> api</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">registerCommand</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"build"</span><span style="color:#ABB2BF">, () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">defaultModes</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  build</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"production"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>这是因为我们需要在加载环境变量之前知道该命令的预期模式，所以需要提前加载用户选项/应用插件。</p>
+<h2 id="对话">对话</h2>
+<p>对话是在创建一个新的项目或者在已有项目中添加新的插件时处理用户选项时需要的。所有的对话逻辑都存储在 <code>prompts.js</code> 文件中。对话内部是通过 <a href="https://github.com/SBoudrias/Inquirer.js">inquirer</a> 实现。</p>
+<p>当用户通过调用 <code>vue invoke</code> 初始化插件时，如果插件根目录包函 <code>prompts.js</code>，他将在调用时被使用。这个文件应该导出一个<a href="https://github.com/SBoudrias/Inquirer.js#question">问题</a>数组 — 将被 Inquirer.js 处理。</p>
+<p>你应该直接导出一个问题数组，或者导出一个返回这些内容的函数。</p>
+<p>例如，直接是问题数组：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// prompts.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> [</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"input"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"locale"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"The locale of project localization."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#61AFEF">    validate</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75;font-style:italic">input</span><span style="color:#C678DD"> =&gt;</span><span style="color:#56B6C2"> !!</span><span style="color:#E06C75">input</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    default</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"en"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">];</span></span>
+<span class="line"></span></code></pre>
+<p>例如，一个返回问题数组的函数：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// prompts.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 将 `package.json` 作为参数传入函数</span></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> pkg</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> prompts</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> [</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"input"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"locale"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"The locale of project localization."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#61AFEF">      validate</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75;font-style:italic">input</span><span style="color:#C678DD"> =&gt;</span><span style="color:#56B6C2"> !!</span><span style="color:#E06C75">input</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      default</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"en"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  ];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 添加动态对话</span></span>
+<span class="line"><span style="color:#C678DD">  if</span><span style="color:#ABB2BF"> (</span><span style="color:#98C379">"@vue/cli-plugin-eslint"</span><span style="color:#C678DD"> in</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">pkg</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">devDependencies</span><span style="color:#56B6C2"> ||</span><span style="color:#ABB2BF"> {})) {</span></span>
+<span class="line"><span style="color:#E5C07B">    prompts</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">push</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">      type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"confirm"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"useESLintPluginVueI18n"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Use ESLint plugin for Vue I18n ?"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#E06C75"> prompts</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>解析到的答案对象将作为选项传入到插件的 generator。</p>
+<p>或者，用户可以通过在命令行传入选项跳过对话直接初始化插件，例如：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">vue</span><span style="color:#98C379"> invoke</span><span style="color:#98C379"> my-plugin</span><span style="color:#D19A66"> --mode</span><span style="color:#98C379"> awesome</span></span>
+<span class="line"></span></code></pre>
+<p>对话可以有<a href="https://github.com/SBoudrias/Inquirer.js#prompt-types">不同的类型</a>，但是在 CLI 大多数使用的是 <code>checkbox</code> 和 <code>confirm</code>。让我们添加一个 <code>confirm</code> 对话，然后在插件的 generator使用它，来创建一个有条件的<a href="#creating-new-templates">模板渲染</a>。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// prompts.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> [</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`addExampleRoutes`</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"confirm"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Add example routes?"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    default</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">false</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">];</span></span>
+<span class="line"></span></code></pre>
+<p>插件应用时，用户将回答示例路由的问题，默认的答案是 <code>No</code>。</p>
+<p><img src="https://cli.vuejs.org/prompts-example.png" alt="Prompts example" loading="lazy" decoding="async"></p>
+<p>如果你想在 generator 中使用用户的选择结果，你可以通过对话名字获得。我们可以修改一下 <code>generator/index.js</code>：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#C678DD">if</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">options</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">addExampleRoutes</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">render</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"./template"</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#ABB2BF">    ...</span><span style="color:#E06C75">options</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>现在如果用户同意创建示例路由，那么模板将被渲染。</p>
+<h2 id="安装本地插件">安装本地插件</h2>
+<p>当你开发自己的插件时，你需要测试它、查看它在使用 Vue CLI 创建的项目中如何工作。你可以使用已经存在的项目或者创建一个新的项目用来测试：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">vue</span><span style="color:#98C379"> create</span><span style="color:#98C379"> test-app</span></span>
+<span class="line"></span></code></pre>
+<p>安装插件，在项目根目录运行下面的命令：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">npm</span><span style="color:#98C379"> install</span><span style="color:#D19A66"> --save-dev</span><span style="color:#98C379"> file:/full/path/to/your/plugin</span></span>
+<span class="line"><span style="color:#61AFEF">vue</span><span style="color:#98C379"> invoke</span><span style="color:#ABB2BF"> &lt;</span><span style="color:#98C379">your-plugin-nam</span><span style="color:#ABB2BF">e&gt;</span></span>
+<span class="line"></span></code></pre>
+<p>每次插件修改后，你需要重复这个步骤。</p>
+<p>另一个方式是利用 Vue UI 的能力来添加插件。你可以运行它：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">vue</span><span style="color:#98C379"> ui</span></span>
+<span class="line"></span></code></pre>
+<p>将打开浏览器的窗口地址 <code>localhost:8000</code>。到 <code>Vue 项目管理</code> 菜单栏：</p>
+<p><img src="https://cli.vuejs.org/ui-project-manager.png" alt="Vue Project Manager" loading="lazy" decoding="async"></p>
+<p>然后找到你的测试项目的名字：</p>
+<p><img src="https://cli.vuejs.org/ui-select-plugin.png" alt="UI Plugins List" loading="lazy" decoding="async"></p>
+<p>点击应用名字，到插件菜单（有个难题（puzzle）图标）然后点击右上角的 <code>添加新的插件</code> 按钮。在新页面中你将看到一系列能够通过 npm 获得的 Vue CLI 插件。在页面底部有一个 <code>浏览本地插件</code> 的按钮：</p>
+<p><img src="https://cli.vuejs.org/ui-browse-local-plugin.png" alt="Browse local plugins" loading="lazy" decoding="async"></p>
+<p>你点击它之后，你能够轻易的搜索到你到你的插件并添加到项目中。在这之后你将看到插件列表，并且你通过简单的点击下 <code>刷新</code> 图标应用插件带来的变化：</p>
+<p><img src="https://cli.vuejs.org/ui-plugin-refresh.png" alt="Refresh plugin" loading="lazy" decoding="async"></p>
+<h2 id="ui-集成">UI 集成</h2>
+<p>Vue CLI 有一个非常强大的UI工具 — 允许用户通过图形接口来架构和管理项目。Vue CLI 插件能够集成到接口中。UI 为 CLI 插件提供了额外的功能：</p>
+<ul>
+<li>你可以执行 npm 任务，直接在 UI 中执行插件中定义的命令；</li>
+<li>你可以展示插件的自定义配置。例如： <a href="https://github.com/Akryum/vue-cli-plugin-apollo">vue-cli-plugin-apollo</a> 针对 Apollo 服务器提供了如下的配置：</li>
+</ul>
+<p><img src="https://cli.vuejs.org/ui-configuration.png" alt="UI Configuration Screen" loading="lazy" decoding="async"></p>
+<ul>
+<li>当创建项目时，你可以展示 <a href="#%E5%AF%B9%E8%AF%9D">对话</a></li>
+<li>你可以为你的插件添加本地化，如果你想支持多种语言</li>
+<li>你可以使插件在 Vue UI 搜索中被搜索到</li>
+</ul>
+<p>所有关于 Vue UI 的逻辑都应该放到根目录的 <code>ui.js</code> 文件 或者 <code>ui/index.js</code>。这个文件应该导出一个函数 — 这个函数接收 api 对象作为参数：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> api</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // Use the API here</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<h3 id="在-ui-中增加任务">在 UI 中增加任务</h3>
+<p>Vue CLI 插件不仅允许你<a href="#extending-package">通过 Generator</a> 为项目添加新的 npm 任务，也可以再 Vue UI 中创建他们。当你想通过 UI 运行任务并且看到输出，这是很有用的。</p>
+<p>让我们通过 <a href="#extending-package">Generator</a> 添加 <code>greet</code> 任务到 UI 中。任务是从项目的 <code>package.json</code> 文件的 <code>scripts</code> 字段生成的。你可以根据 <code>api.describeTask</code> 方法 ‘添加’ 额外的信息和钩子。让我们为任务添加一些额外的信息：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75;font-style:italic"> api</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">describeTask</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">    match</span><span style="color:#ABB2BF">:</span><span style="color:#E06C75"> /greet/</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    description</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Prints a greeting in the console"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"https://cli.vuejs.org/dev-guide/plugin-dev.html#core-concepts"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>现在如果你在 Vue UI 中浏览你的项目，你会发现任务添加的 <code>Task</code> 部分。你可以看见任务名，提供的描述信息，你一个链接图标指向你提供的URL，并且在输出窗口展示了任务输出：</p>
+<p><img src="https://cli.vuejs.org/ui-greet-task.png" alt="UI Greet task" loading="lazy" decoding="async"></p>
+<h3 id="展示配置页面">展示配置页面</h3>
+<p>有时你的项目针对不同的功能或者库，有自定义的配置文件。通过 Vue CLI 插件，你可以在 Vue UI 中展示配置，修改它和保存它（保存将修改你项目中相应的配置）。默认情况下，Vue CLI 项目有个主配置页面，<code>vue.config.js</code> 代表的配置。如果你将 ESLint 包函到项目中，你可以看一个 ESLint 的配置页面：</p>
+<p><img src="https://cli.vuejs.org/ui-configuration-default.png" alt="UI Configuration Screen" loading="lazy" decoding="async"></p>
+<p>让我们为你的插件建一个自定义的配置。第一步，在你的插件添加到已经存在的项目中之后，应该有个配置文件。这意味着你需要在<a href="#creating-new-templates">模板步骤</a>将这个文件添加到 <code>template</code> 文件夹中。</p>
+<p>默认情况下，一个可配置的 UI 能够读取和写入以下文件类型：<code>json</code>，<code>yaml</code>，<code>js</code>，<code>package</code>。让我们命名文件为 <code>myConfig.js</code> 将它放入 <code>template</code> 的根文件夹：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>.</span></span>
+<span class="line"><span>└── generator</span></span>
+<span class="line"><span>    ├── index.js</span></span>
+<span class="line"><span>    └── template</span></span>
+<span class="line"><span>        ├── myConfig.js</span></span>
+<span class="line"><span>        └── src</span></span>
+<span class="line"><span>            ├── layouts</span></span>
+<span class="line"><span>            ├── pages</span></span>
+<span class="line"><span>            └── router.js</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>现在你需要添加一些真实的配置到这个文件中：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// myConfig.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  color</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"black"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>当你的插件被应用后，<code>myConfig.js</code> 文件将被渲染到项目根目录。现在让我们在 <code>ui.js</code> 文件中通过 <code>api.describeConfig</code> 方法添加一个新的配置页面。</p>
+<p>首先你需要传入一些信息：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// ui.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">describeConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 配置的唯一id</span></span>
+<span class="line"><span style="color:#E06C75">  id</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"org.ktsn.vue-auto-routing.config"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 展示的名字</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Greeting configuration"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 展示在名字下面</span></span>
+<span class="line"><span style="color:#E06C75">  description</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"This config defines the color of the greeting printed"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // “更多信息” 的链接</span></span>
+<span class="line"><span style="color:#E06C75">  link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"https://github.com/ktsn/vue-cli-plugin-auto-routing#readme"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>:::danger Warning
+确保正确地为 id 设置命名空间，它必须在所有的插件中唯一。建议使用 <a href="https://en.wikipedia.org/wiki/Reverse_domain_name_notation">reverse domain name notation</a> 命名方法
+:::</p>
+<h3 id="配置-logo">配置 logo</h3>
+<p>你也可以为你的配置选择一个图标。他既可以是 <a href="https://material.io/tools/icons/?style=baseline">Material icon</a> 代码，也可以是自定义图片（看这里 <a href="ui-api.md#public-static-files">Public static files</a>）。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// ui.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">describeConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /* ... */</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // Config icon</span></span>
+<span class="line"><span style="color:#E06C75">  icon</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"color_lens"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>如果你不定义图标，将展示插件logo (看这里 <a href="#logo">Logo</a>)。</p>
+<h4 id="配置文件">配置文件</h4>
+<p>现在你需要将配置文件提供给 UI：这样你可以读取它的内容或者修改它。你需要为你的配置文件选择一个名字，选择格式和提供文件路径：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">describeConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // other config properties</span></span>
+<span class="line"><span style="color:#E06C75">  files</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    myConfig</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      js</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">"myConfig.js"</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>这里可以提供多个文件。如果我们有 <code>myConfig.json</code>，我们使用 <code>json: ['myConfig.json']</code> 属性提供它。顺序是很重要的：如果它不存在，列表中的第一个文件名字将用来创建配置文件。</p>
+<h4 id="展示配置的对话">展示配置的对话</h4>
+<p>我们希望在配置页面中展示一个颜色属性的输入框。为了完成它，我们需要 <code>onRead</code> 钩子，它将返回一个被展示的对话列表：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">describeConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">  onRead</span><span style="color:#ABB2BF">: ({ </span><span style="color:#E06C75;font-style:italic">data</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({</span></span>
+<span class="line"><span style="color:#E06C75">    prompts</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">      {</span></span>
+<span class="line"><span style="color:#E06C75">        name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`color`</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"input"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Define the color for greeting message"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        value</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"white"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    ],</span></span>
+<span class="line"><span style="color:#ABB2BF">  }),</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>上面这个例子中，我们定义值为 ‘白色’ 的输入对话。这就是我们的配置页面如何找到上面提供的所有配置：</p>
+<p><img src="https://cli.vuejs.org/ui-config-start.png" alt="UI Config Start" loading="lazy" decoding="async"></p>
+<p>现在让我们使用来自配置文件的属性，替换硬编码的 <code>white</code> 值。在 <code>onRead</code> 钩子中 <code>data</code> 对象包函每一个配置文件内容的 JSON 结果。在我们的情况下，<code>myConfig.js</code> 的内容是</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// myConfig.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  color</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"black"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<p>所以，<code>data</code> 对象将是</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // File</span></span>
+<span class="line"><span style="color:#E06C75">  myConfig</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // File data</span></span>
+<span class="line"><span style="color:#E06C75">    color</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"black"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>容易看到，我们需要 <code>data.myConfig.color</code> 属性。让我们修改 <code>onRead</code> 钩子：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// ui.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">onRead</span><span style="color:#ABB2BF">: ({ </span><span style="color:#E06C75;font-style:italic">data</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({</span></span>
+<span class="line"><span style="color:#E06C75">  prompts</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`color`</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'input'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'Define the color for greeting message'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      value</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">data</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">myConfig</span><span style="color:#56B6C2"> &amp;&amp;</span><span style="color:#E5C07B"> data</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">myConfig</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">color</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  ]</span></span>
+<span class="line"><span style="color:#ABB2BF">}),</span></span>
+<span class="line"></span></code></pre>
+<p>::: tip
+注意，当页面加载时，如果配置文件不存在 <code>myConfig</code> 可能是 undefined。
+:::</p>
+<p>你可以看见，在配置页面中 <code>white</code> 被 <code>black</code> 替换了。</p>
+<p>我们可以提供一个默认值，如果配置文件不存在：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// ui.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">onRead</span><span style="color:#ABB2BF">: ({ </span><span style="color:#E06C75;font-style:italic">data</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({</span></span>
+<span class="line"><span style="color:#E06C75">  prompts</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`color`</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'input'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'Define the color for greeting message'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      value</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">data</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">myConfig</span><span style="color:#56B6C2"> &amp;&amp;</span><span style="color:#E5C07B"> data</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">myConfig</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">color</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      default</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'black'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  ]</span></span>
+<span class="line"><span style="color:#ABB2BF">}),</span></span>
+<span class="line"></span></code></pre>
+<h4 id="保存配置变化">保存配置变化</h4>
+<p>我们刚刚读取了 <code>myConfig.js</code> 的内容并且在配置页面使用它。现在让我们尝试将颜色输入框的内容保存到文件中。我们可以使用 <code>onWrite</code> 钩子：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// ui.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">describeConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /* ... */</span></span>
+<span class="line"><span style="color:#61AFEF">  onWrite</span><span style="color:#ABB2BF">: ({ </span><span style="color:#E06C75;font-style:italic">prompts</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">api</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p><code>onWrite</code> 钩子能够得到许多<a href="ui-api.html#save-config-changes">参数</a> 但我们仅仅需要其中的两个：<code>prompts</code> 和 <code>api</code>。第一个是当前对话运行时对象 - 我们将得到对话 id 并且通过 id 拿到答案。为了获取答案我们需要使用来自 <code>api</code> 的 <code>async getAnswer()</code> 方法：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// ui.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">async</span><span style="color:#61AFEF"> onWrite</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">api</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">prompts</span><span style="color:#ABB2BF"> }) {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> result</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> {}</span></span>
+<span class="line"><span style="color:#C678DD">  for</span><span style="color:#ABB2BF"> (</span><span style="color:#C678DD">const</span><span style="color:#E5C07B"> prompt</span><span style="color:#C678DD"> of</span><span style="color:#E06C75"> prompts</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E06C75">    result</span><span style="color:#ABB2BF">[</span><span style="color:#98C379">`</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">prompt</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">id</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">] </span><span style="color:#56B6C2">=</span><span style="color:#C678DD"> await</span><span style="color:#E5C07B"> api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getAnswer</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">prompt</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#E5C07B">  api</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setData</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'myConfig'</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">result</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>现在如果你通过配置页面修改颜色输入框的内容，有 <code>black</code> 变为 <code>red</code>，然后按下 <code>保存修改</code> 按钮，你会发现你的项目中的 <code>myConfig.js</code> 文件也发生了变化：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// myConfig.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  color</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"red"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<h3 id="展示对话">展示对话</h3>
+<p>如果你想，你可以在 Vue UI 中展示<a href="#prompts">对话</a>。当你通过 UI 安装插件时，对话将在插件的调用步骤中展示。</p>
+<p>你可以通过添加额外属性扩展 <a href="#prompts-for-3rd-party-plugins">inquirer 对象</a>。他们是可选项且仅仅被 UI 使用：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#7F848E;font-style:italic">// prompts.js</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">module</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">exports</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> [</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 基本对话属性</span></span>
+<span class="line"><span style="color:#E06C75">    name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`addExampleRoutes`</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"confirm"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    message</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Add example routes?"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    default</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">false</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // UI 关联的对话属性</span></span>
+<span class="line"><span style="color:#E06C75">    group</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Strongly recommended"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    description</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Adds example pages, layouts and correct router config"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"https://github.com/ktsn/vue-cli-plugin-auto-routing/#vue-cli-plugin-auto-routing"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">];</span></span>
+<span class="line"></span></code></pre>
+<p>现在，你将在插件调用时看到：</p>
+<p><img src="https://cli.vuejs.org/ui-prompts.png" alt="UI Prompts" loading="lazy" decoding="async"></p>
+<h3 id="logo">Logo</h3>
+<p>你可以放一个 <code>logo.png</code> 文件到文件夹根目录，它将被发布到 npm。将在以下几个地方展示：</p>
+<ul>
+<li>当搜索插件去安装时</li>
+<li>在已安装的插件列表中</li>
+<li>在配置列表中（默认情况）</li>
+<li>在添加任务的任务列表中（默认情况）</li>
+</ul>
+<p><img src="https://cli.vuejs.org/plugins.png" alt="Plugins" loading="lazy" decoding="async"></p>
+<p>Logo 应该是方形非透明图片（理想尺寸 84*84）。</p>
+<h3 id="发布插件到-npm">发布插件到 npm</h3>
+<p>为了发布插件，你需要在 <a href="npmjs.com">npmjs.com</a> 上注册并且全局安装 <code>npm</code>。如果这是你的第一个发布的 npm 模块，请执行</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">npm</span><span style="color:#98C379"> login</span></span>
+<span class="line"></span></code></pre>
+<p>输入你的名字和密码。这将存储你的凭证，这样你就不必每次发布时都输入。</p>
+<p>:::tip
+发布插件之前，确保你为它选择了正确的名字！名字转换是 <code>vue-cli-plugin-&lt;name&gt;</code>。在 <a href="#discoverability">Discoverability</a> 查看更多信息
+:::</p>
+<p>接下来发布插件，到插件的根目录，在命令行执行下面的命令：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">npm</span><span style="color:#98C379"> publish</span></span>
+<span class="line"></span></code></pre>
+<p>成功发布后，你应该能够使用 <code>vue add &lt;plugin-name&gt;</code> 命令将你的插件添加到使用 Vue CLI 创建的项目。</p> </article> <ul class="astro-vj4tpspi my-8"> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/translation/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">translation</span> </a> </li> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/vue/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">vue</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://llccing.github.io/posts/translate-vue-cli-plugin-dev/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://llccing.github.io/posts/translate-vue-cli-plugin-dev/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://llccing.github.io/posts/translate-vue-cli-plugin-dev/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://llccing.github.io/posts/translate-vue-cli-plugin-dev/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://llccing.github.io/posts/translate-vue-cli-plugin-dev/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://llccing.github.io/posts/translate-vue-cli-plugin-dev/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> </div> </div> </footer>     <script>function createProgressBar(){const o=document.createElement("div");o.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const e=document.createElement("div");e.className="progress-bar h-1 w-0 bg-skin-accent",e.id="myBar",o.appendChild(e),document.body.appendChild(o)}createProgressBar();function updateScrollProgress(){const o=document.body.scrollTop||document.documentElement.scrollTop,e=document.documentElement.scrollHeight-document.documentElement.clientHeight,n=o/e*100;if(document){const t=document.getElementById("myBar");t&&(t.style.width=n+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let o=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let e of o){e.classList.add("group");let n=document.createElement("a");n.innerText="#",n.className="heading-link hidden group-hover:inline-block ml-2",n.href="#"+e.id,n.ariaHidden="true",e.appendChild(n)}}addHeadingLinks();function attachCopyButtons(){let o="Copy",e=Array.from(document.querySelectorAll("pre"));for(let t of e){let c=document.createElement("div");c.style.position="relative";let d=document.createElement("button");d.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",d.innerHTML=o,t.setAttribute("tabindex","0"),t.appendChild(d),t?.parentNode?.insertBefore(c,t),c.appendChild(t),d.addEventListener("click",async()=>{await n(t,d)})}async function n(t,c){let r=t.querySelector("code")?.innerText;await navigator.clipboard.writeText(r??""),c.innerText="Copied",setTimeout(()=>{c.innerText=o},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();
+</script></body></html>
