@@ -11,7 +11,10 @@ import { SITE } from "@config";
 export interface Props {
   currentPage: number;
   totalPages: number;
-  paginatedPosts: CollectionEntry<"blog">[];
+  paginatedPosts: (
+    | CollectionEntry<"blog">
+    | CollectionEntry<"short-stories">
+  )[];
 }
 
 const { currentPage, totalPages, paginatedPosts } = Astro.props;
