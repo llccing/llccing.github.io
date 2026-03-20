@@ -23,4 +23,19 @@ const blog = defineCollection({
     }),
 });
 
-export const collections = { blog };
+const shortStories = defineCollection({
+  type: "content",
+  schema: z.object({
+    author: z.string().default(SITE.author),
+    pubDatetime: z.date(),
+    modDatetime: z.date().optional().nullable(),
+    title: z.string(),
+    featured: z.boolean().optional(),
+    draft: z.boolean().optional(),
+    tags: z.array(z.string()).default(["short-story"]),
+    description: z.string(),
+    slug: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, "short-stories": shortStories };
