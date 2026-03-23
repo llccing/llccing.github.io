@@ -18,23 +18,23 @@ draft: false
 
 ### 初识前端三剑客
 
-2016 年刚入行时，我还在用 jQuery 写页面。那时候的仓库名字都很朴素：`bootstrap-days`、`preprocess-css`、`webpack-1`。
+2016 年刚入行时，我还在用 jQuery 写页面。那时候的仓库名字都很朴素：[bootstrap-days](https://github.com/llccing/bootstrap-days)、[preprocess-css](https://github.com/llccing/preprocess-css)、[webpack-1](https://github.com/llccing/webpack-1)。
 
-第一个让我感到"前端真有意思"的项目是 `gallery-by-react`——一个用 React 写的图片画廊。虽然现在看来代码很稚嫩，但那时候能让图片动起来、能用组件化思维写代码，已经让我兴奋了好几天。
+第一个让我感到"前端真有意思"的项目是 [gallery-by-react](https://github.com/llccing/gallery-by-react)——一个用 React 写的图片画廊。虽然现在看来代码很稚嫩，但那时候能让图片动起来、能用组件化思维写代码，已经让我兴奋了好几天。
 
 ### Vue 的第一次邂逅
 
-2017 年，我开始系统学习 Vue。创建了 `vue-cli-project`、`step-angularjs`、`ui-router-demo` 等一堆学习项目。
+2017 年，我开始系统学习 Vue。创建了 [vue-cli-project](https://github.com/llccing/vue-cli-project)、[step-angularjs](https://github.com/llccing/step-angularjs)、[ui-router-demo](https://github.com/llccing/ui-router-demo) 等一堆学习项目。
 
-最有意思的是 `cat` 项目——一个用 Vue 写的"表白网站"。虽然功能简单，但这是我第一次完整地用 Vue 完成一个有实际用途的项目。代码里还能看到当年为了实现一个"爱心飘落"动画，研究了好几天 CSS3 的痕迹。
+最有意思的是 [cat](https://github.com/llccing/cat) 项目——一个用 Vue 写的"表白网站"。虽然功能简单，但这是我第一次完整地用 Vue 完成一个有实际用途的项目。代码里还能看到当年为了实现一个"爱心飘落"动画，研究了好几天 CSS3 的痕迹。
 
 ## 2017-2018：Vue 全面开花
 
 ### 从前端到全栈
 
-这个阶段，我开始尝试"全栈"。创建了 `koa2` 学习 Node.js 后端，用 `socket.io-demo` 研究实时通信，还用 Three.js 做了一个 `visual-room` 3D 可视化项目。
+这个阶段，我开始尝试"全栈"。创建了 [koa2](https://github.com/llccing/koa2) 学习 Node.js 后端，用 [socket.io-demo](https://github.com/llccing/socket.io-demo) 研究实时通信，还用 Three.js 做了一个 [visual-room](https://github.com/llccing/visual-room) 3D 可视化项目。
 
-印象最深的是 `cnodejs-cube` 项目——用 Cube-UI 重写 CNode 社区的移动端。那时候正是移动端 H5 框架百花齐放的时代，我把 Cube-UI、Vant、Mint-UI 都试了个遍。
+印象最深的是 [cnodejs-cube](https://github.com/llccing/cnodejs-cube) 项目——用 Cube-UI 重写 CNode 社区的移动端。那时候正是移动端 H5 框架百花齐放的时代，我把 Cube-UI、Vant、Mint-UI 都试了个遍。
 
 ### 技术栈扩展
 
@@ -49,17 +49,17 @@ draft: false
 
 ### React Native 初体验
 
-2019 年，公司要做 App，我开始学 React Native。`AwesomeProject` 是我的第一个 RN 项目，虽然只是官方教程的跟练，但让我第一次体会到"一套代码，多端运行"的魅力。
+2019 年，公司要做 App，我开始学 React Native。[AwesomeProject](https://github.com/llccing/AwesomeProject) 是我的第一个 RN 项目，虽然只是官方教程的跟练，但让我第一次体会到"一套代码，多端运行"的魅力。
 
-后来还尝试了 `30-days-of-react-native`，每天做一个小 demo，坚持了大概... 10 天就放弃了（笑）。
+后来还尝试了 [30-days-of-react-native](https://github.com/llccing/30-days-of-react-native)，每天做一个小 demo，坚持了大概... 10 天就放弃了（笑）。
 
 ### 全栈项目实战
 
 这个阶段做了几个完整的全栈项目：
 
-- **reading + reading-server**：一个阅读 App，前端 Vue，后端 Node.js + MongoDB
-- **cms-egg**：用 Egg.js 写的内容管理系统
-- **message-board**：留言板项目，练习前后端交互
+- **[reading](https://github.com/llccing/reading) + [reading-server](https://github.com/llccing/reading-server)**：一个阅读 App，前端 Vue，后端 Node.js + MongoDB
+- **[cms-egg](https://github.com/llccing/cms-egg)**：用 Egg.js 写的内容管理系统
+- **[message-board](https://github.com/llccing/message-board)**：留言板项目，练习前后端交互
 
 虽然这些项目都没有上线，但让我对"前后端分离"、"RESTful API"、"JWT 认证"这些概念有了实战理解。
 
@@ -69,9 +69,9 @@ draft: false
 
 2021 年换了工作，新公司用 Angular。于是 GitHub 上出现了一堆 Angular 相关的仓库：
 
-- `angular-carbon-starter`：IBM Carbon Design System 学习
-- `carbon-components-angular`：fork 官方组件库研究源码
-- `generator-jhipster`：尝试 JHipster 全栈脚手架
+- [angular-carbon-starter](https://github.com/llccing/angular-carbon-starter)：IBM Carbon Design System 学习
+- [carbon-components-angular](https://github.com/llccing/carbon-components-angular)：fork 官方组件库研究源码
+- [generator-jhipster](https://github.com/llccing/generator-jhipster)：尝试 JHipster 全栈脚手架
 
 这个阶段的特点是"企业级"——不再是简单的 demo，而是要考虑代码规范、测试覆盖、CI/CD、国际化等工程化问题。
 
@@ -79,7 +79,7 @@ draft: false
 
 后端方面，从 Koa/Express 转向了 NestJS。这个框架的依赖注入、装饰器、模块化设计让我对"后端架构"有了新的认识。
 
-还做了一个有意思的项目 `youtube_speaker`——YouTube 音频提取工具，包含：
+还做了一个有意思的项目 [youtube_speaker](https://github.com/llccing/youtube_speaker)——YouTube 音频提取工具，包含：
 
 - 前端：TypeScript + Tauri（桌面应用）
 - 后端：Java Spring Boot
@@ -93,38 +93,38 @@ draft: false
 
 2024 年开始，GitHub 上的项目画风突变——全是 AI 相关：
 
-**the-app + the-app-server**：我的第一个 AI 聊天应用
+**[the-app](https://github.com/llccing/the-app) + [the-app-server](https://github.com/llccing/the-app-server)**：我的第一个 AI 聊天应用
 
 - 前端：React Native（支持 iOS/Android）
 - 后端：Cloudflare Workers + D1 数据库
 - 特点：边缘计算，全球低延迟
 
-**LinguaLeap**：语言学习 App
+**[LinguaLeap](https://github.com/llccing/LinguaLeap)**：语言学习 App
 
 - 集成语音识别（STT）
 - AI 对话练习
 - 发音纠正
 
-**lobe-chat-clone**：fork 了 Lobe Chat 研究其架构
+**[lobe-chat-clone](https://github.com/llccing/lobe-chat-clone)**：fork 了 Lobe Chat 研究其架构
 
 - 学习了 Streaming Response
 - 理解了 Server-Sent Events
 - 掌握了 AI SDK 的使用
 
-### 专业 SDK 学习
+### 专业 SDK 实战
 
-2025 年接触了 Scandit SDK（计算机视觉 + 身份证识别），一口气做了 4 个 sample：
+2025 年，因为业务需求接触了 Scandit SDK（计算机视觉 + 身份证识别）。这些项目都是 fork 自 [Scandit 官方 GitHub](https://github.com/Scandit) 的示例仓库，在官方 sample 基础上进行了定制和调试：
 
-- `IdCaptureSimpleSample`：基础功能
-- `IdCaptureSettingsSample`：配置管理（用 Svelte 写的）
-- `IdCaptureExtendedSample`：高级功能
-- `IdCaptureUserOnboardingSample`：用户引导流程
+- [IdCaptureSimpleSample](https://github.com/llccing/IdCaptureSimpleSample)：基础功能
+- [IdCaptureSettingsSample](https://github.com/llccing/IdCaptureSettingsSample)：配置管理（用 Svelte 写的）
+- [IdCaptureExtendedSample](https://github.com/llccing/IdCaptureExtendedSample)：高级功能
+- [IdCaptureUserOnboardingSample](https://github.com/llccing/IdCaptureUserOnboardingSample)：用户引导流程
 
-这些项目让我意识到，前端不再只是"写页面"，而是要和各种专业 SDK、AI 模型、边缘计算平台打交道。
+通过在实际业务中使用这些 SDK，让我深刻体会到前端不再只是"写页面"，而是要和各种专业 SDK、AI 模型、边缘计算平台打交道。
 
 ### 微信小游戏
 
-2026 年初做了一个 `minigame-pop`——微信小游戏"气球消消乐"。虽然是个简单的小游戏，但让我体验了：
+2026 年初做了一个 [minigame-pop](https://github.com/llccing/minigame-pop)——微信小游戏"气球消消乐"。虽然是个简单的小游戏，但让我体验了：
 
 - 微信小游戏开发流程
 - Canvas 游戏开发
@@ -192,5 +192,3 @@ draft: false
 ---
 
 _本文基于对 llccing GitHub 账号 98 个仓库的分析整理而成。_
-
-_如果你也想做一次"GitHub 考古"，可以用 GitHub API 获取自己的仓库列表，然后用 AI 帮你分析总结。_
