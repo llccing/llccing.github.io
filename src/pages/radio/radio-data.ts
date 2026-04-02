@@ -315,9 +315,10 @@ export const radioLibrary: RadioCategory[] = [
   {
     id: "flipped",
     title: "Flipped",
-    author: "",
-    description: "A adoable story",
-    tracks: [],
+    author: "Wendelin Van Draanen",
+    description:
+      "A charming story about first love, told from two perspectives — Juli Baker and Bryce Loski.",
+    tracks: flippedTracks,
   },
 ];
 
