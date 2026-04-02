@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "739d1d5a-e232-4aab-97d9-aa03f17428cf",
+      "name": "morning-reminder",
+      "enabled": true,
+      "createdAtMs": 1773740276246,
+      "updatedAtMs": 1774998027522,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 7 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "☀️ 早上好！新的一天开始了~ 要我帮你检查邮箱吗？回复「检查邮箱」查看重要邮件~"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "qqbot",
+        "to": "7BD89A9542BDD37486879D33AD1B158C"
+      },
+      "state": {
+        "nextRunAtMs": 1775084400000,
+        "lastRunAtMs": 1774998000007,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 27515,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 5,
+        "lastErrorReason": "auth",
+        "runningAtMs": 1775084400003
+      }
+    },
+    {
+      "id": "ab783fa2-9dbd-4d70-abdc-01f676f620fe",
+      "agentId": "main",
+      "sessionKey": "agent:main:lightclawbot:direct:100022165198",
+      "name": "daily-english-reading",
+      "enabled": true,
+      "createdAtMs": 1773819073371,
+      "updatedAtMs": 1775073616759,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 4 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "📖 每日英文阅读任务\n\n## 步骤 1: 生成文章\n用 AI 生成一篇 B2 级别英语文章（主题：科技/健康/环境，600-800词）。\n\n## 步骤 2: 生成音频\n用 tts 工具将文章转为语音。\n\n## 步骤 3: 上传音频\n用 lightclaw_upload_file 上传音频文件。\n\n## 步骤 4: 创建博客\n参考 /root/.openclaw/workspace/blog/src/content/blog/daily-english-reading-forever-chemicals.md 格式，创建新文件到 /root/.openclaw/workspace/blog/src/content/blog/daily-english-reading-TOPIC.md。\n\n## 步骤 5: 调用发布脚本\n执行: bash /root/.openclaw/workspace/scripts/daily-english-publish.sh\n\n## 重要\n- 如遇 API 限流，等待 30 秒后重试一次\n- 总时间控制在 15 分钟内\n- 完成后告知用户文章标题和链接",
+        "timeoutSeconds": 900
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "lightclawbot",
+        "to": "user:100022165198"
+      },
+      "state": {
+        "nextRunAtMs": 1775160000000,
+        "lastRunAtMs": 1775073600008,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 16751,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 9,
+        "lastErrorReason": "auth",
+        "lastDelivered": true,
+        "lastError": "HTTP 401: invalid access token or token expired"
+      }
+    },
+    {
+      "id": "104c5be1-9f88-4870-bb35-5a8e9a9dab88",
+      "agentId": "main",
+      "sessionKey": "agent:main:lightclawbot:direct:100022165198",
+      "name": "otree-forum-scan",
+      "enabled": false,
+      "createdAtMs": 1773823194829,
+      "updatedAtMs": 1774146416553,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 14400000,
+        "anchorMs": 1773823194829
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "🔍 oTree Forum 扫描任务（每 4 小时一次）：\n\n1. 抓取论坛前 2 页问题列表\n2. 识别新问题\n3. 更新 otree-forum-tracker.md\n4. 如果有高价值问题，通知用户\n\n请执行扫描并更新追踪文件。",
+        "timeoutSeconds": 600
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "lightclawbot",
+        "to": "user:100022165198"
+      },
+      "state": {
+        "lastRunAtMs": 1774140328978,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 600010,
+        "lastDeliveryStatus": "unknown",
+        "consecutiveErrors": 9,
+        "lastError": "cron: job execution timed out"
+      }
+    },
+    {
+      "id": "f331a3ee-2ec8-4251-9ea6-ead01f17a563",
+      "agentId": "main",
+      "sessionKey": "agent:main:lightclawbot:direct:100022165198",
+      "name": "github-repo-analysis-progress",
+      "enabled": false,
+      "createdAtMs": 1774080869741,
+      "updatedAtMs": 1774146380248,
+      "schedule": {
+        "everyMs": 600000,
+        "kind": "every",
+        "anchorMs": 1774080869741
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "📊 GitHub Repo Analysis Progress Update: I'm continuing to analyze your GitHub repos and prepare the blog summary. Current status: Fetched all 98 repos, created initial categorization. Next: Deep dive into AI-era projects for blog content. Check github-repo-analysis.md for details."
+      },
+      "delivery": {
+        "mode": "announce",
+        "to": "100022165198",
+        "channel": "lightclawbot"
+      },
+      "state": {
+        "lastRunAtMs": 1774145345000,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 32503,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 19,
+        "lastError": "LLM request timed out."
+      }
+    },
+    {
+      "id": "a226039a-73b2-4e7a-bdef-ab56c6687cfb",
+      "agentId": "main",
+      "sessionKey": "agent:main:lightclawbot:direct:100022165198",
+      "name": "每周前端技术速递",
+      "enabled": true,
+      "createdAtMs": 1774688802559,
+      "updatedAtMs": 1774789500017,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 21 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "现在是每周技术速递时间。请：1) 搜索本周前端领域的重要技术动态（Angular、React、性能优化、架构设计、工程化相关）2) 筛选 3-5 条最值得关注的内容 3) 标注哪些和 Angular/TypeScript 直接相关 4) 整理成简洁的速递格式发给 Rowan 5) 更新 tech-tracking.md 文件",
+        "timeoutSeconds": 300
+      },
+      "delivery": {
+        "mode": "announce",
+        "to": "100022165198",
+        "channel": "lightclawbot"
+      },
+      "state": {
+        "nextRunAtMs": 1775394000000,
+        "lastRunAtMs": 1774789200009,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 300008,
+        "lastError": "cron: job execution timed out",
+        "lastErrorReason": "timeout",
+        "lastDeliveryStatus": "unknown",
+        "consecutiveErrors": 1
+      }
+    },
+    {
+      "id": "3854d766-86cf-4957-9bc2-c72ff6fb6a28",
+      "agentId": "main",
+      "sessionKey": "agent:main:lightclawbot:direct:100022165198",
+      "name": "月度前端深度报告",
+      "enabled": true,
+      "createdAtMs": 1774688802627,
+      "updatedAtMs": 1774688802627,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 10 * * 6",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "检查今天是否是本月第一个周六。如果是，执行月度深度报告：1) 选择一个当前热门的前端技术（优先：架构设计、性能优化、工程化方向）2) 做深入分析和对比 3) 评估是否值得 Rowan 学习 4) 如果值得，制定 2 周学习计划 5) 更新 tech-tracking.md 并发送报告给 Rowan。如果不是第一个周六，回复 HEARTBEAT_OK",
+        "timeoutSeconds": 600
+      },
+      "delivery": {
+        "mode": "announce",
+        "to": "100022165198",
+        "channel": "lightclawbot"
+      },
+      "state": {
+        "nextRunAtMs": 1775268000000
+      }
+    },
+    {
+      "id": "a362f5a5-8837-45c2-be8f-0b1ec9772ad4",
+      "agentId": "main",
+      "sessionKey": "agent:main:lightclawbot:direct:100022165198",
+      "name": "博客写作提醒",
+      "enabled": true,
+      "createdAtMs": 1774688802730,
+      "updatedAtMs": 1775044818287,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 20 * * 3",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "博客写作提醒时间到了。请：1) 读取 blog-topics.md 查看待写文章 2) 根据 Rowan 最近可能的工作内容（国泰航空 Angular 项目、性能优化、架构设计），给出 3-5 个具体的选题建议 3) 提醒 Rowan 该写文章了，询问他是否想写，以及对哪个选题感兴趣",
+        "timeoutSeconds": 180
+      },
+      "delivery": {
+        "mode": "announce",
+        "to": "100022165198",
+        "channel": "lightclawbot"
+      },
+      "state": {
+        "nextRunAtMs": 1775649600000,
+        "lastRunAtMs": 1775044800008,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 18279,
+        "lastError": "HTTP 401: invalid access token or token expired",
+        "lastErrorReason": "auth",
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 1
+      }
+    }
+  ]
+}

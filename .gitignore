@@ -1,0 +1,27 @@
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node modules (if any extensions have them)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Delivery queue (transient data)
+delivery-queue/
+
+# Subagents runtime (transient)
+subagents/
+
+# Update check cache
+update-check.json
+
+# Nested git repos (workspace-tina has its own .git)
+workspace-tina/.git/
+workspace/.git/

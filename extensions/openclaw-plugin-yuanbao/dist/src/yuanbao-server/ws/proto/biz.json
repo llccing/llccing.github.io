@@ -1,0 +1,263 @@
+{
+    "options": {
+        "syntax": "proto3"
+    },
+    "nested": {
+        "trpc": {
+            "nested": {
+                "yuanbao": {
+                    "nested": {
+                        "yuanbao_conn": {
+                            "nested": {
+                                "yuanbao_openclaw_proxy": {
+                                    "nested": {
+                                        "ImImageInfoArray": {
+                                            "fields": {
+                                                "type": {
+                                                    "type": "uint32",
+                                                    "id": 1
+                                                },
+                                                "size": {
+                                                    "type": "uint32",
+                                                    "id": 2
+                                                },
+                                                "width": {
+                                                    "type": "uint32",
+                                                    "id": 3
+                                                },
+                                                "height": {
+                                                    "type": "uint32",
+                                                    "id": 4
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "id": 5
+                                                }
+                                            }
+                                        },
+                                        "MsgContent": {
+                                            "fields": {
+                                                "text": {
+                                                    "type": "string",
+                                                    "id": 1
+                                                },
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "id": 2
+                                                },
+                                                "imageFormat": {
+                                                    "type": "uint32",
+                                                    "id": 3
+                                                },
+                                                "data": {
+                                                    "type": "string",
+                                                    "id": 4
+                                                },
+                                                "desc": {
+                                                    "type": "string",
+                                                    "id": 5
+                                                },
+                                                "ext": {
+                                                    "type": "string",
+                                                    "id": 6
+                                                },
+                                                "sound": {
+                                                    "type": "string",
+                                                    "id": 7
+                                                },
+                                                "imageInfoArray": {
+                                                    "rule": "repeated",
+                                                    "type": "ImImageInfoArray",
+                                                    "id": 8
+                                                },
+                                                "index": {
+                                                    "type": "uint32",
+                                                    "id": 9
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "id": 10
+                                                },
+                                                "fileSize": {
+                                                    "type": "uint32",
+                                                    "id": 11
+                                                },
+                                                "fileName": {
+                                                    "type": "string",
+                                                    "id": 12
+                                                }
+                                            }
+                                        },
+                                        "MsgBodyElement": {
+                                            "fields": {
+                                                "msgType": {
+                                                    "type": "string",
+                                                    "id": 1
+                                                },
+                                                "msgContent": {
+                                                    "type": "MsgContent",
+                                                    "id": 2
+                                                }
+                                            }
+                                        },
+                                        "SendC2CMessageReq": {
+                                            "fields": {
+                                                "msgId": {
+                                                    "type": "string",
+                                                    "id": 1
+                                                },
+                                                "toAccount": {
+                                                    "type": "string",
+                                                    "id": 2
+                                                },
+                                                "fromAccount": {
+                                                    "type": "string",
+                                                    "id": 3
+                                                },
+                                                "msgRandom": {
+                                                    "type": "uint32",
+                                                    "id": 4
+                                                },
+                                                "msgBody": {
+                                                    "rule": "repeated",
+                                                    "type": "MsgBodyElement",
+                                                    "id": 5
+                                                }
+                                            }
+                                        },
+                                        "SendC2CMessageRsp": {
+                                            "fields": {
+                                                "code": {
+                                                    "type": "int32",
+                                                    "id": 1
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "id": 2
+                                                }
+                                            }
+                                        },
+                                        "SendGroupMessageReq": {
+                                            "fields": {
+                                                "msgId": {
+                                                    "type": "string",
+                                                    "id": 1
+                                                },
+                                                "groupId": {
+                                                    "type": "string",
+                                                    "id": 2
+                                                },
+                                                "fromAccount": {
+                                                    "type": "string",
+                                                    "id": 3
+                                                },
+                                                "toAccount": {
+                                                    "type": "string",
+                                                    "id": 4
+                                                },
+                                                "random": {
+                                                    "type": "string",
+                                                    "id": 5
+                                                },
+                                                "msgBody": {
+                                                    "rule": "repeated",
+                                                    "type": "MsgBodyElement",
+                                                    "id": 6
+                                                },
+                                                "refMsgId": {
+                                                    "type": "string",
+                                                    "id": 7
+                                                }
+                                            }
+                                        },
+                                        "SendGroupMessageRsp": {
+                                            "fields": {
+                                                "code": {
+                                                    "type": "int32",
+                                                    "id": 1
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "id": 2
+                                                }
+                                            }
+                                        },
+                                        "InboundMessagePush": {
+                                            "fields": {
+                                                "callbackCommand": {
+                                                    "type": "string",
+                                                    "id": 1
+                                                },
+                                                "fromAccount": {
+                                                    "type": "string",
+                                                    "id": 2
+                                                },
+                                                "toAccount": {
+                                                    "type": "string",
+                                                    "id": 3
+                                                },
+                                                "senderNickname": {
+                                                    "type": "string",
+                                                    "id": 4
+                                                },
+                                                "groupId": {
+                                                    "type": "string",
+                                                    "id": 5
+                                                },
+                                                "groupCode": {
+                                                    "type": "string",
+                                                    "id": 6
+                                                },
+                                                "groupName": {
+                                                    "type": "string",
+                                                    "id": 7
+                                                },
+                                                "msgSeq": {
+                                                    "type": "uint32",
+                                                    "id": 8
+                                                },
+                                                "msgRandom": {
+                                                    "type": "uint32",
+                                                    "id": 9
+                                                },
+                                                "msgTime": {
+                                                    "type": "uint32",
+                                                    "id": 10
+                                                },
+                                                "msgKey": {
+                                                    "type": "string",
+                                                    "id": 11
+                                                },
+                                                "msgId": {
+                                                    "type": "string",
+                                                    "id": 12
+                                                },
+                                                "msgBody": {
+                                                    "rule": "repeated",
+                                                    "type": "MsgBodyElement",
+                                                    "id": 13
+                                                },
+                                                "cloudCustomData": {
+                                                    "type": "string",
+                                                    "id": 14
+                                                },
+                                                "eventTime": {
+                                                    "type": "uint32",
+                                                    "id": 15
+                                                },
+                                                "botOwnerId": {
+                                                    "type": "string",
+                                                    "id": 16
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

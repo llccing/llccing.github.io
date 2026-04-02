@@ -1,0 +1,14 @@
+import type { MessageElemHandler, MsgBodyItemType, OutboundContentItem } from './types.js';
+export declare function getHandler(msgType: string): MessageElemHandler | undefined;
+export declare function getAllHandlers(): readonly MessageElemHandler[];
+export declare function buildMsgBody(msgType: string, data: Record<string, unknown>): MsgBodyItemType[] | undefined;
+export declare function prepareOutboundContent(text: string): OutboundContentItem[];
+export declare function buildOutboundMsgBody(items: OutboundContentItem[]): MsgBodyItemType[];
+export type { MessageElemHandler, MsgBodyItemType, MediaItem, ExtractTextFromMsgBodyResult, OutboundContentItem, } from './types.js';
+export { textHandler } from './text.js';
+export { customHandler, buildAtUserMsgBodyItem } from './custom.js';
+export { imageHandler } from './image.js';
+export { soundHandler } from './sound.js';
+export { fileHandler } from './file.js';
+export { videoHandler } from './video.js';
+//# sourceMappingURL=index.d.ts.map

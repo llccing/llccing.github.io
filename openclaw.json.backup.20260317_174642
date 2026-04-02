@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.8",
+    "lastTouchedAt": "2026-03-15T06:41:52.486Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-15T06:38:19.881Z",
+    "lastRunVersion": "2026.3.8",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "/root/.openclaw/workspace",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "timeoutSeconds": 600,
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "model": {
+        "primary": "minimax2/MiniMax-M2.5"
+      }
+    }
+  },
+  "tools": {
+    "profile": "full",
+    "deny": [
+      "browser",
+      "web_search",
+      "web_fetch"
+    ]
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "gateway": {
+    "port": 15634,
+    "mode": "local",
+    "bind": "lan",
+    "controlUi": {
+      "allowedOrigins": [
+        "http://101.32.215.84:15634"
+      ],
+      "allowInsecureAuth": true,
+      "dangerouslyDisableDeviceAuth": true,
+      "basePath": "/a3h75r"
+    },
+    "auth": {
+      "mode": "token",
+      "token": "4759f3890d37612d93be026a78da0ac11f9e150ac4630242"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    }
+  },
+  "plugins": {
+    "entries": {
+      "feishu": {
+        "enabled": true
+      },
+      "openclaw-qqbot": {
+        "enabled": true
+      },
+      "ddingtalk": {
+        "enabled": true
+      },
+      "wecom": {
+        "enabled": true
+      },
+      "adp-openclaw": {
+        "enabled": true
+      },
+      "skillhub": {
+        "enabled": true,
+        "config": {
+          "primaryCli": "skillhub",
+          "fallbackCli": "clawhub",
+          "primaryLabel": "cn-optimized",
+          "fallbackLabel": "public-registry"
+        }
+      }
+    },
+    "installs": {
+      "openclaw-qqbot": {
+        "source": "npm",
+        "spec": "@tencent-connect/openclaw-qqbot",
+        "installPath": "/root/.openclaw/extensions/openclaw-qqbot",
+        "version": "1.5.7",
+        "resolvedName": "@tencent-connect/openclaw-qqbot",
+        "resolvedVersion": "1.5.7",
+        "resolvedSpec": "@tencent-connect/openclaw-qqbot@1.5.7",
+        "integrity": "sha512-L7FmpZFRCPE8rx5T4QXeAKfoOv+UTkOBIyIcur4VPR4WVfEWAN+GMCa88VZYUf89zy834BaNzJNkHbYdasMqIg==",
+        "shasum": "e9ecfe9edd661bad52c78d01abd4f0817f3cbfae",
+        "resolvedAt": "2026-03-15T06:39:06.548Z",
+        "installedAt": "2026-03-15T06:40:10.224Z"
+      },
+      "ddingtalk": {
+        "source": "npm",
+        "spec": "@largezhou/ddingtalk",
+        "installPath": "/root/.openclaw/extensions/ddingtalk",
+        "version": "1.4.0",
+        "resolvedName": "@largezhou/ddingtalk",
+        "resolvedVersion": "1.4.0",
+        "resolvedSpec": "@largezhou/ddingtalk@1.4.0",
+        "integrity": "sha512-LIdhoXqL7+7RyRDriLwPjBF1Ia8ntynndnjLpBu7Om3uSTnkIPsYkxLDY0cpcl03y+zPa5hDq3l1PWDrDOxafg==",
+        "shasum": "3bef86cb0be1d3716852cb4475363201980e4eae",
+        "resolvedAt": "2026-03-15T06:40:17.570Z",
+        "installedAt": "2026-03-15T06:40:27.549Z"
+      },
+      "wecom": {
+        "source": "npm",
+        "spec": "@mocrane/wecom",
+        "installPath": "/root/.openclaw/extensions/wecom",
+        "version": "2026.3.14",
+        "resolvedName": "@mocrane/wecom",
+        "resolvedVersion": "2026.3.14",
+        "resolvedSpec": "@mocrane/wecom@2026.3.14",
+        "integrity": "sha512-ie1Vo6ExXHUxnDAgiie7ExGVxWw7vs83j8h1inlrO0p0uzkyPSylhxK9xwtnZy6YFKZ5ll5sE120WFV54WAt6Q==",
+        "shasum": "115daf2cca0aef50250b6fd89345340cce29244f",
+        "resolvedAt": "2026-03-15T06:40:36.013Z",
+        "installedAt": "2026-03-15T06:40:42.816Z"
+      },
+      "adp-openclaw": {
+        "source": "npm",
+        "spec": "adp-openclaw",
+        "installPath": "/root/.openclaw/extensions/adp-openclaw",
+        "version": "0.0.69",
+        "resolvedName": "adp-openclaw",
+        "resolvedVersion": "0.0.69",
+        "resolvedSpec": "adp-openclaw@0.0.69",
+        "integrity": "sha512-9L5LOQkTe1seu4Yy1y2aPE1ObIZR+yumyJlU+xH+I+7ZxZYC8VVJTaRhYnX/0sLQ7JP4b1Zz0lOvtQfTJ1kypQ==",
+        "shasum": "b0a88a25b8e620a9979ebccdffb8ab6eabdd7e80",
+        "resolvedAt": "2026-03-15T06:40:51.331Z",
+        "installedAt": "2026-03-15T06:40:52.602Z"
+      }
+    }
+  },
+  "models": {
+    "providers": {
+      "minimax2": {
+        "baseUrl": "http://118.145.119.140",
+        "apiKey": "sk-6I6PepAciwnL-BoQaXuCkJWjWaKc8Dq5",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "MiniMax-M2.5",
+            "name": "MiniMax M2.5"
+          }
+        ]
+      },
+      "opencode": {
+        "baseUrl": "https://opencode.ai/zen/v1",
+        "apiKey": "sk-LSYrd716pGOSSw4IIByNfL9RYZSBS10EyxJKXaAgESVnoP8whbqDXkzGExX1FtW7",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "opencode/kimi-k2.5",
+            "name": "kimi",
+            "compat": {
+              "supportsStore": false
+            }
+          }
+        ]
+      }
+    },
+    "mode": "merge"
+  },
+  "channels": {
+    "qqbot": {
+      "enabled": true,
+      "appId": "1903529020",
+      "clientSecret": "20mKgojRwDH7jREv"
+    }
+  }
+}
