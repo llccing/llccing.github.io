@@ -274,7 +274,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
             Audiobook
           </p>
-          <h2 className="mt-1.5 text-2xl font-bold leading-tight text-slate-900 dark:text-white sm:text-3xl">
+          <h2 className="mt-1.5 text-2xl font-bold leading-tight text-slate-900 dark:text-gray-100 sm:text-3xl">
             {currentCategory?.title ?? "Select a collection"}
           </h2>
           {currentCategory?.author && (
@@ -390,7 +390,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     ) : (
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                      <span className="text-xs text-gray-400 dark:text-gray-400">
                         {idx + 1}
                       </span>
                     )}
@@ -400,8 +400,8 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                   <span
                     className={`flex-1 truncate text-sm font-medium ${
                       isActive
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-gray-800 dark:text-gray-200"
+                        ? "text-emerald-600 dark:text-emerald-300"
+                        : "text-gray-800 dark:text-gray-50"
                     }`}
                   >
                     {track.title}
