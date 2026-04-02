@@ -1,0 +1,17 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+import RadioPlayer from "@components/RadioPlayer";
+import { defaultCategoryId, radioLibrary } from "./radio-data";
+---
+
+<!-- eslint-disable -->
+<Layout title="Radio">
+  <Main pageTitle="Radio" pageDesc="Listen back to book recordings">
+    <RadioPlayer
+      client:load
+      categories={radioLibrary}
+      initialCategoryId={defaultCategoryId}
+    />
+  </Main>
+</Layout>

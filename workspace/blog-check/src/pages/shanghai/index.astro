@@ -1,0 +1,117 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+import { ALL_COMPANY } from "./company-data";
+---
+
+<!-- https://www.kzix.com/luohu/4576.html -->
+<Layout title="上海重点企业 415家">
+  <Main pageTitle="Shanghai" pageDesc="Companies in Shanghai">
+    <p class="text-gray-400">数据源 https://www.kzix.com/luohu/4576.html</p>
+
+    <nav class="text-bold mt-2 flex flex-col">
+      <a href="#session1">-- #欧洲公司 -- </a>
+      <a href="#session2">-- #美国公司 -- </a>
+      <a href="#session3">-- #全部公司 -- </a>
+    </nav>
+
+    <div class="mt-8">
+      <h3 id="session1">欧洲公司</h3>
+      {
+        ALL_COMPANY.filter(item => item.tag.includes("eu")).map((item, idx) => (
+          <div class="border-b border-gray-200 p-2">
+            <div class="flex">
+              <div>
+                {idx + 1}. {item.name}
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              {item.link ? (
+                <div class="flex">
+                  <div class="pr-2">link =&gt; </div>
+                  <div>
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Website
+                    </a>
+                  </div>
+                </div>
+              ) : null}
+
+              {item.boss ? (
+                <div class="flex">
+                  <div class="pr-2">Bosses =&gt; </div>
+                  <div>
+                    {item.boss.map((itemBoss, itemIdx) => (
+                      <a
+                        href={itemBoss}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Boss{itemIdx + 1}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-8">
+      <h3 id="session2">美国公司</h3>
+      {
+        ALL_COMPANY.filter(item => item.tag.includes("us")).map((item, idx) => (
+          <div class="border-b border-gray-200 p-2">
+            {idx + 1}. {item.name}
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-8 p-4">
+      <h3 id="session3">全部415家</h3>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search companies..."
+        class="mb-4 w-full rounded border border-gray-300 p-2 text-slate-950"
+      />
+      <div id="companyList">
+        {
+          ALL_COMPANY.map((item, idx) => (
+            <div class="border-b border-gray-200 p-2">
+              {idx + 1}. {item.name}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </Main>
+</Layout>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const companyList = document.getElementById("companyList");
+    const companies = companyList.querySelectorAll("div");
+
+    searchInput.addEventListener("input", () => {
+      const searchQuery = searchInput.value.toLowerCase();
+      companies.forEach(company => {
+        if (company.textContent.toLowerCase().includes(searchQuery)) {
+          company.style.display = "";
+        } else {
+          company.style.display = "none";
+        }
+      });
+    });
+  });
+</script>

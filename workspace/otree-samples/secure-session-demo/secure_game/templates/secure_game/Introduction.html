@@ -1,0 +1,48 @@
+{% extends "global/page.html" %}
+{% load otree %}
+
+{% block title %}
+    Welcome to the Secure Study
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <h2>🔒 Security Information</h2>
+        
+        <p class="alert alert-info">
+            <strong>Your Session Code:</strong> <code class="text-primary">{{ session_code }}</code>
+        </p>
+        
+        <p>
+            This session uses enhanced security measures:
+        </p>
+        
+        <ul>
+            <li><strong>12-digit session code</strong> - Much harder to guess than standard 8-digit codes</li>
+            <li><strong>Unique participant tracking</strong> - Each participant gets a unique identifier</li>
+            <li><strong>Verification code</strong> - Your personal code: <code>{{ verification_code }}</code></li>
+        </ul>
+        
+        <hr>
+        
+        <h3>Why This Matters</h3>
+        
+        <p>
+            In standard oTree deployments, session codes are only 8 characters long, 
+            making them potentially vulnerable to brute-force attacks. Our enhanced 
+            configuration increases this to 12 characters, making unauthorized access 
+            <strong>2 trillion times harder</strong>.
+        </p>
+        
+        <p class="alert alert-warning">
+            <strong>Important:</strong> Please keep your session code private. 
+            Do not share it with anyone outside your study.
+        </p>
+        
+        {% next_button %}
+    </div>
+</div>
+
+{% endblock %}

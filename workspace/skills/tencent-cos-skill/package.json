@@ -1,0 +1,16 @@
+{
+  "name": "tencent-cos-skill",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cos-mcp": "^1.0.14",
+    "cos-nodejs-sdk-v5": "^2.15.4"
+  }
+}

@@ -1,0 +1,496 @@
+{
+  "scrapedAt": "2026-03-19T04:40:00+08:00",
+  "source": "https://www.otreehub.com/forum/",
+  "pages": 2,
+  "topics": [
+    {
+      "page": 1,
+      "title": "How to update participant.payoff for completed MTurk sessions?",
+      "link": "https://www.otreehub.com/forum/1452/",
+      "forumId": "1452",
+      "replies": 1,
+      "lastActivity": "4 hours ago"
+    },
+    {
+      "page": 1,
+      "title": "Unauthorized Users Automatically Joining Private Game Sessions on Heroku Platform",
+      "link": "https://www.otreehub.com/forum/1258/",
+      "forumId": "1258",
+      "replies": 5,
+      "lastActivity": "6 days ago"
+    },
+    {
+      "page": 1,
+      "title": "Deleted apps by mistake",
+      "link": "https://www.otreehub.com/forum/1451/",
+      "forumId": "1451",
+      "replies": 0,
+      "lastActivity": "1 week ago"
+    },
+    {
+      "page": 1,
+      "title": "Old oTree Hub site stuck on Python 3.9 (Heroku EOL) – cannot create new site",
+      "link": "https://www.otreehub.com/forum/1437/",
+      "forumId": "1437",
+      "replies": 5,
+      "lastActivity": "1 week ago"
+    },
+    {
+      "page": 1,
+      "title": "{{back_button}} conflicts with is_displayed",
+      "link": "https://www.otreehub.com/forum/1450/",
+      "forumId": "1450",
+      "replies": 1,
+      "lastActivity": "2 weeks ago"
+    },
+    {
+      "page": 1,
+      "title": "oTree has been updated and database must be deleted",
+      "link": "https://www.otreehub.com/forum/1449/",
+      "forumId": "1449",
+      "replies": 0,
+      "lastActivity": "3 weeks ago"
+    },
+    {
+      "page": 1,
+      "title": "live_method not working in oTree Studio?",
+      "link": "https://www.otreehub.com/forum/1445/",
+      "forumId": "1445",
+      "replies": 4,
+      "lastActivity": "4 weeks ago"
+    },
+    {
+      "page": 1,
+      "title": "Having trouble access data during session",
+      "link": "https://www.otreehub.com/forum/1447/",
+      "forumId": "1447",
+      "replies": 3,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "What happens to your projects when you cancel your oTree Subscription?",
+      "link": "https://www.otreehub.com/forum/1448/",
+      "forumId": "1448",
+      "replies": 0,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "Change email address",
+      "link": "https://www.otreehub.com/forum/1446/",
+      "forumId": "1446",
+      "replies": 0,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "CAS authentification",
+      "link": "https://www.otreehub.com/forum/1435/",
+      "forumId": "1435",
+      "replies": 1,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "oTree HR does not recognize participant field finished with oTree 6.0",
+      "link": "https://www.otreehub.com/forum/1443/",
+      "forumId": "1443",
+      "replies": 2,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "PLAYERS_PER_GROUP = 1 rather than None",
+      "link": "https://www.otreehub.com/forum/1444/",
+      "forumId": "1444",
+      "replies": 0,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "How do sites deployment work concretely?",
+      "link": "https://www.otreehub.com/forum/1442/",
+      "forumId": "1442",
+      "replies": 0,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "oTree MTurk Sandbox shows blank iframe when using custom mturk_template.html",
+      "link": "https://www.otreehub.com/forum/1441/",
+      "forumId": "1441",
+      "replies": 0,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "Feature requests for next oTree version?",
+      "link": "https://www.otreehub.com/forum/1381/",
+      "forumId": "1381",
+      "replies": 8,
+      "lastActivity": "1 month ago"
+    },
+    {
+      "page": 1,
+      "title": "Participants in progress",
+      "link": "https://www.otreehub.com/forum/1440/",
+      "forumId": "1440",
+      "replies": 0,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "liveSend to another group?",
+      "link": "https://www.otreehub.com/forum/1439/",
+      "forumId": "1439",
+      "replies": 1,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Project disappeared from oTree Studio after using OTAI",
+      "link": "https://www.otreehub.com/forum/1438/",
+      "forumId": "1438",
+      "replies": 1,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Env var OTREE_REST_KEY must be defined to use REST API",
+      "link": "https://www.otreehub.com/forum/1433/",
+      "forumId": "1433",
+      "replies": 4,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Old oTree Hub site stuck on Python 3.9 (Heroku EOL) – cannot create new site",
+      "link": "https://www.otreehub.com/forum/1436/",
+      "forumId": "1436",
+      "replies": 0,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Bug in BaseGroup.get_player_by_role()",
+      "link": "https://www.otreehub.com/forum/1434/",
+      "forumId": "1434",
+      "replies": 1,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Live page WebSocket issues",
+      "link": "https://www.otreehub.com/forum/1431/",
+      "forumId": "1431",
+      "replies": 1,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Can't start studio project",
+      "link": "https://www.otreehub.com/forum/1432/",
+      "forumId": "1432",
+      "replies": 0,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Data saved locally but not on Heroku when using live_method in oTree",
+      "link": "https://www.otreehub.com/forum/1430/",
+      "forumId": "1430",
+      "replies": 0,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "What is the right database plan for Continuous Double Auction experiment with groups of 6?",
+      "link": "https://www.otreehub.com/forum/1429/",
+      "forumId": "1429",
+      "replies": 0,
+      "lastActivity": "2 months ago"
+    },
+    {
+      "page": 1,
+      "title": "oTree 6.0 released",
+      "link": "https://www.otreehub.com/forum/1428/",
+      "forumId": "1428",
+      "replies": 0,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Kindly Requesting oTree6.0 Demo code",
+      "link": "https://www.otreehub.com/forum/1427/",
+      "forumId": "1427",
+      "replies": 0,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 1,
+      "title": "Group size updated between two apps",
+      "link": "https://www.otreehub.com/forum/1426/",
+      "forumId": "1426",
+      "replies": 2,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 1,
+      "title": "SQLAlchemy dependencies",
+      "link": "https://www.otreehub.com/forum/1420/",
+      "forumId": "1420",
+      "replies": 3,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Registration and subscription",
+      "link": "https://www.otreehub.com/forum/1425/",
+      "forumId": "1425",
+      "replies": 3,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "CSS stopped working in oTree Studio",
+      "link": "https://www.otreehub.com/forum/1424/",
+      "forumId": "1424",
+      "replies": 2,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Null Field Error",
+      "link": "https://www.otreehub.com/forum/1423/",
+      "forumId": "1423",
+      "replies": 3,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Admin Report",
+      "link": "https://www.otreehub.com/forum/1418/",
+      "forumId": "1418",
+      "replies": 0,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "otreehub",
+      "link": "https://www.otreehub.com/forum/1422/",
+      "forumId": "1422",
+      "replies": 0,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Accessing SESSION_FIELDS via REST API?",
+      "link": "https://www.otreehub.com/forum/1421/",
+      "forumId": "1421",
+      "replies": 0,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "oTree 6.0 beta",
+      "link": "https://www.otreehub.com/forum/1403/",
+      "forumId": "1403",
+      "replies": 3,
+      "lastActivity": "4 months ago"
+    },
+    {
+      "page": 2,
+      "title": "What AI sample apps would you like to see? (ChatGPT etc)",
+      "link": "https://www.otreehub.com/forum/1410/",
+      "forumId": "1410",
+      "replies": 4,
+      "lastActivity": "4 months ago"
+    },
+    {
+      "page": 2,
+      "title": "No-Code Twitter Mockup",
+      "link": "https://www.otreehub.com/forum/1419/",
+      "forumId": "1419",
+      "replies": 0,
+      "lastActivity": "4 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Balanced treatment assignment",
+      "link": "https://www.otreehub.com/forum/1417/",
+      "forumId": "1417",
+      "replies": 1,
+      "lastActivity": "3 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Prolific",
+      "link": "https://www.otreehub.com/forum/1416/",
+      "forumId": "1416",
+      "replies": 5,
+      "lastActivity": "4 months ago"
+    },
+    {
+      "page": 2,
+      "title": "[object Blob] error while downloading",
+      "link": "https://www.otreehub.com/forum/1415/",
+      "forumId": "1415",
+      "replies": 2,
+      "lastActivity": "4 months ago"
+    },
+    {
+      "page": 2,
+      "title": "CurrencyField not rounded in first use but rounded in second use",
+      "link": "https://www.otreehub.com/forum/1413/",
+      "forumId": "1413",
+      "replies": 1,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Otree HR deregister setting - wrong message",
+      "link": "https://www.otreehub.com/forum/1414/",
+      "forumId": "1414",
+      "replies": 1,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "New beta features: back button, preserving unsubmitted forms, filtering fields in admin",
+      "link": "https://www.otreehub.com/forum/1411/",
+      "forumId": "1411",
+      "replies": 0,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "formatting options",
+      "link": "https://www.otreehub.com/forum/1408/",
+      "forumId": "1408",
+      "replies": 0,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "problem with creating session on Heroku",
+      "link": "https://www.otreehub.com/forum/1349/",
+      "forumId": "1349",
+      "replies": 4,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Package requirements (psycopg2, sentry-sdk, etc.) error",
+      "link": "https://www.otreehub.com/forum/1409/",
+      "forumId": "1409",
+      "replies": 1,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Example code Empty",
+      "link": "https://www.otreehub.com/forum/1391/",
+      "forumId": "1391",
+      "replies": 2,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Postgresql max connections",
+      "link": "https://www.otreehub.com/forum/1407/",
+      "forumId": "1407",
+      "replies": 1,
+      "lastActivity": "5 months ago"
+    },
+    {
+      "page": 2,
+      "title": "oTree and Moodle via LTI 1.3",
+      "link": "https://www.otreehub.com/forum/1404/",
+      "forumId": "1404",
+      "replies": 2,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Mouse tracking",
+      "link": "https://www.otreehub.com/forum/1405/",
+      "forumId": "1405",
+      "replies": 1,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Problem with websockets",
+      "link": "https://www.otreehub.com/forum/1406/",
+      "forumId": "1406",
+      "replies": 1,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "TypeError: after_all_players_arrive() got an unexpected keyword argument 'subsession'",
+      "link": "https://www.otreehub.com/forum/1402/",
+      "forumId": "1402",
+      "replies": 1,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Changing email id for account",
+      "link": "https://www.otreehub.com/forum/1401/",
+      "forumId": "1401",
+      "replies": 1,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "KeyError: 'csrftoken'",
+      "link": "https://www.otreehub.com/forum/1400/",
+      "forumId": "1400",
+      "replies": 1,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "oTree 5.12 beta",
+      "link": "https://www.otreehub.com/forum/1399/",
+      "forumId": "1399",
+      "replies": 0,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Code on studio and deploy on Heroku",
+      "link": "https://www.otreehub.com/forum/1396/",
+      "forumId": "1396",
+      "replies": 1,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Heroku deployment failed: \"Push failed: cannot parse Procfile\"",
+      "link": "https://www.otreehub.com/forum/1398/",
+      "forumId": "1398",
+      "replies": 1,
+      "lastActivity": "6 months ago"
+    },
+    {
+      "page": 2,
+      "title": "Experimenter input during a session",
+      "link": "https://www.otreehub.com/forum/1397/",
+      "forumId": "1397",
+      "replies": 0,
+      "lastActivity": "6 months ago"
+    }
+  ],
+  "summary": {
+    "totalTopics": 60,
+    "page1Count": 30,
+    "page2Count": 30
+  },
+  "screenshots": [
+    "/root/.openclaw/workspace/otree-forum-page1.png",
+    "/root/.openclaw/workspace/otree-forum-page2.png"
+  ]
+}

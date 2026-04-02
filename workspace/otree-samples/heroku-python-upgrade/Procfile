@@ -1,0 +1,1 @@
+web: otree run otree.settings

@@ -1,0 +1,38 @@
+{
+  "site": {
+    "title": "oTree Study",
+    "base_url": "https://the-three-fish.github.io",
+    "base_path": "/",
+    "trailing_slash": false,
+    "favicon": "/images/s-logo-blue.jpg",
+    "logo": "/images/logo5.png",
+    "logo_width": "200",
+    "logo_height": "38",
+    "logo_text": "Astroplate"
+  },
+
+  "settings": {
+    "pagination": 4,
+    "summary_length": 120,
+    "blog_folder": "blog"
+  },
+
+  "nav_button": {
+    "enable": true,
+    "label": "Get Started",
+    "link": "/contact"
+  },
+
+  "params": {
+    "contact_form_action": "",
+    "tag_manager_id": "",
+    "footer_content": "一站式oTree开发服务，耐心细致的服务。一站式oTree开发服务，耐心细致的服务，确保项目顺利进行。专业团队，全程陪伴，满足您的需求。",
+    "copyright": "Designed and Developed By oTree Study"
+  },
+
+  "metadata": {
+    "meta_author": "rowan2024",
+    "meta_image": "/images/og-image.png",
+    "meta_description": "astro boilerplate"
+  }
+}

@@ -1,0 +1,60 @@
+name: Generate oTree Blog Post Draft
+
+on:
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  generate-and-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-generativeai
+
+      - name: Run script to find topic and generate post
+        id: generate
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # Run the script. It will create a new file in src/content/blog/.
+          python .github/scripts/generate_post.py
+          
+          # Find the topic to use in the PR title
+          # This is a simple way to pass the topic to the next step
+          TOPIC_LINE=$(grep -m 1 -- "- \[ \]" plan.md | sed 's/- \[ \] //')
+          echo "topic=${TOPIC_LINE}" >> $GITHUB_OUTPUT
+    
+      - name: Update plan.md
+        run: |
+          # Use sed to replace the first occurrence of `[ ]` with `[x]`
+          # This ensures the change is part of the same commit.
+          sed -i '0,/- \[ \]/s/- \[ \]/- [x]/' plan.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat: AI生成博客草稿 '${{ steps.generate.outputs.topic }}'"
+          branch: "draft/blog-${{ github.run_number }}"
+          title: "博客草稿: ${{ steps.generate.outputs.topic }}"
+          body: |
+            这是一篇AI自动生成的oTree技术博客草稿，主题：**${{ steps.generate.outputs.topic }}**
+            
+            ## 审查清单
+            - [ ] 检查生成内容的准确性和语调
+            - [ ] 添加必要的代码示例或图片  
+            - [ ] 编辑语法和文体
+            - [ ] 准备好后合并以发布
+            
+            *由 'Generate oTree Blog Post' 工作流自动生成*
+          labels: blog-draft, ai-generated, oTree
+          assignees: ${{ github.actor }} # Assigns the PR to the user who triggered the workflow

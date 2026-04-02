@@ -1,0 +1,73 @@
+---
+banner:
+  title: 解决您在使用oTree过程中的任何问题
+  content: 如果您忙于答辩，有个很好的实验想法，没时间来实现，那么找我吧，提供专家级的技术支持。任何OTREE相关的问题，如果您做起来很难，那么也来找我吧。
+  image: /images/banner-art.png
+  button:
+    label: "联系我们"
+    link: "/contact"
+    enable: true
+
+# feature
+feature: 
+  title: 关于我们您需要知道的事
+  features:
+  - name: "Github Private"
+    icon: "/images/code.svg"
+    content: "代码托管在Github私有库，不会丢失，切有版本管理，每处改动都可以追溯。"
+  - name: "技术支持"
+    icon: "/images/user-clock.svg"
+    content: "有任何问题，您联系我们都会耐心解答，直到您明白。"
+  - name: "实验托管"
+    icon: "/images/cloud.svg"
+    content: "我们提供实验托管服务，在世界各地都有服务器，能够确保实验参与人员能够流畅的参加您的实验。"
+
+# services
+services:
+  - title: "🚀 oTree Launcher - 零配置的实验研究环境"
+    content: "告别命令行恐惧！oTree Launcher 是专为 oTree 研究者设计的桌面应用，内置 Python 版本管理（3.7-3.13）、一键依赖安装、智能虚拟环境。无论你是新手还是专家，都能在 5 分钟内启动你的实验。欢迎试用并反馈建议！"
+    images:
+      - "/images/service-slide-1.png"
+      - "/images/service-slide-2.png"
+      - "/images/service-slide-3.png"
+    button:
+      enable: true
+      label: "了解详情"
+      link: /blog/otree-launcher
+
+  - title: "oTree 实验定制开发服务"
+    content: "拥有多年 oTree 开发经验，为您提供从实验设计到部署的一站式服务。无论是经典的公共品博弈、信任博弈，还是复杂的市场实验、多人互动实验，我们都能帮您实现。代码托管在 GitHub 私有仓库，版本控制，安全可靠。"
+    images:
+      - "/images/service-slide-1.png"
+      - "/images/service-slide-2.png"
+      - "/images/service-slide-3.png"
+    button:
+      enable: true
+      label: "联系我们"
+      link: /contact
+
+  - title: "实验托管与技术支持"
+    content: "提供全球多地服务器托管服务，确保您的实验参与者无论身处何地都能流畅参与。从环境配置、依赖安装到服务器运维，我们提供 7x24 技术支持。遇到任何 oTree 相关问题，都可以联系我们获得专业解答。"
+    images:
+      - "/images/service-slide-1.png"
+    button:
+      enable: true
+      label: "查看方案"
+      link: /contact
+
+# workflow
+workflow: 
+  title: "与我们一起体验最佳工作流程"
+  image: "/images/banner.png"
+  description: ""
+
+# call_to_action
+call_to_action:
+  title: 准备好开始了吗?
+  content: 不要犹豫，练习我们，据说目前已经联系我们的用户还没有后悔的，都会觉得物超所值哟。
+  image: '/images/cta.png'
+  button:
+    enable: true
+    label: "联系我们"
+    link: "/contact"
+---

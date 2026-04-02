@@ -1,0 +1,34 @@
+{% extends "global/page.html" %}
+{% load otree %}
+
+{% block title %}
+    Study Complete
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <h2>Thank You! 🎉</h2>
+        
+        <p>
+            You have completed the study. Your session remained secure throughout.
+        </p>
+        
+        <div class="alert alert-info">
+            <h4>Security Summary</h4>
+            <ul>
+                <li>Session Code Length: 12 characters</li>
+                <li>Character Set: 62 possible characters (a-z, A-Z, 0-9)</li>
+                <li>Brute-force resistance: 62^12 combinations</li>
+            </ul>
+        </div>
+        
+        <p>
+            If you have any questions about the security measures used in this study,
+            please contact the researcher.
+        </p>
+    </div>
+</div>
+
+{% endblock %}

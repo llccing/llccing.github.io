@@ -1,0 +1,31 @@
+{% extends "global/page.html" %}
+{% load otree %}
+
+{% block title %}
+    Task Page
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <h2>Your Task</h2>
+        
+        <p>
+            This is a sample task page. In a real study, you would add your 
+            experimental task here.
+        </p>
+        
+        <div class="alert alert-success">
+            <strong>✅ Your session is secure!</strong>
+            <br>
+            Session Code: <code>{{ participant.session.code }}</code>
+            <br>
+            Your ID: <code>{{ participant.id_in_group }}</code>
+        </div>
+        
+        {% next_button %}
+    </div>
+</div>
+
+{% endblock %}
