@@ -1,0 +1,487 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://llccing.github.io/posts/angular-ssr-hydration-bff/"><meta name="generator" content="Astro v4.16.19"><!-- General Meta Tags --><title>Angular SSR、Hydration 与 BFF：从零理清架构知识点 | Rowan's Blog</title><meta name="title" content="Angular SSR、Hydration 与 BFF：从零理清架构知识点 | Rowan's Blog"><meta name="description" content="Angular 的易混知识点"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="Angular SSR、Hydration 与 BFF：从零理清架构知识点 | Rowan's Blog"><meta property="og:description" content="Angular 的易混知识点"><meta property="og:url" content="https://llccing.github.io/posts/angular-ssr-hydration-bff/"><meta property="og:image" content="https://llccing.github.io/posts/angular-ssrhydration-%E4%B8%8E-bff%E4%BB%8E%E9%9B%B6%E7%90%86%E6%B8%85%E6%9E%B6%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-04-18T03:23:19.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://llccing.github.io/posts/angular-ssr-hydration-bff/"><meta property="twitter:title" content="Angular SSR、Hydration 与 BFF：从零理清架构知识点 | Rowan's Blog"><meta property="twitter:description" content="Angular 的易混知识点"><meta property="twitter:image" content="https://llccing.github.io/posts/angular-ssrhydration-%E4%B8%8E-bff%E4%BB%8E%E9%9B%B6%E7%90%86%E6%B8%85%E6%9E%B6%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><!-- Google tag (gtag.js) --><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1X5E9W6VJ2"></script> <script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-1X5E9W6VJ2");
+</script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.CFAw_Ga_.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (width>=640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.ClFfh2EL.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (width>=640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (width>=640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:angular-ssrhydration-与-bff从零理清架构知识点}@layer astro{::view-transition-old(angular-ssrhydration-与-bff从零理清架构知识点){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular-ssrhydration-与-bff从零理清架构知识点){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular-ssrhydration-与-bff从零理清架构知识点){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular-ssrhydration-与-bff从零理清架构知识点){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:angular}@layer astro{::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:hydration}@layer astro{::view-transition-old(hydration){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(hydration){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(hydration){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(hydration){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-4]{view-transition-name:ssr}@layer astro{::view-transition-old(ssr){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(ssr){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(ssr){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(ssr){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/short-stories/" class="astro-3ef6ksr2">
+Short Stories
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex justify-start max-w-3xl mx-auto px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">Angular SSR、Hydration 与 BFF：从零理清架构知识点</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-04-18T03:23:19.000Z">Apr 18, 2026</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">11:23 AM</span></span></div> <article id="article" role="article" class="astro-vj4tpspi max-w-3xl mx-auto mt-8 prose"> <blockquote>
+<p>这个内容主要来自一个Angular的 <a href="https://github.com/angular/angular/issues/68014">issue</a>，了解issue的过程中，对于之前不懂的知识点有了新的了解。</p>
+</blockquote>
+<h1 id="angular-ssrhydration-与-bff从零理清架构知识点">Angular SSR、Hydration 与 BFF：从零理清架构知识点</h1>
+<h2 id="一一个网页是怎么显示出来的">一、一个网页是怎么显示出来的</h2>
+<p>浏览器要显示网页，最终需要的是 <strong>HTML</strong>。HTML 可以通过两种方式产生：</p>
+<h3 id="csrclient-side-rendering-浏览器自己画">CSR（Client Side Rendering）—— 浏览器自己画</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>浏览器请求 → 拿到一个几乎空白的 HTML + 一堆 JS</span></span>
+<span class="line"><span>→ JS 在浏览器里执行 → JS 创建 DOM → 页面出来</span></span>
+<span class="line"><span></span></span></code></pre>
+<ul>
+<li>优点：前后端彻底分离，开发简单</li>
+<li>缺点：JS 没下完之前用户看到白屏；搜索引擎抓不到内容</li>
+</ul>
+<h3 id="ssrserver-side-rendering-服务器先画好">SSR（Server Side Rendering）—— 服务器先画好</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>浏览器请求 → 服务器运行 Angular，生成完整 HTML → 返回给浏览器</span></span>
+<span class="line"><span>→ 浏览器直接显示 → 用户立刻看到内容</span></span>
+<span class="line"><span></span></span></code></pre>
+<ul>
+<li>优点：首屏快，SEO 友好</li>
+<li>缺点：服务器压力更大，开发复杂度上升</li>
+</ul>
+<hr>
+<h2 id="二ssr-的问题页面能看不能用">二、SSR 的问题：页面”能看不能用”</h2>
+<p>服务器返回的 HTML 只是<strong>静态</strong>的——它能看，但不能交互。</p>
+<p>比如页面上有个 <code>&lt;button&gt;</code>，服务器输出的 HTML 里确实有，但点了没反应，因为事件监听还没绑上去。</p>
+<p>要让页面”活起来”，浏览器还是要下载 Angular 的 JS 并执行。</p>
+<p>问题来了：<strong>Angular 启动后，它要不要把页面重新画一遍？</strong></p>
+<ul>
+<li><strong>不用 Hydration</strong>：Angular 把服务器给的 DOM 全部丢掉，自己从零重建。用户看到页面”闪”一下。</li>
+<li><strong>用 Hydration</strong>：Angular 发现页面里已经有服务器画好的 DOM，直接”接管”它——把事件绑上去、把组件实例挂上去，不重画。</li>
+</ul>
+<blockquote>
+<p><strong>Hydration = Angular 在浏览器启动时，复用服务器已有的 DOM，而不是重建它。</strong></p>
+</blockquote>
+<hr>
+<h2 id="三hydration-的使用场景">三、Hydration 的使用场景</h2>
+<h3 id="适合用-hydration">适合用 Hydration</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>场景</th><th>原因</th></tr></thead><tbody><tr><td>首屏体验很重要（官网、电商详情页）</td><td>用户一打开就要看到内容，不能白屏等 JS</td></tr><tr><td>SEO 很重要</td><td>搜索引擎更容易读取服务端已输出的 HTML</td></tr><tr><td>弱网或低性能设备较多</td><td>先给 HTML，用户更早看到内容</td></tr><tr><td>页面结构稳定，首屏内容明确</td><td>服务端产出的 DOM 和客户端预期一致，不容易 mismatch</td></tr></tbody></table>
+<h3 id="不太适合-hydration">不太适合 Hydration</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>场景</th><th>原因</th></tr></thead><tbody><tr><td>纯后台管理系统</td><td>SEO 不重要，首屏没那么极端，纯 CSR 更简单</td></tr><tr><td>首屏重度依赖浏览器专属 API</td><td><code>window</code>、Canvas、WebGL 等在服务端不存在</td></tr><tr><td>首屏 DOM 会被客户端立刻大改</td><td>容易发生 hydration mismatch</td></tr></tbody></table>
+<hr>
+<h2 id="四angular-中的三种服务端参与模式">四、Angular 中的三种”服务端参与”模式</h2>
+<h3 id="1-实时-ssr">1. 实时 SSR</h3>
+<p>每次请求到达服务器时，Angular 实时运行组件逻辑，生成 HTML 并返回。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#ABB2BF">{ </span><span style="color:#E06C75">path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"**"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">renderMode</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">RenderMode</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">Server</span><span style="color:#ABB2BF"> }</span></span>
+<span class="line"></span></code></pre>
+<h3 id="2-预渲染prerender">2. 预渲染（Prerender）</h3>
+<p>在 <code>ng build</code> 构建阶段就提前生成好 HTML 文件，请求到来时直接返回。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#ABB2BF">{ </span><span style="color:#E06C75">path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"**"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">renderMode</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">RenderMode</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">Prerender</span><span style="color:#ABB2BF"> }</span></span>
+<span class="line"></span></code></pre>
+<h3 id="3-纯客户端">3. 纯客户端</h3>
+<p>不做服务端渲染，和传统 CSR 一样。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#ABB2BF">{ </span><span style="color:#E06C75">path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"**"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">renderMode</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">RenderMode</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">Client</span><span style="color:#ABB2BF"> }</span></span>
+<span class="line"></span></code></pre>
+<blockquote>
+<p><strong>Hydration 配合的是前两种模式。</strong> 只有先存在服务端产出的 HTML，客户端才有东西可以”接管”。</p>
+</blockquote>
+<hr>
+<h2 id="五一个-angular-ssr--hydration-项目的完整流程">五、一个 Angular SSR + Hydration 项目的完整流程</h2>
+<p>以本项目为例：</p>
+<h3 id="构建阶段">构建阶段</h3>
+<p><code>angular.json</code> 配置了 <code>outputMode: "server"</code>，<code>main.server.ts</code> 配置了 <code>RenderMode.Prerender</code>。
+Angular CLI 执行 <code>ng build</code> 时，先走一遍服务端渲染逻辑，提前生成好 HTML。</p>
+<h3 id="用户打开页面">用户打开页面</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>1. 浏览器请求 http://localhost:4200</span></span>
+<span class="line"><span>2. 服务端把预渲染好的 HTML 返回</span></span>
+<span class="line"><span>3. 浏览器直接显示（用户立刻看到标题和按钮）</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>   此时页面能看，但按钮点了没反应。</span></span>
+<span class="line"><span></span></span></code></pre>
+<h3 id="angular-客户端启动">Angular 客户端启动</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>4. 浏览器同时下载 Angular JS</span></span>
+<span class="line"><span>5. JS 加载完后执行 main.ts：</span></span>
+<span class="line"><span>   bootstrapApplication(App, {</span></span>
+<span class="line"><span>     providers: [provideClientHydration(withEventReplay())],</span></span>
+<span class="line"><span>   })</span></span>
+<span class="line"><span>6. Angular 进入 hydration 流程：</span></span>
+<span class="line"><span>   - 不重建 DOM</span></span>
+<span class="line"><span>   - 把组件实例和已有 DOM 节点对应起来</span></span>
+<span class="line"><span>   - 把 (click)="insert2()" 事件绑定到按钮上</span></span>
+<span class="line"><span>7. 页面变成"可交互"的</span></span>
+<span class="line"><span></span></span></code></pre>
+<h3 id="用户点击按钮">用户点击按钮</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>8. 执行 this.anchor().vcr.createComponent(Portal)</span></span>
+<span class="line"><span>   这是普通的运行时操作，hydration 已经完成</span></span>
+<span class="line"><span></span></span></code></pre>
+<hr>
+<h2 id="六关键-api-说明">六、关键 API 说明</h2>
+<h3 id="provideclienthydration"><code>provideClientHydration()</code></h3>
+<p>在 <code>main.ts</code>（客户端入口）中调用。告诉 Angular：启动时不要重建 DOM，而是接管服务端已有的 DOM。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#7F848E;font-style:italic">// src/main.ts</span></span>
+<span class="line"><span style="color:#61AFEF">bootstrapApplication</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">App</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#E06C75">  providers</span><span style="color:#ABB2BF">: [</span><span style="color:#61AFEF">provideClientHydration</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">withEventReplay</span><span style="color:#ABB2BF">())],</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<h3 id="witheventreplay"><code>withEventReplay()</code></h3>
+<p>解决一个时间差问题：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>服务器返回 HTML → 用户看到按钮 → 用户点了按钮</span></span>
+<span class="line"><span>→ 但 Angular JS 还没加载完 → 点击丢失</span></span>
+<span class="line"><span></span></span></code></pre>
+<p><code>withEventReplay()</code> 会把 hydration 完成前的用户事件记录下来，等 hydration 完成后重新触发。
+它和数据获取、BFF 没有任何关系，只是 hydration 的一个增强功能。</p>
+<h3 id="provideserverrendering"><code>provideServerRendering()</code></h3>
+<p>在 <code>main.server.ts</code>（服务端入口）中调用。配置服务端渲染能力和路由规则。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#7F848E;font-style:italic">// src/main.server.ts</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> config</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">ApplicationConfig</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  providers</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#61AFEF">    provideClientHydration</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">withEventReplay</span><span style="color:#ABB2BF">()),</span></span>
+<span class="line"><span style="color:#61AFEF">    provideServerRendering</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">withRoutes</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">serverRoutes</span><span style="color:#ABB2BF">)),</span></span>
+<span class="line"><span style="color:#ABB2BF">  ],</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="七项目中各文件的职责">七、项目中各文件的职责</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>文件</th><th>职责</th></tr></thead><tbody><tr><td><code>src/main.ts</code></td><td>客户端入口，启动 Angular 应用，开启 hydration</td></tr><tr><td><code>src/main.server.ts</code></td><td>服务端入口，配置 SSR/预渲染规则</td></tr><tr><td><code>src/server.ts</code></td><td>Express 服务器，承载 HTTP 请求，把 HTML 返回给浏览器</td></tr><tr><td><code>src/app/app.ts</code></td><td>应用组件，包含页面逻辑和模板</td></tr><tr><td><code>angular.json</code></td><td>项目构建配置，声明 <code>outputMode</code>、SSR 入口等</td></tr></tbody></table>
+<hr>
+<h2 id="八bff-是什么">八、BFF 是什么</h2>
+<p>BFF = <strong>Backend For Frontend</strong>，专门为前端组织数据的中间层服务。</p>
+<p>它和 SSR/Hydration 不在同一个维度：</p>
+<ul>
+<li>SSR/Hydration 解决的是 <strong>“页面怎么渲染出来”</strong></li>
+<li>BFF 解决的是 <strong>“前端怎么拿到数据”</strong></li>
+</ul>
+<h3 id="没有-bff-时">没有 BFF 时</h3>
+<p>假设页面需要：用户名、订单列表、推荐商品，分散在 3 个后端服务里。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>浏览器 → 用户服务（拿用户名）</span></span>
+<span class="line"><span>浏览器 → 订单服务（拿订单）</span></span>
+<span class="line"><span>浏览器 → 推荐服务（拿推荐）</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>前端发 3 个请求，处理 3 种接口格式。</p>
+<h3 id="有-bff-时">有 BFF 时</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>浏览器 → BFF（一个请求）</span></span>
+<span class="line"><span>BFF → 用户服务 + 订单服务 + 推荐服务（内部聚合）</span></span>
+<span class="line"><span>BFF → 浏览器（返回一份整理好的 JSON）</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>前端只发 1 个请求，拿到的数据格式刚好是页面需要的。</p>
+<h3 id="bff-的核心能力">BFF 的核心能力</h3>
+<ul>
+<li><strong>聚合</strong>：把多个后端接口合成一个</li>
+<li><strong>裁剪</strong>：只返回前端需要的字段</li>
+<li><strong>适配</strong>：把后端数据转换成页面友好的结构</li>
+<li><strong>鉴权</strong>：统一处理认证和权限</li>
+<li><strong>缓存</strong>：减少对后端的重复请求</li>
+</ul>
+<hr>
+<h2 id="九ssrhydration-与-bff-的对比">九、SSR/Hydration 与 BFF 的对比</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>SSR + Hydration</th><th>BFF</th></tr></thead><tbody><tr><td><strong>解决什么</strong></td><td>页面怎么更快显示、怎么被搜索引擎抓到</td><td>前端怎么更方便地拿到数据</td></tr><tr><td><strong>输出什么</strong></td><td>HTML</td><td>JSON</td></tr><tr><td><strong>谁消费</strong></td><td>浏览器（渲染页面）</td><td>前端代码（获取数据）</td></tr><tr><td><strong>必须用 Node 吗</strong></td><td>Angular SSR 需要 Node</td><td>不一定，任何语言都行</td></tr><tr><td><strong>互相依赖吗</strong></td><td>不依赖</td><td>不依赖</td></tr></tbody></table>
+<p>它们可以<strong>独立使用</strong>，也可以<strong>组合使用</strong>：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>组合</th><th>典型场景</th></tr></thead><tbody><tr><td>只有 SSR + Hydration，没有 BFF</td><td>简单官网、博客、本项目</td></tr><tr><td>只有 BFF，没有 SSR</td><td>后台管理系统</td></tr><tr><td>SSR + Hydration + BFF</td><td>大型面向用户的站点（电商、门户）</td></tr><tr><td>都没有</td><td>最简单的纯前端 SPA</td></tr></tbody></table>
+<hr>
+<h2 id="十node-在这里扮演什么角色">十、Node 在这里扮演什么角色</h2>
+<p>Node 只是一个运行时，不等于 BFF，也不等于 SSR。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>角色</th><th>说明</th></tr></thead><tbody><tr><td><strong>SSR 宿主</strong></td><td>Node 运行 Angular 服务端渲染逻辑，生成 HTML。本项目的 <code>server.ts</code> 就是这个角色</td></tr><tr><td><strong>BFF</strong></td><td>Node 聚合后端接口、返回 JSON。本项目没有这个角色</td></tr><tr><td><strong>既是 SSR 宿主又是 BFF</strong></td><td>同一个 Express 里既有 SSR 逻辑又有 <code>/api/*</code> 接口。大型项目常见</td></tr></tbody></table>
+<p>判断方法：看 Node 层主要在做什么。</p>
+<ul>
+<li>主要在调用 Angular SSR 引擎、返回 HTML → <strong>SSR 宿主</strong></li>
+<li>主要在聚合后端服务、返回 JSON → <strong>BFF</strong></li>
+<li>两者都有 → <strong>SSR + BFF</strong></li>
+</ul>
+<hr>
+<h2 id="十一ng-serve-与生产部署">十一、<code>ng serve</code> 与生产部署</h2>
+<h3 id="开发模式ng-serve">开发模式：<code>ng serve</code></h3>
+<p>Angular CLI 的开发服务器，默认监听 <strong>4200</strong> 端口。
+它会自动处理 SSR 请求（利用 <code>server.ts</code> 导出的 <code>reqHandler</code>），不需要你手动启动 Express。</p>
+<h3 id="生产模式ng-build--部署">生产模式：<code>ng build</code> + 部署</h3>
+<p>构建产物取决于 <code>angular.json</code> 中的 <code>outputMode</code>：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>outputMode</th><th>产物</th><th>部署方式</th></tr></thead><tbody><tr><td><code>"static"</code></td><td>纯 HTML/CSS/JS 静态文件</td><td>Nginx / CDN 直接托管</td></tr><tr><td><code>"server"</code></td><td>Node 服务端代码 + 静态资源</td><td>需要 Node 进程运行（PM2 / Docker）</td></tr></tbody></table>
+<p><strong>本项目的 <code>outputMode</code> 是 <code>"server"</code></strong>，所以生产环境需要一个 Node 进程来运行。</p>
+<h3 id="pm2-和-nginx-不是二选一">PM2 和 Nginx 不是二选一</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>Nginx</th><th>PM2</th></tr></thead><tbody><tr><td>做什么</td><td>反向代理、HTTPS、静态资源缓存、负载均衡</td><td>管理 Node 进程，自动重启、日志、集群模式</td></tr><tr><td>处理什么</td><td>所有入站请求的第一道门</td><td>只负责让 Node 进程活着</td></tr></tbody></table>
+<p>生产环境最常见的做法是<strong>一起用</strong>：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>用户请求 → Nginx（反向代理 + HTTPS + 静态资源）</span></span>
+<span class="line"><span>         → PM2 管理的 Node 进程（处理 SSR 请求）</span></span>
+<span class="line"><span></span></span></code></pre>
+<blockquote>
+<p><strong>需不需要 Node 进程，取决于 <code>outputMode</code> 是不是 <code>"server"</code>，而不是有没有 hydration。</strong>
+Hydration 发生在浏览器里，和服务端用什么部署方式无关。</p>
+</blockquote>
+<hr>
+<h2 id="十二viewcontainerrefcreatecomponent-与-hydration-的关系">十二、ViewContainerRef.createComponent() 与 Hydration 的关系</h2>
+<p>本项目中的这行代码：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">anchor</span><span style="color:#ABB2BF">().</span><span style="color:#E5C07B">vcr</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createComponent</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">Portal</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span></code></pre>
+<p>它本身<strong>不是 hydration API</strong>，而是 Angular 的动态组件创建能力。</p>
+<h3 id="为什么它容易和-hydration-冲突">为什么它容易和 hydration 冲突</h3>
+<ul>
+<li>Hydration 需要客户端 DOM 和服务端 DOM 保持一致</li>
+<li><code>createComponent()</code> 会直接插入新的 DOM 节点</li>
+<li>如果在 hydration 尚未完成时执行，Angular 会发现”DOM 跟预期不一样”，触发 mismatch 错误</li>
+</ul>
+<h3 id="安全的时机-vs-危险的时机">安全的时机 vs 危险的时机</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>时机</th><th>风险</th></tr></thead><tbody><tr><td>按钮点击后创建（本项目的做法）</td><td>低风险，hydration 早已完成</td></tr><tr><td>构造函数或 <code>ngOnInit</code> 中创建</td><td>高风险，可能在 hydration 过程中执行</td></tr><tr><td><code>afterNextRender</code> 中创建</td><td>安全，确保在客户端渲染完成后执行</td></tr></tbody></table>
+<hr>
+<h2 id="十三总结架构图">十三、总结架构图</h2>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>┌──────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│                 渲染维度                       │</span></span>
+<span class="line"><span>│                                              │</span></span>
+<span class="line"><span>│   服务端生成 HTML（SSR / 预渲染）               │</span></span>
+<span class="line"><span>│         ↓                                    │</span></span>
+<span class="line"><span>│   浏览器显示 HTML                              │</span></span>
+<span class="line"><span>│         ↓                                    │</span></span>
+<span class="line"><span>│   Angular 接管 DOM（Hydration）                │</span></span>
+<span class="line"><span>│         ↓                                    │</span></span>
+<span class="line"><span>│   页面可交互                                   │</span></span>
+<span class="line"><span>└──────────────────────────────────────────────┘</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>┌──────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│                 数据维度                       │</span></span>
+<span class="line"><span>│                                              │</span></span>
+<span class="line"><span>│   前端需要数据                                 │</span></span>
+<span class="line"><span>│         ↓                                    │</span></span>
+<span class="line"><span>│   请求 BFF（或直接请求后端）                     │</span></span>
+<span class="line"><span>│         ↓                                    │</span></span>
+<span class="line"><span>│   BFF 聚合多个后端服务                          │</span></span>
+<span class="line"><span>│         ↓                                    │</span></span>
+<span class="line"><span>│   返回 JSON 给前端                             │</span></span>
+<span class="line"><span>└──────────────────────────────────────────────┘</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>两个维度独立存在，可以单独用，也可以组合用。</span></span>
+<span class="line"><span></span></span></code></pre> </article> <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/hydration/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">hydration</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/ssr/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">ssr</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://llccing.github.io/posts/angular-ssr-hydration-bff/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://llccing.github.io/posts/angular-ssr-hydration-bff/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://llccing.github.io/posts/angular-ssr-hydration-bff/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://llccing.github.io/posts/angular-ssr-hydration-bff/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://llccing.github.io/posts/angular-ssr-hydration-bff/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://llccing.github.io/posts/angular-ssr-hydration-bff/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> </div> </div> </footer>     <script>function createProgressBar(){const o=document.createElement("div");o.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const e=document.createElement("div");e.className="progress-bar h-1 w-0 bg-skin-accent",e.id="myBar",o.appendChild(e),document.body.appendChild(o)}createProgressBar();function updateScrollProgress(){const o=document.body.scrollTop||document.documentElement.scrollTop,e=document.documentElement.scrollHeight-document.documentElement.clientHeight,n=o/e*100;if(document){const t=document.getElementById("myBar");t&&(t.style.width=n+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let o=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let e of o){e.classList.add("group");let n=document.createElement("a");n.innerText="#",n.className="heading-link hidden group-hover:inline-block ml-2",n.href="#"+e.id,n.ariaHidden="true",e.appendChild(n)}}addHeadingLinks();function attachCopyButtons(){let o="Copy",e=Array.from(document.querySelectorAll("pre"));for(let t of e){let c=document.createElement("div");c.style.position="relative";let d=document.createElement("button");d.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",d.innerHTML=o,t.setAttribute("tabindex","0"),t.appendChild(d),t?.parentNode?.insertBefore(c,t),c.appendChild(t),d.addEventListener("click",async()=>{await n(t,d)})}async function n(t,c){let r=t.querySelector("code")?.innerText;await navigator.clipboard.writeText(r??""),c.innerText="Copied",setTimeout(()=>{c.innerText=o},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();
+</script></body></html>
