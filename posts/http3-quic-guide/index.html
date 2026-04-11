@@ -1,0 +1,526 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://llccing.github.io/posts/http3-quic-guide/"><meta name="generator" content="Astro v4.16.19"><!-- General Meta Tags --><title>HTTP/3 科普：QUIC、0-RTT、队头阻塞、连接迁移，一次讲清楚 | Rowan's Blog</title><meta name="title" content="HTTP/3 科普：QUIC、0-RTT、队头阻塞、连接迁移，一次讲清楚 | Rowan's Blog"><meta name="description" content="从前端开发者的视角出发，系统讲解 HTTP/3 背后的核心概念：QUIC 协议、0-RTT 握手、队头阻塞、连接迁移，以及它对实际项目的影响。"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="HTTP/3 科普：QUIC、0-RTT、队头阻塞、连接迁移，一次讲清楚 | Rowan's Blog"><meta property="og:description" content="从前端开发者的视角出发，系统讲解 HTTP/3 背后的核心概念：QUIC 协议、0-RTT 握手、队头阻塞、连接迁移，以及它对实际项目的影响。"><meta property="og:url" content="https://llccing.github.io/posts/http3-quic-guide/"><meta property="og:image" content="https://llccing.github.io/posts/http3-%E7%A7%91%E6%99%AEquic0-rtt%E9%98%9F%E5%A4%B4%E9%98%BB%E5%A1%9E%E8%BF%9E%E6%8E%A5%E8%BF%81%E7%A7%BB%E4%B8%80%E6%AC%A1%E8%AE%B2%E6%B8%85%E6%A5%9A.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-04-11T00:00:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://llccing.github.io/posts/http3-quic-guide/"><meta property="twitter:title" content="HTTP/3 科普：QUIC、0-RTT、队头阻塞、连接迁移，一次讲清楚 | Rowan's Blog"><meta property="twitter:description" content="从前端开发者的视角出发，系统讲解 HTTP/3 背后的核心概念：QUIC 协议、0-RTT 握手、队头阻塞、连接迁移，以及它对实际项目的影响。"><meta property="twitter:image" content="https://llccing.github.io/posts/http3-%E7%A7%91%E6%99%AEquic0-rtt%E9%98%9F%E5%A4%B4%E9%98%BB%E5%A1%9E%E8%BF%9E%E6%8E%A5%E8%BF%81%E7%A7%BB%E4%B8%80%E6%AC%A1%E8%AE%B2%E6%B8%85%E6%A5%9A.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><!-- Google tag (gtag.js) --><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1X5E9W6VJ2"></script> <script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-1X5E9W6VJ2");
+</script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.CFAw_Ga_.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (width>=640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.ClFfh2EL.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (width>=640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (width>=640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:http3-科普quic0-rtt队头阻塞连接迁移一次讲清楚}@layer astro{::view-transition-old(http3-科普quic0-rtt队头阻塞连接迁移一次讲清楚){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(http3-科普quic0-rtt队头阻塞连接迁移一次讲清楚){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(http3-科普quic0-rtt队头阻塞连接迁移一次讲清楚){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(http3-科普quic0-rtt队头阻塞连接迁移一次讲清楚){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:http}@layer astro{::view-transition-old(http){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(http){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(http){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(http){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:network}@layer astro{::view-transition-old(network){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(network){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(network){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(network){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-4]{view-transition-name:frontend}@layer astro{::view-transition-old(frontend){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(frontend){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(frontend){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(frontend){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/short-stories/" class="astro-3ef6ksr2">
+Short Stories
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex justify-start max-w-3xl mx-auto px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">HTTP/3 科普：QUIC、0-RTT、队头阻塞、连接迁移，一次讲清楚</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-04-11T00:00:00.000Z">Apr 11, 2026</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">08:00 AM</span></span></div> <article id="article" role="article" class="astro-vj4tpspi max-w-3xl mx-auto mt-8 prose"> <p>前几天和同事讨论公司的 Angular 项目，聊到要不要升级 HTTP/3。我们的项目架构是经典的 Nginx + Node.js，前面 Nginx 做反向代理，后面 Node.js 跑 server.js。聊着聊着发现，HTTP/3 背后的很多概念其实并不清楚 —— QUIC 是什么？0-RTT 到底快在哪？队头阻塞是怎么回事？</p>
+<p>这篇文章就从”为什么需要 HTTP/3”出发，把这些概念一个个讲清楚，最后再回到实际项目，看看 HTTP/3 对前端开发者意味着什么。</p>
+<h2 id="http-协议的演进">HTTP 协议的演进</h2>
+<p>先看一条时间线：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>HTTP/1.0 (1996) → HTTP/1.1 (1997) → HTTP/2 (2015) → HTTP/3 (2022)</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>每一代 HTTP 都在解决上一代的性能瓶颈。但前三代有一个共同点：<strong>底层都跑在 TCP 上</strong>。</p>
+<p>HTTP/3 做了一个大胆的决定 —— 把 TCP 换成了 QUIC（基于 UDP）。这不是小修小补，是<strong>换了地基</strong>。</p>
+<p>要理解这个决定，得先搞清楚 TCP 到底有什么问题。而这就要从”队头阻塞”说起。</p>
+<h2 id="队头阻塞head-of-line-blocking">队头阻塞（Head-of-Line Blocking）</h2>
+<h3 id="http11-的队头阻塞">HTTP/1.1 的队头阻塞</h3>
+<p>HTTP/1.1 有一个基本限制：<strong>一个 TCP 连接在同一时间只能处理一个请求-响应</strong>。</p>
+<p>你请求了一个 JS 文件，在它返回之前，同一条连接上的 CSS 请求只能排队等着。这就是最原始的队头阻塞。</p>
+<p>浏览器的应对策略很简单粗暴 —— 对同一个域名开 6 个 TCP 连接，并行加载。但每条连接都要经历完整的 TCP 握手和 TLS 握手，开销不小。而且 6 条连接也不够用，于是又有了域名分片（domain sharding）等 hack 手段。</p>
+<h3 id="http2-的改进与新问题">HTTP/2 的改进与新问题</h3>
+<p>HTTP/2 引入了<strong>多路复用（Multiplexing）</strong>：在一个 TCP 连接上同时跑多个”流”（stream），每个请求是一个独立的流。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>HTTP/1.1: 一条连接一次只能传一个请求</span></span>
+<span class="line"><span>┌──────────────────────────────────────┐</span></span>
+<span class="line"><span>│  请求1 ████████  请求2 ████████  ... │  串行排队</span></span>
+<span class="line"><span>└──────────────────────────────────────┘</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>HTTP/2: 一条连接同时传多个流</span></span>
+<span class="line"><span>┌──────────────────────────────────────┐</span></span>
+<span class="line"><span>│  流1 ██ 流2 ██ 流1 ██ 流3 ██ 流2 ██ │  交替传输</span></span>
+<span class="line"><span>└──────────────────────────────────────┘</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>看起来完美解决了问题？没有。</p>
+<p>HTTP/2 的多路复用建立在 TCP 之上，而 <strong>TCP 不认识”流”这个概念</strong>。TCP 只知道一件事：字节必须按顺序到达。</p>
+<p>假设浏览器同时请求 JS、CSS 和一张图片，三个流的数据包在同一条 TCP 连接上传输。如果 JS 流的某个数据包丢了：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>TCP 视角下的 HTTP/2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  流1 (JS)   ████░████        ← 包丢了，等重传</span></span>
+<span class="line"><span>  流2 (CSS)  ████████ ...等   ← 我的包都到了，但 TCP 不让我交付</span></span>
+<span class="line"><span>  流3 (图片) ████████ ...等   ← 我也被卡住了</span></span>
+<span class="line"><span>             ─────────→ 时间</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>TCP 要求所有字节按顺序交付给应用层。流 1 丢了一个包，TCP 会暂停<strong>整条连接</strong>的数据交付，直到丢失的包重传成功。流 2 和流 3 的数据明明已经到了，却只能干等。</p>
+<p>这就是 <strong>TCP 层面的队头阻塞</strong>。HTTP/2 在应用层消除了 HTTP/1.1 的队头阻塞，却在传输层引入了新的队头阻塞。</p>
+<p>在网络条件好的时候（丢包率低），这个问题不明显。但在弱网环境下（移动网络、跨国访问），丢包率一上去，HTTP/2 的表现甚至可能<strong>不如 HTTP/1.1 的多连接方案</strong> —— 因为 HTTP/1.1 开了 6 条连接，一条连接丢包只影响那一条，而 HTTP/2 把所有鸡蛋放在一个篮子里。</p>
+<h3 id="http3--quic-的解决方案">HTTP/3 + QUIC 的解决方案</h3>
+<p>QUIC 把”流”的概念<strong>下沉到了传输层</strong>。每个流有自己独立的顺序控制和丢包重传机制：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>QUIC 视角下的 HTTP/3:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  流1 (JS)   ████░████        ← 包丢了，流1 自己等重传</span></span>
+<span class="line"><span>  流2 (CSS)  ██████████ ✓     ← 不受影响，正常交付</span></span>
+<span class="line"><span>  流3 (图片) ██████████ ✓     ← 不受影响，正常交付</span></span>
+<span class="line"><span>             ─────────→ 时间</span></span>
+<span class="line"><span></span></span></code></pre>
+<p><strong>一个流丢包，只阻塞自己，不影响其他流。</strong> 这才是真正意义上的多路复用。</p>
+<p>用一个生活中的比喻：TCP 的多路复用像是多辆车走同一条单车道，前面的车抛锚了，后面所有车都得等。QUIC 的多路复用像是多车道高速公路，一条车道出事故，其他车道照常通行。</p>
+<h2 id="0-rtt-连接建立">0-RTT 连接建立</h2>
+<h3 id="先理解-rtt">先理解 RTT</h3>
+<p>RTT（Round-Trip Time，往返时间）是一个数据包从客户端到服务器再回来的时间。你 ping 一个服务器显示 30ms，那 RTT 就是 30ms。</p>
+<p>RTT 看起来很小，但它是<strong>乘法效应</strong> —— 如果建立连接需要 3 个 RTT，那就是 90ms 的延迟，而且这还没开始传任何业务数据。对于首屏加载来说，每一个 RTT 都很宝贵。</p>
+<h3 id="tcp--tls-需要多少个-rtt">TCP + TLS 需要多少个 RTT？</h3>
+<p>一个安全的 HTTPS 连接需要两步：先建立 TCP 连接，再建立 TLS 加密通道。</p>
+<p><strong>TCP + TLS 1.2（老方案）：3 个 RTT</strong></p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>客户端                                    服务器</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── SYN ─────────────────────────────────→│  ┐</span></span>
+<span class="line"><span>  │←── SYN-ACK ────────────────────────────│  │ TCP 三次握手</span></span>
+<span class="line"><span>  │── ACK ─────────────────────────────────→│  ┘ 1 RTT</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── ClientHello ─────────────────────────→│  ┐</span></span>
+<span class="line"><span>  │←── ServerHello + 证书 + 密钥参数 ──────│  │</span></span>
+<span class="line"><span>  │── 客户端密钥交换 + ChangeCipherSpec ───→│  │ TLS 1.2 握手</span></span>
+<span class="line"><span>  │←── ChangeCipherSpec + Finished ────────│  ┘ 2 RTT</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── HTTP 请求（加密的）─────────────────→│  终于开始传数据！</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  总计：3 个 RTT 后才能发出第一个 HTTP 请求</span></span>
+<span class="line"><span></span></span></code></pre>
+<p><strong>TCP + TLS 1.3（现代方案）：2 个 RTT</strong></p>
+<p>TLS 1.3 把握手优化到了 1 个 RTT（合并了密钥交换步骤），加上 TCP 握手的 1 个 RTT，总共 2 个 RTT。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>客户端                                    服务器</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── SYN ─────────────────────────────────→│  ┐ TCP 握手</span></span>
+<span class="line"><span>  │←── SYN-ACK ────────────────────────────│  ┘ 1 RTT</span></span>
+<span class="line"><span>  │── ACK ─────────────────────────────────→│</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── ClientHello + 密钥共享 ──────────────→│  ┐ TLS 1.3 握手</span></span>
+<span class="line"><span>  │←── ServerHello + 证书 + Finished ──────│  ┘ 1 RTT</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── HTTP 请求（加密的）─────────────────→│</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  总计：2 个 RTT</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>这已经比 TLS 1.2 好多了，但 QUIC 还能更快。</p>
+<h3 id="quic-的-1-rtt-首次连接">QUIC 的 1-RTT 首次连接</h3>
+<p>QUIC 的核心思路是：<strong>把传输握手和加密握手合并成一步</strong>。</p>
+<p>TCP 和 TLS 是两个独立的协议，各握各的手。QUIC 直接在协议内部集成了 TLS 1.3，握手过程一步到位：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>客户端                                    服务器</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── Initial（含 TLS ClientHello）────────→│  ┐</span></span>
+<span class="line"><span>  │←── Handshake（含证书 + 密钥 + Fin）───│  │ 传输 + 加密一起搞定</span></span>
+<span class="line"><span>  │── Handshake Complete + HTTP 请求 ─────→│  ┘ 1 RTT</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │←── HTTP 响应 ─────────────────────────│</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  总计：1 个 RTT 就开始传数据</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>对比一下：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>方案</th><th>RTT 数</th><th>假设 RTT = 50ms</th></tr></thead><tbody><tr><td>TCP + TLS 1.2</td><td>3 RTT</td><td>150ms</td></tr><tr><td>TCP + TLS 1.3</td><td>2 RTT</td><td>100ms</td></tr><tr><td>QUIC 首次连接</td><td>1 RTT</td><td>50ms</td></tr></tbody></table>
+<p>省下的每一个 RTT，用户都能感知到。尤其是跨国访问（RTT 可能 200ms+），从 3 RTT 到 1 RTT 就是从 600ms 降到 200ms，差距非常明显。</p>
+<h3 id="quic-的-0-rtt-恢复连接">QUIC 的 0-RTT 恢复连接</h3>
+<p>如果用户<strong>之前访问过</strong>这个网站，QUIC 还有一招更狠的 —— <strong>0-RTT</strong>。</p>
+<p>原理是这样的：首次连接成功后，服务器会给客户端一个”恢复令牌”（类似于 TLS Session Ticket）。下次再访问时，客户端直接用这个令牌加密请求数据，跟握手包一起发出去：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>客户端                                    服务器</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  │── Initial + 0-RTT 数据（HTTP请求）────→│  服务器立刻处理请求！</span></span>
+<span class="line"><span>  │←── Handshake + HTTP 响应 ─────────────│</span></span>
+<span class="line"><span>  │                                         │</span></span>
+<span class="line"><span>  总计：0 个 RTT！第一个包就带着业务数据</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>客户端不需要等握手完成就把请求发出去了。服务器收到后立刻开始处理，同时完成握手。用户感知就是<strong>秒开</strong>。</p>
+<h3 id="0-rtt-的安全代价">0-RTT 的安全代价</h3>
+<p>天下没有免费的午餐。0-RTT 有一个已知的安全风险：<strong>重放攻击（Replay Attack）</strong>。</p>
+<p>攻击者可以截获 0-RTT 的数据包，原封不动地重新发给服务器。因为 0-RTT 数据是用缓存的密钥加密的，服务器无法区分”这是用户发的”还是”这是攻击者重放的”。</p>
+<p>举个例子：如果 0-RTT 包含的是”转账 1000 元”这样的请求，攻击者重放一次就能让你多转 1000 元。</p>
+<p>所以业界的共识是：</p>
+<ul>
+<li>✅ <strong>0-RTT 适合</strong>：GET 请求、静态资源加载、页面首屏渲染 —— 这些是幂等的，重放了也没关系</li>
+<li>❌ <strong>0-RTT 不适合</strong>：POST 请求、支付、表单提交 —— 这些操作必须走完整的 1-RTT 握手</li>
+</ul>
+<p>实际上，服务器端可以通过配置来限制 0-RTT 的使用范围。Nginx、Cloudflare 等都支持只对安全的请求类型启用 0-RTT。</p>
+<h2 id="连接迁移connection-migration">连接迁移（Connection Migration）</h2>
+<p>这是 QUIC 解决的第三个大问题，也是移动互联网时代特别重要的一个特性。</p>
+<h3 id="tcp-的连接标识方式">TCP 的连接标识方式</h3>
+<p>TCP 用一个”四元组”来唯一标识一条连接：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>TCP 连接 = (源 IP, 源端口, 目标 IP, 目标端口)</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>这意味着，<strong>只要你的 IP 地址变了，连接就断了</strong>。四元组里任何一个值变化，对 TCP 来说就是一条全新的连接。</p>
+<p>什么时候 IP 会变？在今天的移动场景下，太常见了：</p>
+<ul>
+<li>📱 手机从 WiFi 切到 4G/5G（比如走出办公室）</li>
+<li>🚇 坐地铁经过不同基站，IP 可能变化</li>
+<li>🏢 笔记本从公司 WiFi 切到会议室 WiFi</li>
+<li>📶 走进电梯信号断了，出来后重新连接</li>
+<li>🚄 坐高铁，频繁在基站之间切换</li>
+</ul>
+<p>每一次网络切换，TCP 连接都会断开。然后需要：</p>
+<ol>
+<li>重新建立 TCP 连接（1 RTT）</li>
+<li>重新进行 TLS 握手（1-2 RTT）</li>
+<li>如果是 HTTP/2，所有正在传输的流全部中断</li>
+</ol>
+<p>如果你正在看视频、传文件、或者加载一个复杂的页面，就会感受到明显的卡顿或中断。</p>
+<h3 id="quic-的-connection-id">QUIC 的 Connection ID</h3>
+<p>QUIC 不用四元组，而是用一个随机生成的 <strong>Connection ID</strong> 来标识连接：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>TCP:</span></span>
+<span class="line"><span>  连接 = (192.168.1.5 : 12345, 93.184.216.34 : 443)</span></span>
+<span class="line"><span>  ↓ WiFi → 4G，IP 变了</span></span>
+<span class="line"><span>  连接 = (10.0.0.8 : 54321, 93.184.216.34 : 443)  ← 不同的四元组 = 新连接</span></span>
+<span class="line"><span>  → 必须重新握手，一切从头来</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>QUIC:</span></span>
+<span class="line"><span>  连接 = Connection ID: 0x1a2b3c4d</span></span>
+<span class="line"><span>  ↓ WiFi → 4G，IP 变了</span></span>
+<span class="line"><span>  连接 = Connection ID: 0x1a2b3c4d  ← 同一个 ID = 同一条连接</span></span>
+<span class="line"><span>  → 无缝继续传输，用户无感知</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>当客户端的 IP 变化时，它只需要用新的 IP 地址发送一个带有相同 Connection ID 的包。服务器通过 Connection ID 识别出”这还是同一个客户端”，验证通过后继续传输，<strong>不需要重新握手</strong>。</p>
+<p>整个过程对应用层完全透明 —— 你的视频不会卡，文件不会断，页面不会白屏。</p>
+<h3 id="安全考虑">安全考虑</h3>
+<p>你可能会想：如果攻击者伪造一个带有别人 Connection ID 的包呢？</p>
+<p>QUIC 对此有防护。每个包都经过加密和认证，Connection ID 的迁移还需要通过<strong>路径验证（Path Validation）</strong>—— 服务器会向新的地址发送一个挑战，客户端必须正确响应，才能完成迁移。这确保了攻击者无法劫持别人的连接。</p>
+<h2 id="quic-协议全景">QUIC 协议全景</h2>
+<p>讲完了三大核心特性，我们退一步看看 QUIC 的全貌。</p>
+<h3 id="quic-是什么">QUIC 是什么？</h3>
+<p><strong>QUIC（Quick UDP Internet Connections）</strong> 最初由 Google 在 2012 年设计并在 Chrome 中实验，2021 年由 IETF 标准化为 <a href="https://datatracker.ietf.org/doc/html/rfc9000">RFC 9000</a>。</p>
+<p>它是一个<strong>基于 UDP 的通用传输协议</strong>，但提供了比 TCP 更强大的能力：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>协议栈对比：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>HTTP/2                    HTTP/3</span></span>
+<span class="line"><span>┌──────────────┐          ┌──────────────┐</span></span>
+<span class="line"><span>│   HTTP/2     │          │   HTTP/3     │</span></span>
+<span class="line"><span>├──────────────┤          ├──────────────┤</span></span>
+<span class="line"><span>│   TLS 1.2+   │          │              │</span></span>
+<span class="line"><span>├──────────────┤          │    QUIC      │  ← 集成了 可靠传输</span></span>
+<span class="line"><span>│    TCP       │          │              │     + 加密 + 多路复用</span></span>
+<span class="line"><span>├──────────────┤          ├──────────────┤</span></span>
+<span class="line"><span>│     IP       │          │  UDP  /  IP  │</span></span>
+<span class="line"><span>└──────────────┘          └──────────────┘</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>QUIC 不是简单地”用 UDP 代替 TCP”。UDP 本身不保证可靠性、不保证顺序、没有拥塞控制。QUIC 在 UDP 之上<strong>重新实现了这一切</strong>，并且做得比 TCP 更好。</p>
+<p>可以这样理解：UDP 只是 QUIC 的”载体”，就像 IP 是 TCP 的载体一样。QUIC 的真正价值在于它重新设计了传输层该怎么工作。</p>
+<h3 id="为什么不直接改-tcp">为什么不直接改 TCP？</h3>
+<p>既然 TCP 有这么多问题，为什么不直接改 TCP，而是要新造一个协议？</p>
+<p>原因是 <strong>TCP 的”协议僵化”（Protocol Ossification）</strong>。</p>
+<p>TCP 已经存在了 40 多年，它的行为模式被写进了：</p>
+<ul>
+<li>操作系统内核（Linux、Windows、macOS）</li>
+<li>路由器固件</li>
+<li>防火墙规则</li>
+<li>NAT 设备</li>
+<li>运营商的中间设备（middlebox）</li>
+</ul>
+<p>这些设备中的很多已经不只是”转发 TCP 包”，而是会<strong>检查甚至修改</strong> TCP 头部的字段。如果你在 TCP 协议里加了一个新字段或改变了某个行为，很可能被中间设备丢弃或篡改。</p>
+<p>Google 曾经尝试过在 TCP 上做优化（比如 TCP Fast Open），发现在实际网络中有大量中间设备不兼容，部署起来困难重重。</p>
+<p>而 UDP 就简单多了。UDP 的头部只有 8 个字节，几乎没有什么可检查的，所有中间设备都会老老实实地转发。在 UDP 上建新协议，是绕过协议僵化最务实的方案。</p>
+<h3 id="quic-的内置加密">QUIC 的内置加密</h3>
+<p>还有一个值得注意的设计决策：<strong>QUIC 强制加密所有内容</strong>。</p>
+<p>不仅仅是载荷数据（像 HTTPS 那样），连大部分包头信息都是加密的。TCP 的头部是明文的，中间设备可以看到序列号、窗口大小等信息；QUIC 的头部只暴露极少的信息（Connection ID 和一些标志位）。</p>
+<p>这不仅提升了隐私性，还有一个实际好处：<strong>防止未来的协议僵化</strong>。因为中间设备看不到包头的细节，就无法针对特定字段做特殊处理，QUIC 团队就可以自由地演进协议而不担心兼容性问题。</p>
+<h2 id="实际部署http3-跟我的前端项目有什么关系">实际部署：HTTP/3 跟我的前端项目有什么关系？</h2>
+<p>理论讲完了，回到开头的问题：我们的 Angular 项目要不要上 HTTP/3？</p>
+<h3 id="典型的前端项目架构">典型的前端项目架构</h3>
+<p>很多 Angular、React、Vue 项目的部署架构是这样的：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>用户浏览器 ←── 公网 ──→ Nginx ←── 内网/本机 ──→ Node.js (server.js)</span></span>
+<span class="line"><span>                ↑                                    ↑</span></span>
+<span class="line"><span>          HTTP/3 在这里              这里用 HTTP/1.1 就够了</span></span>
+<span class="line"><span>          (面向公网用户)              (内网通信，延迟 &lt; 1ms)</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>HTTP/3 解决的是<strong>公网传输</strong>的问题 —— 高延迟、丢包、网络切换。而 Nginx 到 Node.js 之间是内网甚至本机通信，这些问题根本不存在。</p>
+<p>所以结论很清楚：</p>
+<ul>
+<li><strong>外层（Nginx ↔ 浏览器）</strong>：HTTP/3 有价值，配置在 Nginx 上</li>
+<li><strong>内层（Nginx ↔ Node.js）</strong>：不需要 HTTP/3，HTTP/1.1 或 Unix Socket 就够了</li>
+</ul>
+<h3 id="前端代码需要改吗">前端代码需要改吗？</h3>
+<p><strong>完全不需要。</strong></p>
+<p>HTTP/3 是传输层协议，对应用层完全透明。你的 Angular 组件、路由、HTTP 拦截器、API 调用，统统不需要任何改动。<code>HttpClient</code> 发出的请求，底层走 HTTP/2 还是 HTTP/3，由浏览器和服务器自动协商，前端代码感知不到。</p>
+<p>甚至连 <code>fetch()</code>、<code>XMLHttpRequest</code> 这些底层 API 也不需要改 —— 协议切换发生在更底层的网络栈中。</p>
+<h3 id="需要改的是什么">需要改的是什么？</h3>
+<p>升级 HTTP/3 本质上是一个<strong>运维/基础设施</strong>层面的工作：</p>
+<p><strong>1. Nginx 配置</strong></p>
+<p>Nginx 从 1.25.0 开始原生支持 HTTP/3。核心配置只需要加几行：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="nginx"><code><span class="line"><span style="color:#C678DD">server</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    # 传统 HTTPS (HTTP/1.1 + HTTP/2，基于 TCP)</span></span>
+<span class="line"><span style="color:#C678DD">    listen </span><span style="color:#D19A66">443</span><span style="color:#ABB2BF"> ssl;</span></span>
+<span class="line"><span style="color:#C678DD">    http2 </span><span style="color:#D19A66">on</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    # HTTP/3 (基于 QUIC + UDP)</span></span>
+<span class="line"><span style="color:#C678DD">    listen </span><span style="color:#D19A66">443</span><span style="color:#ABB2BF"> quic;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    ssl_certificate </span><span style="color:#ABB2BF">    /path/to/cert.pem;</span></span>
+<span class="line"><span style="color:#C678DD">    ssl_certificate_key </span><span style="color:#ABB2BF">/path/to/key.pem;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    # 告诉浏览器 "我支持 HTTP/3，你下次可以用 QUIC 来连"</span></span>
+<span class="line"><span style="color:#C678DD">    add_header </span><span style="color:#ABB2BF">Alt-Svc </span><span style="color:#98C379">'h3=":443"; ma=86400'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    location</span><span style="color:#ABB2BF"> / {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # 反代到后端 Node.js，内网用 HTTP/1.1</span></span>
+<span class="line"><span style="color:#C678DD">        proxy_pass </span><span style="color:#ABB2BF">http://localhost:3000;</span></span>
+<span class="line"><span style="color:#C678DD">        proxy_http_version </span><span style="color:#D19A66">1.1</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">        proxy_set_header </span><span style="color:#ABB2BF">Upgrade $</span><span style="color:#E06C75">http_upgrade</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">        proxy_set_header </span><span style="color:#ABB2BF">Connection </span><span style="color:#98C379">"upgrade"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">        proxy_set_header </span><span style="color:#ABB2BF">Host $</span><span style="color:#E06C75">host</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">        proxy_set_header </span><span style="color:#ABB2BF">X-Real-IP $</span><span style="color:#E06C75">remote_addr</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>注意 <code>Alt-Svc</code> 这个响应头 —— 它是 HTTP/3 的发现机制。浏览器第一次访问时走 HTTP/2（TCP），收到 <code>Alt-Svc</code> 头后知道服务器支持 HTTP/3，下次就会尝试用 QUIC 连接。这个降级过程是自动的，完全不需要前端配合。</p>
+<p><strong>2. 防火墙规则</strong></p>
+<p>这是很容易被忽略的一点。HTTP/3 基于 UDP，而很多防火墙/安全组默认<strong>只放行 TCP 443</strong>，不放行 UDP 443。</p>
+<p>需要额外开放：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>UDP 443 入站  ← QUIC 需要这个端口</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>如果用的是云服务商（阿里云、AWS、GCP），需要在安全组里加上 UDP 443 的规则。</p>
+<p><strong>3. CDN 和负载均衡</strong></p>
+<p>如果你的项目前面还有 CDN（比如 Cloudflare、阿里云 CDN），好消息是主流 CDN 已经默认支持 HTTP/3，通常只需要在控制台勾选启用。坏消息是如果你用的是自建负载均衡（比如旧版 AWS ALB），可能不支持 HTTP/3，需要额外评估。</p>
+<h3 id="什么场景值得上-http3">什么场景值得上 HTTP/3？</h3>
+<p>并不是所有项目都急需 HTTP/3。它的收益取决于你的用户画像和网络环境：</p>
+<p><strong>收益明显的场景：</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>场景</th><th>为什么</th></tr></thead><tbody><tr><td>大量移动端用户</td><td>连接迁移（WiFi ↔ 蜂窝）直接受益</td></tr><tr><td>弱网 / 高延迟地区</td><td>0-RTT + 无队头阻塞在丢包环境下优势显著</td></tr><tr><td>首屏性能要求极高</td><td>1-RTT 握手减少白屏时间</td></tr><tr><td>全球化部署</td><td>跨国访问 RTT 高，省下的 RTT 数更有意义</td></tr><tr><td>频繁的短连接</td><td>0-RTT 减少每次连接的握手开销</td></tr></tbody></table>
+<p><strong>收益不明显的场景：</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>场景</th><th>为什么</th></tr></thead><tbody><tr><td>B 端内网系统</td><td>网络稳定，延迟低，丢包少</td></tr><tr><td>桌面浏览器为主</td><td>没有连接迁移的需求</td></tr><tr><td>VPN 访问</td><td>VPN 通道本身可能不支持 UDP</td></tr><tr><td>长连接为主（WebSocket）</td><td>HTTP/3 主要优化短连接场景</td></tr></tbody></table>
+<h3 id="如何验证-http3-是否生效">如何验证 HTTP/3 是否生效？</h3>
+<p>部署完之后，怎么确认 HTTP/3 真的在工作？</p>
+<p><strong>方法 1：Chrome DevTools</strong></p>
+<p>打开 DevTools → Network → 右键列头 → 勾选 “Protocol”。如果看到 <code>h3</code> 就说明在用 HTTP/3：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Name          Protocol    Size</span></span>
+<span class="line"><span>app.js        h3          245 kB</span></span>
+<span class="line"><span>styles.css    h3          18 kB</span></span>
+<span class="line"><span>logo.png      h3          5.2 kB</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>注意：第一次访问大概率还是 <code>h2</code>（HTTP/2），因为浏览器需要先收到 <code>Alt-Svc</code> 头才知道可以用 HTTP/3。刷新一次就应该变成 <code>h3</code> 了。</p>
+<p><strong>方法 2：curl 命令行</strong></p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">curl</span><span style="color:#D19A66"> -I</span><span style="color:#D19A66"> --http3</span><span style="color:#98C379"> https://your-site.com</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 如果支持，会看到 HTTP/3 200 的响应</span></span>
+<span class="line"></span></code></pre>
+<p><strong>方法 3：在线检测工具</strong></p>
+<ul>
+<li><a href="https://http3check.net/">HTTP/3 Check</a> —— 输入域名即可检测</li>
+<li><a href="https://cloudflare-quic.com/">Cloudflare HTTP/3 Test</a></li>
+</ul>
+<h2 id="浏览器和服务器的支持情况">浏览器和服务器的支持情况</h2>
+<p>截至 2026 年，HTTP/3 的生态已经相当成熟：</p>
+<h3 id="浏览器支持">浏览器支持</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>浏览器</th><th>HTTP/3 支持</th></tr></thead><tbody><tr><td>Chrome</td><td>✅ 87+ (2020)</td></tr><tr><td>Firefox</td><td>✅ 88+ (2021)</td></tr><tr><td>Safari</td><td>✅ 14+ (2020)</td></tr><tr><td>Edge</td><td>✅ 87+ (2020)</td></tr></tbody></table>
+<p>所有主流浏览器都已支持，全球覆盖率超过 95%。</p>
+<h3 id="服务器--cdn-支持">服务器 / CDN 支持</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>软件/服务</th><th>HTTP/3 支持</th></tr></thead><tbody><tr><td>Nginx</td><td>✅ 1.25.0+ (2023)</td></tr><tr><td>Caddy</td><td>✅ 默认开启</td></tr><tr><td>LiteSpeed</td><td>✅ 最早支持的服务器之一</td></tr><tr><td>Cloudflare</td><td>✅ 默认启用</td></tr><tr><td>阿里云 CDN</td><td>✅ 控制台开启</td></tr><tr><td>AWS CloudFront</td><td>✅ 2022 年支持</td></tr></tbody></table>
+<p>如果你的项目使用 Cloudflare 或类似 CDN，可能你的用户已经在用 HTTP/3 了，只是你不知道而已。</p>
+<h2 id="总结">总结</h2>
+<p>最后用一张表把所有核心概念串起来：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>概念</th><th>解决什么问题</th><th>一句话解释</th></tr></thead><tbody><tr><td><strong>QUIC</strong></td><td>TCP 的历史包袱</td><td>基于 UDP 的新一代传输协议，集成了加密和多路复用</td></tr><tr><td><strong>无队头阻塞</strong></td><td>HTTP/2 在 TCP 上的多路复用缺陷</td><td>一个流丢包不会卡住其他流</td></tr><tr><td><strong>0-RTT</strong></td><td>连接建立太慢</td><td>回访用户第一个包就能带请求数据，连接”秒建立”</td></tr><tr><td><strong>连接迁移</strong></td><td>切网就断连</td><td>用 Connection ID 取代 IP 四元组，切网不断连</td></tr><tr><td><strong>强制加密</strong></td><td>隐私和防僵化</td><td>连包头都加密，中间设备无法窥探和干扰</td></tr></tbody></table>
+<p>对前端开发者来说，HTTP/3 的核心认知是：</p>
+<ol>
+<li><strong>代码层面完全无感</strong> —— 不需要改一行代码</li>
+<li><strong>收益在网络层</strong> —— 移动端和弱网场景受益最大</li>
+<li><strong>部署是运维的事</strong> —— 改 Nginx 配置 + 开 UDP 443 端口</li>
+<li><strong>可以渐进升级</strong> —— HTTP/3 自带降级机制，不支持的客户端自动走 HTTP/2</li>
+</ol>
+<p>HTTP/3 不是什么需要追赶的”新技术焦虑”，它是互联网基础设施的一次自然演进。理解它背后的原理，能帮你在做架构决策和性能优化时有更清晰的判断。</p> </article> <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/http/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">http</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/network/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">network</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/frontend/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">frontend</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://llccing.github.io/posts/http3-quic-guide/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://llccing.github.io/posts/http3-quic-guide/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://llccing.github.io/posts/http3-quic-guide/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://llccing.github.io/posts/http3-quic-guide/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://llccing.github.io/posts/http3-quic-guide/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://llccing.github.io/posts/http3-quic-guide/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> </div> </div> </footer>     <script>function createProgressBar(){const o=document.createElement("div");o.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const e=document.createElement("div");e.className="progress-bar h-1 w-0 bg-skin-accent",e.id="myBar",o.appendChild(e),document.body.appendChild(o)}createProgressBar();function updateScrollProgress(){const o=document.body.scrollTop||document.documentElement.scrollTop,e=document.documentElement.scrollHeight-document.documentElement.clientHeight,n=o/e*100;if(document){const t=document.getElementById("myBar");t&&(t.style.width=n+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let o=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let e of o){e.classList.add("group");let n=document.createElement("a");n.innerText="#",n.className="heading-link hidden group-hover:inline-block ml-2",n.href="#"+e.id,n.ariaHidden="true",e.appendChild(n)}}addHeadingLinks();function attachCopyButtons(){let o="Copy",e=Array.from(document.querySelectorAll("pre"));for(let t of e){let c=document.createElement("div");c.style.position="relative";let d=document.createElement("button");d.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",d.innerHTML=o,t.setAttribute("tabindex","0"),t.appendChild(d),t?.parentNode?.insertBefore(c,t),c.appendChild(t),d.addEventListener("click",async()=>{await n(t,d)})}async function n(t,c){let r=t.querySelector("code")?.innerText;await navigator.clipboard.writeText(r??""),c.innerText="Copied",setTimeout(()=>{c.innerText=o},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();
+</script></body></html>
