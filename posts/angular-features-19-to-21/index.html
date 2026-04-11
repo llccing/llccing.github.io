@@ -1,0 +1,963 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://llccing.github.io/posts/angular-features-19-to-21/"><meta name="generator" content="Astro v4.16.19"><!-- General Meta Tags --><title>Angular 升级指南（三）：Angular 19-21 新特性详解 | Rowan's Blog</title><meta name="title" content="Angular 升级指南（三）：Angular 19-21 新特性详解 | Rowan's Blog"><meta name="description" content="Angular 19-21 标志着框架的成熟期——Signals 全面稳定、Zoneless 正式落地、resource/httpResource 响应式数据获取、增量水合等特性让 Angular 焕然一新。"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="Angular 升级指南（三）：Angular 19-21 新特性详解 | Rowan's Blog"><meta property="og:description" content="Angular 19-21 标志着框架的成熟期——Signals 全面稳定、Zoneless 正式落地、resource/httpResource 响应式数据获取、增量水合等特性让 Angular 焕然一新。"><meta property="og:url" content="https://llccing.github.io/posts/angular-features-19-to-21/"><meta property="og:image" content="https://llccing.github.io/posts/angular-%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97%E4%B8%89angular-19-21-%E6%96%B0%E7%89%B9%E6%80%A7%E8%AF%A6%E8%A7%A3.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-04-11T12:20:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://llccing.github.io/posts/angular-features-19-to-21/"><meta property="twitter:title" content="Angular 升级指南（三）：Angular 19-21 新特性详解 | Rowan's Blog"><meta property="twitter:description" content="Angular 19-21 标志着框架的成熟期——Signals 全面稳定、Zoneless 正式落地、resource/httpResource 响应式数据获取、增量水合等特性让 Angular 焕然一新。"><meta property="twitter:image" content="https://llccing.github.io/posts/angular-%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97%E4%B8%89angular-19-21-%E6%96%B0%E7%89%B9%E6%80%A7%E8%AF%A6%E8%A7%A3.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><!-- Google tag (gtag.js) --><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1X5E9W6VJ2"></script> <script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-1X5E9W6VJ2");
+</script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.CFAw_Ga_.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (width>=640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.ClFfh2EL.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (width>=640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (width>=640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:angular-升级指南三angular-19-21-新特性详解}@layer astro{::view-transition-old(angular-升级指南三angular-19-21-新特性详解){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular-升级指南三angular-19-21-新特性详解){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular-升级指南三angular-19-21-新特性详解){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular-升级指南三angular-19-21-新特性详解){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:angular}@layer astro{::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/short-stories/" class="astro-3ef6ksr2">
+Short Stories
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex justify-start max-w-3xl mx-auto px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">Angular 升级指南（三）：Angular 19-21 新特性详解</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-04-11T12:20:00.000Z">Apr 11, 2026</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">08:20 PM</span></span></div> <article id="article" role="article" class="astro-vj4tpspi max-w-3xl mx-auto mt-8 prose"> <blockquote>
+<p>本文是 Angular 升级系列教程的第三篇，覆盖 Angular 19、20、21 三个版本。系列文章：</p>
+<ul>
+<li><a href="/posts/angular-features-13-to-15">（一）Angular 13-15 新特性详解</a></li>
+<li><a href="/posts/angular-features-16-to-18">（二）Angular 16-18 新特性详解</a></li>
+<li><strong>（三）Angular 19-21 新特性详解</strong>（本文）</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="angular-192024年11月">Angular 19（2024年11月）</h2>
+<p>Angular 19 是 Signals 响应式系统的<strong>收官之作</strong>——几乎所有核心 Signal API 都在这个版本正式稳定。</p>
+<h3 id="1-signals-核心-api-全面稳定">1. Signals 核心 API 全面稳定 ✅</h3>
+<p><code>signal</code>、<code>computed</code>、<code>effect</code>、<code>input</code>、<code>output</code>、<code>model</code>、<code>viewChild</code>、<code>viewChildren</code>、<code>contentChild</code>、<code>contentChildren</code> 全部标记为稳定版：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  Component</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">computed</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">effect</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  input</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">output</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">model</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  viewChild</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">viewChildren</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">contentChild</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">contentChildren</span></span>
+<span class="line"><span style="color:#ABB2BF">} </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/core'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-task-board'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`</span></span>
+<span class="line"><span style="color:#98C379">    &lt;h2&gt;{{ title() }} ({{ activeCount() }}/{{ tasks().length }})&lt;/h2&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;input #newTask /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;button (click)="addTask(newTask.value); newTask.value = ''"&gt;添加&lt;/button&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    @for (task of tasks(); track task.id) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;div class="task" [class.done]="task.done"&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;input type="checkbox"</span></span>
+<span class="line"><span style="color:#98C379">          [checked]="task.done"</span></span>
+<span class="line"><span style="color:#98C379">          (change)="toggleTask(task.id)" /&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;span&gt;{{ task.text }}&lt;/span&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">    } @empty {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;p&gt;暂无任务，添加一个吧！&lt;/p&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;div #footer&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;ng-content /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">  `</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> TaskBoardComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // signal input — 稳定 ✅</span></span>
+<span class="line"><span style="color:#E06C75">  title</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> input</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'任务看板'</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // model — 双向绑定信号，稳定 ✅</span></span>
+<span class="line"><span style="color:#E06C75">  tasks</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> model</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">Task</span><span style="color:#ABB2BF">[]&gt;([]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // computed — 稳定 ✅</span></span>
+<span class="line"><span style="color:#E06C75">  activeCount</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span></span>
+<span class="line"><span style="color:#E5C07B">    this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">tasks</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">filter</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">t</span><span style="color:#C678DD"> =&gt;</span><span style="color:#56B6C2"> !</span><span style="color:#E5C07B">t</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">done</span><span style="color:#ABB2BF">).</span><span style="color:#E06C75">length</span></span>
+<span class="line"><span style="color:#ABB2BF">  );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // output — 稳定 ✅</span></span>
+<span class="line"><span style="color:#E06C75">  taskAdded</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> output</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">Task</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"><span style="color:#E06C75">  taskToggled</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> output</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">number</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // viewChild — 稳定 ✅</span></span>
+<span class="line"><span style="color:#E06C75">  footer</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> viewChild</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">ElementRef</span><span style="color:#ABB2BF">&gt;(</span><span style="color:#98C379">'footer'</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // effect — 稳定 ✅</span></span>
+<span class="line"><span style="color:#61AFEF">    effect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">      console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`活跃任务: </span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">activeCount</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  addTask</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">text</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#ABB2BF"> (</span><span style="color:#56B6C2">!</span><span style="color:#E5C07B">text</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">trim</span><span style="color:#ABB2BF">()) </span><span style="color:#C678DD">return</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> task</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Date</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">now</span><span style="color:#ABB2BF">(), </span><span style="color:#E06C75">text</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">done</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">false</span><span style="color:#ABB2BF"> };</span></span>
+<span class="line"><span style="color:#E5C07B">    this</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">tasks</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">update</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">list</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> [...</span><span style="color:#E06C75">list</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">task</span><span style="color:#ABB2BF">]);</span></span>
+<span class="line"><span style="color:#E5C07B">    this</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">taskAdded</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">emit</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">task</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  toggleTask</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">number</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E5C07B">    this</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">tasks</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">update</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">list</span><span style="color:#C678DD"> =&gt;</span></span>
+<span class="line"><span style="color:#E5C07B">      list</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">map</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">t</span><span style="color:#C678DD"> =&gt;</span><span style="color:#E5C07B"> t</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">id</span><span style="color:#56B6C2"> ===</span><span style="color:#E06C75"> id</span><span style="color:#C678DD"> ?</span><span style="color:#ABB2BF"> { ...</span><span style="color:#E06C75">t</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">done</span><span style="color:#ABB2BF">: </span><span style="color:#56B6C2">!</span><span style="color:#E5C07B">t</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">done</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">:</span><span style="color:#E06C75"> t</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">    );</span></span>
+<span class="line"><span style="color:#E5C07B">    this</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">taskToggled</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">emit</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="2-resource-api开发者预览版">2. <code>resource()</code> API（开发者预览版）🧪 ⭐</h3>
+<p>全新的异步数据获取原语，与 Signals 深度集成，替代手动管理 loading/error 状态：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Component</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">resource</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/core'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">interface</span><span style="color:#E5C07B"> User</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">number</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  email</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  avatar</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-user-profile'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`</span></span>
+<span class="line"><span style="color:#98C379">    &lt;div class="profile"&gt;</span></span>
+<span class="line"><span style="color:#98C379">      @if (userResource.isLoading()) {</span></span>
+<span class="line"><span style="color:#98C379">        &lt;div class="skeleton"&gt;加载中...&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">      }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">      @if (userResource.value(); as user) {</span></span>
+<span class="line"><span style="color:#98C379">        &lt;img [src]="user.avatar" [alt]="user.name" /&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;h2&gt;{{ user.name }}&lt;/h2&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;p&gt;{{ user.email }}&lt;/p&gt;</span></span>
+<span class="line"><span style="color:#98C379">      }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">      @if (userResource.error(); as err) {</span></span>
+<span class="line"><span style="color:#98C379">        &lt;div class="error"&gt;</span></span>
+<span class="line"><span style="color:#98C379">          &lt;p&gt;加载失败: {{ err }}&lt;/p&gt;</span></span>
+<span class="line"><span style="color:#98C379">          &lt;button (click)="userResource.reload()"&gt;重试&lt;/button&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">      }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">      &lt;div class="nav"&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;button (click)="userId.update(v =&gt; v - 1)"</span></span>
+<span class="line"><span style="color:#98C379">                [disabled]="userId() &lt;= 1"&gt;上一个&lt;/button&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;span&gt;用户 #{{ userId() }}&lt;/span&gt;</span></span>
+<span class="line"><span style="color:#98C379">        &lt;button (click)="userId.update(v =&gt; v + 1)"&gt;下一个&lt;/button&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">  `</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> UserProfileComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  userId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // resource — 响应式数据获取</span></span>
+<span class="line"><span style="color:#E06C75">  userResource</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> resource</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // request: 定义依赖的信号</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 当 userId 变化时，自动取消上一次请求并重新获取</span></span>
+<span class="line"><span style="color:#61AFEF">    request</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">userId</span><span style="color:#ABB2BF">() }),</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // loader: 异步加载函数</span></span>
+<span class="line"><span style="color:#61AFEF">    loader</span><span style="color:#ABB2BF">: </span><span style="color:#C678DD">async</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75;font-style:italic">request</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">abortSignal</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">      const</span><span style="color:#E5C07B"> res</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#61AFEF"> fetch</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#98C379">        `https://api.example.com/users/</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">request</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">id</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">        { </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">abortSignal</span><span style="color:#ABB2BF"> }</span></span>
+<span class="line"><span style="color:#ABB2BF">      );</span></span>
+<span class="line"><span style="color:#C678DD">      if</span><span style="color:#ABB2BF"> (</span><span style="color:#56B6C2">!</span><span style="color:#E5C07B">res</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">ok</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> Error</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`HTTP </span><span style="color:#C678DD">${</span><span style="color:#E5C07B">res</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">status</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">      return</span><span style="color:#ABB2BF"> (</span><span style="color:#C678DD">await</span><span style="color:#E5C07B"> res</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">json</span><span style="color:#ABB2BF">()) </span><span style="color:#C678DD">as</span><span style="color:#E5C07B"> User</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><code>resource</code> 的状态属性：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>属性</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td><code>value()</code></td><td><code>T | undefined</code></td><td>加载成功的数据</td></tr><tr><td><code>error()</code></td><td><code>unknown</code></td><td>错误信息</td></tr><tr><td><code>isLoading()</code></td><td><code>boolean</code></td><td>是否正在加载</td></tr><tr><td><code>status()</code></td><td><code>ResourceStatus</code></td><td>状态枚举：idle / loading / resolved / error</td></tr><tr><td><code>reload()</code></td><td><code>void</code></td><td>手动重新加载</td></tr></tbody></table>
+<h3 id="3-linkedsignal开发者预览版">3. <code>linkedSignal</code>（开发者预览版）🧪</h3>
+<p>创建一个可写信号，当源信号变化时自动重置为计算值：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Component</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">computed</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">linkedSignal</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/core'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-product-filter'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`</span></span>
+<span class="line"><span style="color:#98C379">    &lt;h2&gt;商品筛选&lt;/h2&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 分类选择 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;select [value]="category()" (change)="category.set($any($event.target).value)"&gt;</span></span>
+<span class="line"><span style="color:#98C379">      @for (cat of categories; track cat.value) {</span></span>
+<span class="line"><span style="color:#98C379">        &lt;option [value]="cat.value"&gt;{{ cat.label }}&lt;/option&gt;</span></span>
+<span class="line"><span style="color:#98C379">      }</span></span>
+<span class="line"><span style="color:#98C379">    &lt;/select&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 排序方式 — 切换分类时自动重置为默认排序 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;select [value]="sortBy()" (change)="sortBy.set($any($event.target).value)"&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;option value="price"&gt;价格&lt;/option&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;option value="name"&gt;名称&lt;/option&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;option value="rating"&gt;评分&lt;/option&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;option value="sales"&gt;销量&lt;/option&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;/select&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 当前页码 — 切换分类或排序时自动重置为第1页 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;div class="pagination"&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;button (click)="page.update(p =&gt; p - 1)" [disabled]="page() &lt;= 1"&gt;上一页&lt;/button&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;span&gt;第 {{ page() }} 页&lt;/span&gt;</span></span>
+<span class="line"><span style="color:#98C379">      &lt;button (click)="page.update(p =&gt; p + 1)"&gt;下一页&lt;/button&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;/div&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;p&gt;分类: {{ category() }} | 排序: {{ sortBy() }} | 页码: {{ page() }}&lt;/p&gt;</span></span>
+<span class="line"><span style="color:#98C379">  `</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> ProductFilterComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  categories</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> [</span></span>
+<span class="line"><span style="color:#ABB2BF">    { </span><span style="color:#E06C75">value</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'electronics'</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">label</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'电子产品'</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">    { </span><span style="color:#E06C75">value</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'books'</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">label</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'图书'</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">    { </span><span style="color:#E06C75">value</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'clothing'</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">label</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'服装'</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">  ];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 源信号</span></span>
+<span class="line"><span style="color:#E06C75">  category</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'electronics'</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // linkedSignal: 分类变化时，排序重置为 'price'</span></span>
+<span class="line"><span style="color:#E06C75">  sortBy</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> linkedSignal</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">    source</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">category</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#61AFEF">    computation</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#98C379"> 'price'</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // linkedSignal: 分类或排序变化时，页码重置为 1</span></span>
+<span class="line"><span style="color:#E06C75">  page</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> linkedSignal</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">    source</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">cat</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">category</span><span style="color:#ABB2BF">(), </span><span style="color:#E06C75">sort</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">sortBy</span><span style="color:#ABB2BF">() }),</span></span>
+<span class="line"><span style="color:#61AFEF">    computation</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#D19A66"> 1</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><code>linkedSignal</code> vs <code>computed</code> 的区别：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// computed — 只读，完全由依赖决定</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> fullName</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#98C379"> `</span><span style="color:#C678DD">${</span><span style="color:#61AFEF">firstName</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#C678DD"> ${</span><span style="color:#61AFEF">lastName</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// fullName 不能手动修改</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// linkedSignal — 可写，但源变化时会重置</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> selectedCity</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> linkedSignal</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  source</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">country</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#61AFEF">  computation</span><span style="color:#ABB2BF">: (</span><span style="color:#E06C75;font-style:italic">country</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> getDefaultCity</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">country</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// selectedCity 可以手动 set/update</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 但当 country 变化时，会自动重置为默认城市</span></span>
+<span class="line"></span></code></pre>
+<h3 id="4-standalone-默认为-true">4. Standalone 默认为 true</h3>
+<p>Angular 19 中 <code>standalone: true</code> 成为所有组件、指令、管道的默认值：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// Angular 19 — 不需要写 standalone: true</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-hello'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  imports</span><span style="color:#ABB2BF">: [</span><span style="color:#E06C75">CommonModule</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'&lt;h1&gt;Hello&lt;/h1&gt;'</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> HelloComponent</span><span style="color:#ABB2BF"> {}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 等价于之前的</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  standalone</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">,  </span><span style="color:#7F848E;font-style:italic">// 不再需要</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-hello'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  imports</span><span style="color:#ABB2BF">: [</span><span style="color:#E06C75">CommonModule</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'&lt;h1&gt;Hello&lt;/h1&gt;'</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> HelloComponent</span><span style="color:#ABB2BF"> {}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 如果需要非独立组件，必须显式声明</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  standalone</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">false</span><span style="color:#ABB2BF">,  </span><span style="color:#7F848E;font-style:italic">// 显式声明</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-legacy'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'&lt;h1&gt;Legacy&lt;/h1&gt;'</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> LegacyComponent</span><span style="color:#ABB2BF"> {}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="5-路由级渲染模式route-level-render-mode">5. 路由级渲染模式（Route-level Render Mode）</h3>
+<p>可以在路由配置中为每个路由指定渲染策略：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Routes</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/router'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">RenderMode</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/ssr'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> const</span><span style="color:#E5C07B"> routes</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Routes</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> [</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">''</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    component</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">HomeComponent</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    data</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">renderMode</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">RenderMode</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">Server</span><span style="color:#ABB2BF"> }  </span><span style="color:#7F848E;font-style:italic">// SSR</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'about'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    component</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">AboutComponent</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    data</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">renderMode</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">RenderMode</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">Prerender</span><span style="color:#ABB2BF"> }  </span><span style="color:#7F848E;font-style:italic">// SSG（静态生成）</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'dashboard'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    component</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">DashboardComponent</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    data</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">renderMode</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">RenderMode</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">Client</span><span style="color:#ABB2BF"> }  </span><span style="color:#7F848E;font-style:italic">// 纯 CSR</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">  {</span></span>
+<span class="line"><span style="color:#E06C75">    path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'blog/:slug'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    component</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">BlogPostComponent</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    data</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">renderMode</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">RenderMode</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">Prerender</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#E06C75">    resolve</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // 动态路由的预渲染参数</span></span>
+<span class="line"><span style="color:#61AFEF">      renderParams</span><span style="color:#ABB2BF">: </span><span style="color:#C678DD">async</span><span style="color:#ABB2BF"> () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        const</span><span style="color:#E5C07B"> slugs</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#61AFEF"> getAllBlogSlugs</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">        return</span><span style="color:#E5C07B"> slugs</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">map</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">slug</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">slug</span><span style="color:#ABB2BF"> }));</span></span>
+<span class="line"><span style="color:#ABB2BF">      }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">];</span></span>
+<span class="line"></span></code></pre>
+<h3 id="6-增量水合incremental-hydration开发者预览版">6. 增量水合（Incremental Hydration）开发者预览版 🧪</h3>
+<p>结合 <code>@defer</code> 实现按需水合，大幅减少首屏 JavaScript 执行量：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-page'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`</span></span>
+<span class="line"><span style="color:#98C379">    &lt;header&gt;页面头部 — 立即水合&lt;/header&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 进入视口时才水合 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    @defer (hydrate on viewport) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;app-heavy-chart /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    } @placeholder {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;div class="skeleton"&gt;图表区域&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 用户交互时才水合 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    @defer (hydrate on interaction) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;app-comments /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    } @placeholder {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;div&gt;评论区（点击激活）&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 浏览器空闲时水合 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    @defer (hydrate on idle) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;app-recommendations /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 永不水合 — 纯静态内容 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    @defer (hydrate never) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;app-static-footer /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 鼠标悬停时水合 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    @defer (hydrate on hover) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;app-preview-card /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;!-- 定时水合 --&gt;</span></span>
+<span class="line"><span style="color:#98C379">    @defer (hydrate on timer(5s)) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;app-analytics /&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"><span style="color:#98C379">  `</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> PageComponent</span><span style="color:#ABB2BF"> {}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="7-hmr-默认开启">7. HMR 默认开启</h3>
+<p>开发服务器默认启用 Hot Module Replacement，样式和模板修改即时生效：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#7F848E;font-style:italic"># 默认开启 HMR</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> serve</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 禁用</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> serve</span><span style="color:#D19A66"> --no-hmr</span></span>
+<span class="line"></span></code></pre>
+<h3 id="8-其他变更">8. 其他变更</h3>
+<ul>
+<li>支持 TypeScript 5.5 - 5.6</li>
+<li>需要 Node.js 18.19+</li>
+<li><code>effect()</code> 默认在组件销毁时自动清理</li>
+<li><code>afterRender</code> / <code>afterNextRender</code> 新的 phase API</li>
+<li>改进的 SSR 日志和调试信息</li>
+<li>Angular DevTools 更新</li>
+</ul>
+<p><strong>升级命令：</strong></p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@19</span><span style="color:#98C379"> @angular/cli@19</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="angular-202025年5月">Angular 20（2025年5月）</h2>
+<p>Angular 20 是<strong>Zoneless 时代的开端</strong>——无 Zone.js 变更检测正式稳定。</p>
+<h3 id="1-zoneless-变更检测正式稳定-">1. Zoneless 变更检测正式稳定 ✅ ⭐</h3>
+<p>这是 Angular 历史上最重要的性能里程碑之一：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">bootstrapApplication</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/platform-browser'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">provideZonelessChangeDetection</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/core'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 注意：不再有 "Experimental" 前缀</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">bootstrapApplication</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">AppComponent</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#E06C75">  providers</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#61AFEF">    provideZonelessChangeDetection</span><span style="color:#ABB2BF">()  </span><span style="color:#7F848E;font-style:italic">// 正式稳定 ✅</span></span>
+<span class="line"><span style="color:#ABB2BF">  ]</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>Zoneless 的影响：</p>
+<ul>
+<li>新项目默认不再包含 <code>zone.js</code></li>
+<li>包体积减少约 13KB（gzipped）</li>
+<li>变更检测完全由 Signals 驱动，更精确、更高效</li>
+<li>不再有 <code>NgZone.run()</code> 的心智负担</li>
+<li>第三方库的 <code>setTimeout</code>/<code>Promise</code> 不再触发不必要的变更检测</li>
+</ul>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// Zoneless 下的最佳实践 — 全面使用 Signals</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-search'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`</span></span>
+<span class="line"><span style="color:#98C379">    &lt;input [value]="query()" (input)="query.set($any($event.target).value)" /&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    @if (results.isLoading()) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;div class="spinner"&gt;搜索中...&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    @if (results.value(); as items) {</span></span>
+<span class="line"><span style="color:#98C379">      @for (item of items; track item.id) {</span></span>
+<span class="line"><span style="color:#98C379">        &lt;div class="result"&gt;{{ item.title }}&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">      } @empty {</span></span>
+<span class="line"><span style="color:#98C379">        &lt;p&gt;未找到结果&lt;/p&gt;</span></span>
+<span class="line"><span style="color:#98C379">      }</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"><span style="color:#98C379">  `</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> SearchComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  query</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">''</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">  results</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> resource</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">    request</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">query</span><span style="color:#ABB2BF">(),</span></span>
+<span class="line"><span style="color:#61AFEF">    loader</span><span style="color:#ABB2BF">: </span><span style="color:#C678DD">async</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">request</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75;font-style:italic">q</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">abortSignal</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">      if</span><span style="color:#ABB2BF"> (</span><span style="color:#56B6C2">!</span><span style="color:#E06C75">q</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">return</span><span style="color:#ABB2BF"> [];</span></span>
+<span class="line"><span style="color:#C678DD">      const</span><span style="color:#E5C07B"> res</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#61AFEF"> fetch</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`/api/search?q=</span><span style="color:#C678DD">${</span><span style="color:#E06C75">q</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">, { </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">abortSignal</span><span style="color:#ABB2BF"> });</span></span>
+<span class="line"><span style="color:#C678DD">      return</span><span style="color:#E5C07B"> res</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">json</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="2-httpresource-api开发者预览版">2. <code>httpResource</code> API（开发者预览版）🧪 ⭐</h3>
+<p>基于 <code>HttpClient</code> 的响应式数据获取，是 <code>resource()</code> 的 HTTP 专用版本：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Component</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/core'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">httpResource</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/common/http'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">interface</span><span style="color:#E5C07B"> Todo</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">number</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  title</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  completed</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">boolean</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-todos'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`</span></span>
+<span class="line"><span style="color:#98C379">    &lt;h2&gt;待办事项&lt;/h2&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    @if (todosResource.isLoading()) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;div class="spinner"&gt;加载中...&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    @if (todosResource.hasValue()) {</span></span>
+<span class="line"><span style="color:#98C379">      @for (todo of todosResource.value()!; track todo.id) {</span></span>
+<span class="line"><span style="color:#98C379">        &lt;div [class.completed]="todo.completed"&gt;</span></span>
+<span class="line"><span style="color:#98C379">          &lt;input type="checkbox" [checked]="todo.completed" /&gt;</span></span>
+<span class="line"><span style="color:#98C379">          {{ todo.title }}</span></span>
+<span class="line"><span style="color:#98C379">        &lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">      }</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    @if (todosResource.error(); as err) {</span></span>
+<span class="line"><span style="color:#98C379">      &lt;div class="error"&gt;错误: {{ err }}&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#98C379">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#98C379">    &lt;button (click)="userId.set(userId() + 1)"&gt;切换用户&lt;/button&gt;</span></span>
+<span class="line"><span style="color:#98C379">    &lt;button (click)="todosResource.reload()"&gt;刷新&lt;/button&gt;</span></span>
+<span class="line"><span style="color:#98C379">  `</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> TodosComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  userId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // httpResource — 自动跟踪信号依赖</span></span>
+<span class="line"><span style="color:#E06C75">  todosResource</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> httpResource</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">Todo</span><span style="color:#ABB2BF">[]&gt;({</span></span>
+<span class="line"><span style="color:#61AFEF">    url</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#98C379"> `https://jsonplaceholder.typicode.com/todos?userId=</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">userId</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><code>httpResource</code> vs <code>resource</code> 的区别：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// resource — 通用异步加载，使用 fetch 或任意异步操作</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> data</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> resource</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">  request</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">id</span><span style="color:#ABB2BF">() }),</span></span>
+<span class="line"><span style="color:#61AFEF">  loader</span><span style="color:#ABB2BF">: </span><span style="color:#C678DD">async</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75;font-style:italic">request</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">abortSignal</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> res</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#61AFEF"> fetch</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`/api/</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">request</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">id</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">, { </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">abortSignal</span><span style="color:#ABB2BF"> });</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#E5C07B"> res</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">json</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// httpResource — 专为 HTTP 设计，自动使用 HttpClient</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 支持拦截器、类型安全、请求配置</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> data</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> httpResource</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">MyType</span><span style="color:#ABB2BF">&gt;({</span></span>
+<span class="line"><span style="color:#61AFEF">  url</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#98C379"> `/api/</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">id</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  method</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'GET'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#61AFEF">  headers</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#98C379">'Authorization'</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`Bearer </span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">token</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF"> }),</span></span>
+<span class="line"><span style="color:#61AFEF">  params</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">page</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">page</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">toString</span><span style="color:#ABB2BF">() }),</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<h3 id="3-linkedsignal-正式稳定">3. <code>linkedSignal</code> 正式稳定 ✅</h3>
+<p>从开发者预览版升级为稳定版：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">signal</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">linkedSignal</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">computed</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/core'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 地址表单示例</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> country</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'CN'</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> cityMap</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Record</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">[]&gt; </span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#98C379">  'CN'</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">'北京'</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'上海'</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'深圳'</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'广州'</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#98C379">  'US'</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">'New York'</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'Los Angeles'</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'Chicago'</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#98C379">  'JP'</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">'东京'</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'大阪'</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">'京都'</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> availableCities</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E06C75"> cityMap</span><span style="color:#ABB2BF">[</span><span style="color:#61AFEF">country</span><span style="color:#ABB2BF">()] </span><span style="color:#56B6C2">||</span><span style="color:#ABB2BF"> []);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 切换国家时，城市自动重置为第一个</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 用户也可以手动选择其他城市</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> city</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> linkedSignal</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  source</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">country</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#61AFEF">  computation</span><span style="color:#ABB2BF">: (</span><span style="color:#E06C75;font-style:italic">c</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">=&gt;</span><span style="color:#E06C75"> cityMap</span><span style="color:#ABB2BF">[</span><span style="color:#E06C75">c</span><span style="color:#ABB2BF">]?.[</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">] </span><span style="color:#56B6C2">||</span><span style="color:#98C379"> ''</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">city</span><span style="color:#ABB2BF">()); </span><span style="color:#7F848E;font-style:italic">// '北京'</span></span>
+<span class="line"><span style="color:#E5C07B">city</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">set</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'上海'</span><span style="color:#ABB2BF">);     </span><span style="color:#7F848E;font-style:italic">// 手动修改</span></span>
+<span class="line"><span style="color:#E5C07B">console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">city</span><span style="color:#ABB2BF">()); </span><span style="color:#7F848E;font-style:italic">// '上海'</span></span>
+<span class="line"><span style="color:#E5C07B">country</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">set</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'US'</span><span style="color:#ABB2BF">);    </span><span style="color:#7F848E;font-style:italic">// 切换国家</span></span>
+<span class="line"><span style="color:#E5C07B">console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">city</span><span style="color:#ABB2BF">()); </span><span style="color:#7F848E;font-style:italic">// 'New York' — 自动重置</span></span>
+<span class="line"></span></code></pre>
+<h3 id="4-resource-正式稳定">4. <code>resource()</code> 正式稳定 ✅</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// resource 现在是稳定 API，可以放心在生产环境使用</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> articleResource</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> resource</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">  request</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">slug</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">slug</span><span style="color:#ABB2BF">() }),</span></span>
+<span class="line"><span style="color:#61AFEF">  loader</span><span style="color:#ABB2BF">: </span><span style="color:#C678DD">async</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75;font-style:italic">request</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">abortSignal</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> res</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#61AFEF"> fetch</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`/api/articles/</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">request</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">slug</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#E06C75">      signal</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">abortSignal</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#ABB2BF"> (</span><span style="color:#56B6C2">!</span><span style="color:#E5C07B">res</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">ok</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> Error</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'文章不存在'</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#E5C07B"> res</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">json</span><span style="color:#ABB2BF">() </span><span style="color:#C678DD">as</span><span style="color:#E5C07B"> Promise</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">Article</span><span style="color:#ABB2BF">&gt;;</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 在模板中使用</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// @switch (articleResource.status()) {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//   @case ('loading') { &lt;skeleton /&gt; }</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//   @case ('resolved') { &lt;article [data]="articleResource.value()!" /&gt; }</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//   @case ('error') { &lt;error-message [error]="articleResource.error()" /&gt; }</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// }</span></span>
+<span class="line"></span></code></pre>
+<h3 id="5-effect-行为改进">5. <code>effect()</code> 行为改进</h3>
+<p>Angular 20 中 <code>effect()</code> 的行为更加可预测：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// effect 现在默认在组件上下文中运行</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 组件销毁时自动清理</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  selector</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'app-logger'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'...'</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> LoggerComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  count</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 自动追踪依赖，自动清理</span></span>
+<span class="line"><span style="color:#61AFEF">    effect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">      console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`Count changed to: </span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">count</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 带清理函数的 effect</span></span>
+<span class="line"><span style="color:#61AFEF">    effect</span><span style="color:#ABB2BF">((</span><span style="color:#E06C75;font-style:italic">onCleanup</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">      const</span><span style="color:#E5C07B"> id</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">        this</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">count</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">update</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">v</span><span style="color:#C678DD"> =&gt;</span><span style="color:#E06C75"> v</span><span style="color:#56B6C2"> +</span><span style="color:#D19A66"> 1</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">      }, </span><span style="color:#D19A66">1000</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">      onCleanup</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">));</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="6-增量水合改进">6. 增量水合改进</h3>
+<p>增量水合在 Angular 20 中得到进一步完善：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">provideClientHydration</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">withIncrementalHydration</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> '@angular/platform-browser'</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">bootstrapApplication</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">AppComponent</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#E06C75">  providers</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#61AFEF">    provideClientHydration</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#61AFEF">      withIncrementalHydration</span><span style="color:#ABB2BF">()  </span><span style="color:#7F848E;font-style:italic">// 启用增量水合</span></span>
+<span class="line"><span style="color:#ABB2BF">    )</span></span>
+<span class="line"><span style="color:#ABB2BF">  ]</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<h3 id="7-其他变更">7. 其他变更</h3>
+<ul>
+<li>支持 TypeScript 5.7 - 5.8</li>
+<li>需要 Node.js 20+</li>
+<li><code>output()</code> 的 <code>void</code> 类型改进</li>
+<li>构建性能持续优化</li>
+<li>Angular DevTools 增强</li>
+<li>改进的错误消息和诊断</li>
+</ul>
+<p><strong>升级命令：</strong></p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@20</span><span style="color:#98C379"> @angular/cli@20</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="angular-21预计-2025年底">Angular 21（预计 2025年底）</h2>
+<p>Angular 21 目前处于开发阶段，以下是基于 Angular 团队路线图和社区信息的预期特性：</p>
+<h3 id="预期特性">预期特性</h3>
+<ol>
+<li><strong><code>httpResource</code> 正式稳定</strong> — 从开发者预览版升级为稳定版</li>
+<li><strong>增量水合正式稳定</strong> — SSR 性能进一步提升</li>
+<li><strong>Signal Forms</strong> — 基于 Signals 的全新表单 API（可能是开发者预览版）</li>
+<li><strong>更多 Zoneless 优化</strong> — 进一步减少对 Zone.js 的依赖</li>
+<li><strong>构建性能持续改进</strong> — esbuild 和 Vite 集成深化</li>
+<li><strong>Angular DevTools 增强</strong> — 更好的 Signal 调试体验</li>
+</ol>
+<blockquote>
+<p>注意：Angular 21 的具体特性以官方发布为准，以上为基于路线图的预测。</p>
+</blockquote>
+<hr>
+<h2 id="全系列特性状态总览">全系列特性状态总览</h2>
+<h3 id="signals-生态演进">Signals 生态演进</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>特性</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21(预期)</th></tr></thead><tbody><tr><td>signal / computed</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>effect</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>input()</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>output()</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>model()</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>viewChild/viewChildren</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>linkedSignal</td><td>—</td><td>—</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td></tr><tr><td>resource()</td><td>—</td><td>—</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td></tr><tr><td>httpResource</td><td>—</td><td>—</td><td>—</td><td>—</td><td>🧪</td><td>✅?</td></tr></tbody></table>
+<h3 id="构建与渲染演进">构建与渲染演进</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>特性</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th></tr></thead><tbody><tr><td>esbuild 构建器</td><td>🧪</td><td>✅ 默认</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>新控制流 @if/@for</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>@defer</td><td>—</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>SSR 水合</td><td>🧪</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>增量水合</td><td>—</td><td>—</td><td>—</td><td>🧪</td><td>🧪+</td></tr><tr><td>Zoneless</td><td>—</td><td>—</td><td>🧪</td><td>🧪</td><td>✅</td></tr><tr><td>Standalone 默认</td><td>—</td><td>默认生成</td><td>默认生成</td><td>默认值 true</td><td>✅</td></tr></tbody></table>
+<h3 id="版本依赖要求">版本依赖要求</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Angular</th><th>TypeScript</th><th>Node.js</th><th>RxJS</th></tr></thead><tbody><tr><td>13</td><td>4.4</td><td>12.20+ / 14.15+</td><td>7.4+</td></tr><tr><td>14</td><td>4.6 - 4.7</td><td>14.15+ / 16.10+</td><td>7.4+</td></tr><tr><td>15</td><td>4.8</td><td>14.20+ / 16.13+</td><td>7.4+</td></tr><tr><td>16</td><td>4.9 - 5.0</td><td>16.14+ / 18.10+</td><td>7.4+</td></tr><tr><td>17</td><td>5.2</td><td>18.13+</td><td>7.4+</td></tr><tr><td>18</td><td>5.4</td><td>18.19+</td><td>7.4+</td></tr><tr><td>19</td><td>5.5 - 5.6</td><td>18.19+</td><td>7.4+</td></tr><tr><td>20</td><td>5.7 - 5.8</td><td>20+</td><td>7.4+</td></tr></tbody></table>
+<hr>
+<h2 id="从-angular-13-到-20-的完整升级路径">从 Angular 13 到 20 的完整升级路径</h2>
+<h3 id="推荐策略逐版本升级">推荐策略：逐版本升级</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#7F848E;font-style:italic"># 每次升级一个大版本</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@14</span><span style="color:#98C379"> @angular/cli@14</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@15</span><span style="color:#98C379"> @angular/cli@15</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@16</span><span style="color:#98C379"> @angular/cli@16</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@17</span><span style="color:#98C379"> @angular/cli@17</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@18</span><span style="color:#98C379"> @angular/cli@18</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@19</span><span style="color:#98C379"> @angular/cli@19</span></span>
+<span class="line"><span style="color:#61AFEF">ng</span><span style="color:#98C379"> update</span><span style="color:#98C379"> @angular/core@20</span><span style="color:#98C379"> @angular/cli@20</span></span>
+<span class="line"></span></code></pre>
+<h3 id="每个版本的关键迁移动作">每个版本的关键迁移动作</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>升级到</th><th>必做</th><th>推荐做</th></tr></thead><tbody><tr><td>14</td><td>处理 Typed Forms 类型错误（或用 Untyped* 过渡）</td><td>尝试 Standalone Components</td></tr><tr><td>15</td><td>—</td><td>迁移到 Standalone + provide* 函数</td></tr><tr><td>16</td><td>—</td><td>开始使用 Signals</td></tr><tr><td>17</td><td>更新 Node.js 到 18+</td><td>迁移到新控制流语法 <code>ng g @angular/core:control-flow</code></td></tr><tr><td>18</td><td>—</td><td>尝试 Zoneless</td></tr><tr><td>19</td><td>—</td><td>全面拥抱 Signals（input/output/model）</td></tr><tr><td>20</td><td>更新 Node.js 到 20+</td><td>启用 Zoneless，使用 resource/httpResource</td></tr></tbody></table>
+<h3 id="官方升级工具">官方升级工具</h3>
+<p>Angular 官方提供了交互式升级指南，会根据你的当前版本和目标版本生成定制化的升级步骤：</p>
+<p>👉 <a href="https://angular.dev/update-guide">https://angular.dev/update-guide</a></p>
+<hr>
+<blockquote>
+<p>系列文章：</p>
+<ul>
+<li><a href="/posts/angular-features-13-to-15">（一）Angular 13-15 新特性详解</a></li>
+<li><a href="/posts/angular-features-16-to-18">（二）Angular 16-18 新特性详解</a></li>
+<li><strong>（三）Angular 19-21 新特性详解</strong>（本文）</li>
+</ul>
+</blockquote> </article> <ul class="astro-vj4tpspi my-8"> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://llccing.github.io/posts/angular-features-19-to-21/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://llccing.github.io/posts/angular-features-19-to-21/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://llccing.github.io/posts/angular-features-19-to-21/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://llccing.github.io/posts/angular-features-19-to-21/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://llccing.github.io/posts/angular-features-19-to-21/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://llccing.github.io/posts/angular-features-19-to-21/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> </div> </div> </footer>     <script>function createProgressBar(){const o=document.createElement("div");o.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const e=document.createElement("div");e.className="progress-bar h-1 w-0 bg-skin-accent",e.id="myBar",o.appendChild(e),document.body.appendChild(o)}createProgressBar();function updateScrollProgress(){const o=document.body.scrollTop||document.documentElement.scrollTop,e=document.documentElement.scrollHeight-document.documentElement.clientHeight,n=o/e*100;if(document){const t=document.getElementById("myBar");t&&(t.style.width=n+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let o=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let e of o){e.classList.add("group");let n=document.createElement("a");n.innerText="#",n.className="heading-link hidden group-hover:inline-block ml-2",n.href="#"+e.id,n.ariaHidden="true",e.appendChild(n)}}addHeadingLinks();function attachCopyButtons(){let o="Copy",e=Array.from(document.querySelectorAll("pre"));for(let t of e){let c=document.createElement("div");c.style.position="relative";let d=document.createElement("button");d.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",d.innerHTML=o,t.setAttribute("tabindex","0"),t.appendChild(d),t?.parentNode?.insertBefore(c,t),c.appendChild(t),d.addEventListener("click",async()=>{await n(t,d)})}async function n(t,c){let r=t.querySelector("code")?.innerText;await navigator.clipboard.writeText(r??""),c.innerText="Copied",setTimeout(()=>{c.innerText=o},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();
+</script></body></html>
