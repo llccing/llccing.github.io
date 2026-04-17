@@ -1,23 +1,23 @@
 ---
-pubDatetime: 2026-04-11T20:20:00+08:00
-title: Angular 升级指南（三）：Angular 19-21 新特性详解
+pubDatetime: 2026-04-17T12:00:00+08:00
+title: Angular 升级指南（三）：Angular 19-22 新特性详解
 slug: angular-features-19-to-21
 featured: false
 draft: false
 tags: ["angular"]
-description: Angular 19-21 标志着框架的成熟期——Signals 全面稳定、Zoneless 正式落地、resource/httpResource 响应式数据获取、增量水合等特性让 Angular 焕然一新。
+description: Angular 19-22 标志着框架的成熟期--Signals 全面稳定、Zoneless 正式落地、Signal Forms、Angular Aria 无障碍组件、默认 OnPush 等特性让 Angular 焕然一新。
 ---
 
-> 本文是 Angular 升级系列教程的第三篇，覆盖 Angular 19、20、21 三个版本。系列文章：
+> 本文是 Angular 升级系列教程的第三篇，覆盖 Angular 19、20、21、22 四个版本。系列文章：
 > - [（一）Angular 13-15 新特性详解](/posts/angular-features-13-to-15)
 > - [（二）Angular 16-18 新特性详解](/posts/angular-features-16-to-18)
-> - **（三）Angular 19-21 新特性详解**（本文）
+> - **（三）Angular 19-22 新特性详解**（本文）
 
 ---
 
 ## Angular 19（2024年11月）
 
-Angular 19 是 Signals 响应式系统的**收官之作**——几乎所有核心 Signal API 都在这个版本正式稳定。
+Angular 19 是 Signals 响应式系统的**收官之作**--几乎所有核心 Signal API 都在这个版本正式稳定。
 
 ### 1. Signals 核心 API 全面稳定 ✅
 
@@ -55,26 +55,26 @@ import {
   `
 })
 export class TaskBoardComponent {
-  // signal input — 稳定 ✅
+  // signal input - 稳定 ✅
   title = input('任务看板');
 
-  // model — 双向绑定信号，稳定 ✅
+  // model - 双向绑定信号，稳定 ✅
   tasks = model<Task[]>([]);
 
-  // computed — 稳定 ✅
+  // computed - 稳定 ✅
   activeCount = computed(() =>
     this.tasks().filter(t => !t.done).length
   );
 
-  // output — 稳定 ✅
+  // output - 稳定 ✅
   taskAdded = output<Task>();
   taskToggled = output<number>();
 
-  // viewChild — 稳定 ✅
+  // viewChild - 稳定 ✅
   footer = viewChild<ElementRef>('footer');
 
   constructor() {
-    // effect — 稳定 ✅
+    // effect - 稳定 ✅
     effect(() => {
       console.log(`活跃任务: ${this.activeCount()}`);
     });
@@ -143,7 +143,7 @@ interface User {
 export class UserProfileComponent {
   userId = signal(1);
 
-  // resource — 响应式数据获取
+  // resource - 响应式数据获取
   userResource = resource({
     // request: 定义依赖的信号
     // 当 userId 变化时，自动取消上一次请求并重新获取
@@ -191,7 +191,7 @@ import { Component, signal, computed, linkedSignal } from '@angular/core';
       }
     </select>
 
-    <!-- 排序方式 — 切换分类时自动重置为默认排序 -->
+    <!-- 排序方式 - 切换分类时自动重置为默认排序 -->
     <select [value]="sortBy()" (change)="sortBy.set($any($event.target).value)">
       <option value="price">价格</option>
       <option value="name">名称</option>
@@ -199,7 +199,7 @@ import { Component, signal, computed, linkedSignal } from '@angular/core';
       <option value="sales">销量</option>
     </select>
 
-    <!-- 当前页码 — 切换分类或排序时自动重置为第1页 -->
+    <!-- 当前页码 - 切换分类或排序时自动重置为第1页 -->
     <div class="pagination">
       <button (click)="page.update(p => p - 1)" [disabled]="page() <= 1">上一页</button>
       <span>第 {{ page() }} 页</span>
@@ -236,11 +236,11 @@ export class ProductFilterComponent {
 `linkedSignal` vs `computed` 的区别：
 
 ```typescript
-// computed — 只读，完全由依赖决定
+// computed - 只读，完全由依赖决定
 const fullName = computed(() => `${firstName()} ${lastName()}`);
 // fullName 不能手动修改
 
-// linkedSignal — 可写，但源变化时会重置
+// linkedSignal - 可写，但源变化时会重置
 const selectedCity = linkedSignal({
   source: country,
   computation: (country) => getDefaultCity(country)
@@ -254,7 +254,7 @@ const selectedCity = linkedSignal({
 Angular 19 中 `standalone: true` 成为所有组件、指令、管道的默认值：
 
 ```typescript
-// Angular 19 — 不需要写 standalone: true
+// Angular 19 - 不需要写 standalone: true
 @Component({
   selector: 'app-hello',
   imports: [CommonModule],
@@ -327,7 +327,7 @@ export const routes: Routes = [
 @Component({
   selector: 'app-page',
   template: `
-    <header>页面头部 — 立即水合</header>
+    <header>页面头部 - 立即水合</header>
 
     <!-- 进入视口时才水合 -->
     @defer (hydrate on viewport) {
@@ -348,7 +348,7 @@ export const routes: Routes = [
       <app-recommendations />
     }
 
-    <!-- 永不水合 — 纯静态内容 -->
+    <!-- 永不水合 - 纯静态内容 -->
     @defer (hydrate never) {
       <app-static-footer />
     }
@@ -398,7 +398,7 @@ ng update @angular/core@19 @angular/cli@19
 
 ## Angular 20（2025年5月）
 
-Angular 20 是**Zoneless 时代的开端**——无 Zone.js 变更检测正式稳定。
+Angular 20 是**Zoneless 时代的开端**--无 Zone.js 变更检测正式稳定。
 
 ### 1. Zoneless 变更检测正式稳定 ✅ ⭐
 
@@ -424,7 +424,7 @@ Zoneless 的影响：
 - 第三方库的 `setTimeout`/`Promise` 不再触发不必要的变更检测
 
 ```typescript
-// Zoneless 下的最佳实践 — 全面使用 Signals
+// Zoneless 下的最佳实践 - 全面使用 Signals
 @Component({
   selector: 'app-search',
   template: `
@@ -500,7 +500,7 @@ interface Todo {
 export class TodosComponent {
   userId = signal(1);
 
-  // httpResource — 自动跟踪信号依赖
+  // httpResource - 自动跟踪信号依赖
   todosResource = httpResource<Todo[]>({
     url: () => `https://jsonplaceholder.typicode.com/todos?userId=${this.userId()}`
   });
@@ -510,7 +510,7 @@ export class TodosComponent {
 `httpResource` vs `resource` 的区别：
 
 ```typescript
-// resource — 通用异步加载，使用 fetch 或任意异步操作
+// resource - 通用异步加载，使用 fetch 或任意异步操作
 const data = resource({
   request: () => ({ id: this.id() }),
   loader: async ({ request, abortSignal }) => {
@@ -519,7 +519,7 @@ const data = resource({
   }
 });
 
-// httpResource — 专为 HTTP 设计，自动使用 HttpClient
+// httpResource - 专为 HTTP 设计，自动使用 HttpClient
 // 支持拦截器、类型安全、请求配置
 const data = httpResource<MyType>({
   url: () => `/api/${this.id()}`,
@@ -558,7 +558,7 @@ console.log(city()); // '北京'
 city.set('上海');     // 手动修改
 console.log(city()); // '上海'
 country.set('US');    // 切换国家
-console.log(city()); // 'New York' — 自动重置
+console.log(city()); // 'New York' - 自动重置
 ```
 
 ### 4. `resource()` 正式稳定 ✅
@@ -649,20 +649,177 @@ ng update @angular/core@20 @angular/cli@20
 
 ---
 
-## Angular 21（预计 2025年底）
+## Angular 21（2025年11月）
 
-Angular 21 目前处于开发阶段，以下是基于 Angular 团队路线图和社区信息的预期特性：
+Angular 21 带来了 **Signal Forms**、**Angular Aria 无障碍组件**、**Vitest 默认测试运行器**等重磅特性，同时多个 API 从预览版正式稳定。
 
-### 预期特性
+### 1. Signal Forms（实验版）🧪 ⭐
 
-1. **`httpResource` 正式稳定** — 从开发者预览版升级为稳定版
-2. **增量水合正式稳定** — SSR 性能进一步提升
-3. **Signal Forms** — 基于 Signals 的全新表单 API（可能是开发者预览版）
-4. **更多 Zoneless 优化** — 进一步减少对 Zone.js 的依赖
-5. **构建性能持续改进** — esbuild 和 Vite 集成深化
-6. **Angular DevTools 增强** — 更好的 Signal 调试体验
+全新的基于 Signals 的表单 API，允许开发者使用信号管理表单状态，提供更直观的表单创建体验：
 
-> 注意：Angular 21 的具体特性以官方发布为准，以上为基于路线图的预测。
+```typescript
+// Signal Forms 示例（实验版）
+import { signal } from '@angular/core';
+
+// Signal Forms 使用信号驱动表单状态
+// 提供更直观的表单创建体验
+// 支持与 Reactive Forms 渐进式迁移
+```
+
+Signal Forms 包含的核心能力：
+- `FieldState.getError()` 方法--直接获取字段的特定验证错误
+- `reloadValidation` 手动触发异步验证
+- `validateAsync` 和 `validateHttp` 的 debounce 选项--减少不必要的异步验证请求
+- 支持 `number|null` 绑定到 `<input type="text">`
+- CVA（ControlValueAccessor）互操作--与现有 Reactive Forms 渐进式迁移
+
+### 2. Angular Aria 无障碍组件（开发者预览版）🧪
+
+提供 8 种无障碍、无样式（headless）的交互模式，开发者可以自定义样式来匹配自己的设计系统。这些组件遵循 WAI-ARIA 规范，开箱即用地提供键盘导航、屏幕阅读器支持等无障碍特性。
+
+### 3. Vitest 成为默认测试运行器 ✅
+
+Angular CLI 的 `ng test` 默认使用 Vitest，替代了 Karma。同时提供了实验性的 Karma 到 Vitest 迁移工具：
+
+```bash
+# ng test 现在默认使用 Vitest
+ng test
+
+# 从 Karma 迁移到 Vitest（实验性迁移工具）
+ng generate @angular/core:karma-to-vitest
+```
+
+### 4. httpResource 正式稳定 ✅
+
+从开发者预览版升级为稳定版，可以放心在生产环境中使用：
+
+```typescript
+import { httpResource } from '@angular/common/http';
+
+// httpResource 现在是稳定 API ✅
+const todosResource = httpResource<Todo[]>({
+  url: () => `https://api.example.com/todos?userId=${this.userId()}`
+});
+```
+
+### 5. 增量水合正式稳定 ✅
+
+增量水合从开发者预览版升级为稳定版，SSR 性能进一步提升。结合 `@defer` 实现按需水合，大幅减少首屏 JavaScript 执行量。
+
+### 6. Zoneless 稳定且默认 ✅
+
+Zoneless 变更检测在 v20.2 稳定后，v21 中成为**新项目的默认配置**。使用 `ng new` 创建的新项目不再包含 `zone.js`，变更检测完全由 Signals 驱动。
+
+```typescript
+// Angular 21 新项目默认使用 Zoneless
+// 不再需要手动配置 provideZonelessChangeDetection()
+bootstrapApplication(AppComponent);
+```
+
+### 7. Signal 调试工具
+
+Angular DevTools 中新增 Signal 调试 UI，可以检查和调试信号的值、依赖关系和变更历史，让 Signals 的调试体验大幅提升。
+
+### 8. 其他变更
+
+- 支持 TypeScript 5.8 - 5.9
+- 需要 Node.js 20+
+- 改进的 HMR 支持
+- 模板 HMR 稳定
+
+**升级命令：**
+
+```bash
+ng update @angular/core@21 @angular/cli@21
+```
+
+---
+
+## Angular 22（预计 2026 年中发布）
+
+Angular 22 目前处于 next 阶段（22.0.0-next.8，2026年4月15日），以下内容基于 next 版本，最终特性以官方发布为准。
+
+### 1. 默认 OnPush 变更检测 ⭐
+
+这是一个重大的行为变更--组件的 `changeDetection` 属性未定义时，默认为 `OnPush`。如需保持之前的行为，需显式设置 `ChangeDetectionStrategy.Eager`：
+
+```typescript
+// Angular 22 - 默认 OnPush
+@Component({
+  selector: 'app-example',
+  template: '...'
+})
+export class ExampleComponent {}
+// changeDetection 默认为 OnPush
+
+// 如需旧行为
+@Component({
+  selector: 'app-eager',
+  changeDetection: ChangeDetectionStrategy.Eager,
+  template: '...'
+})
+export class EagerComponent {}
+```
+
+### 2. 移除 ComponentFactoryResolver & ComponentFactory
+
+这两个已废弃的 API 被彻底移除。需要直接传递组件类给 `ViewContainerRef.createComponent` 或使用独立的 `createComponent` 函数：
+
+```typescript
+// ❌ Angular 22 之前的写法（已移除）
+const factory = this.resolver.resolveComponentFactory(MyComponent);
+const ref = this.container.createComponent(factory);
+
+// ✅ Angular 22 的写法
+const ref = this.container.createComponent(MyComponent);
+// 或使用独立函数
+import { createComponent } from '@angular/core';
+const ref = createComponent(MyComponent, { environmentInjector });
+```
+
+### 3. 移除 Hammer.js 集成
+
+Hammer.js 触摸手势集成被移除，开发者需要自行实现触摸手势处理或使用替代库。
+
+### 4. 要求 TypeScript 6.0+
+
+不再支持 TypeScript 5.9 及更早版本。TypeScript 6.0 由微软用 Go 重写编译器，带来 **5-10x 的编译速度提升**，这对大型 Angular 项目是重大利好。
+
+### 5. 增量水合成为默认行为
+
+`incremental hydration` 成为默认的水合策略，不再需要手动配置 `withIncrementalHydration()`。
+
+### 6. AI 调试工具
+
+Angular 22 引入了 AI 驱动的调试工具：
+- Angular DI graph in-page AI tool--可视化依赖注入图
+- AI runtime debugging tools--智能运行时调试
+- 增强的性能分析（profiling）与文档 URL 关联
+
+### 7. Shadow DOM 支持
+
+支持在 Shadow Root 下启动 Angular 应用，为 Web Components 集成提供更好的支持。
+
+### 8. Signal Forms 增强 🧪+
+
+在 Angular 21 实验版的基础上持续改进：
+- CVA 互操作改进
+- `parseErrors` 支持旧版 NG_VALIDATORS
+- 信号表单的 `controlValue` 改进
+
+### 9. 编译器改进
+
+- 支持 HTML 注释
+- 安全导航操作符正确收窄可空类型
+- 重复选择器编译时报错（NG8023）
+- `strictTemplates` 在 `ng update` 时自动添加到 tsconfig
+
+### 10. 其他 Breaking Changes
+
+- `CanMatchFn` 的 `currentSnapshot` 参数变为必需
+- 未使用的样式在关联 host 被移除时自动清理
+
+> 注意：Angular 22 目前处于 next 阶段，以上特性可能在正式发布前有所调整。
 
 ---
 
@@ -670,29 +827,31 @@ Angular 21 目前处于开发阶段，以下是基于 Angular 团队路线图和
 
 ### Signals 生态演进
 
-| 特性 | 16 | 17 | 18 | 19 | 20 | 21(预期) |
-|------|----|----|----|----|----|----|
-| signal / computed | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| effect | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| input() | — | 🧪 | ✅ | ✅ | ✅ | ✅ |
-| output() | — | 🧪 | ✅ | ✅ | ✅ | ✅ |
-| model() | — | 🧪 | ✅ | ✅ | ✅ | ✅ |
-| viewChild/viewChildren | — | 🧪 | ✅ | ✅ | ✅ | ✅ |
-| linkedSignal | — | — | — | 🧪 | ✅ | ✅ |
-| resource() | — | — | — | 🧪 | ✅ | ✅ |
-| httpResource | — | — | — | — | 🧪 | ✅? |
+| 特性 | 16 | 17 | 18 | 19 | 20 | 21 | 22 |
+|------|----|----|----|----|----|----|----|
+| signal / computed | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| effect | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| input() | - | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| output() | - | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| model() | - | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| viewChild/viewChildren | - | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| linkedSignal | - | - | - | 🧪 | ✅ | ✅ | ✅ |
+| resource() | - | - | - | 🧪 | ✅ | ✅ | ✅ |
+| httpResource | - | - | - | - | 🧪 | ✅ | ✅ |
+| Signal Forms | - | - | - | - | - | 🧪 | 🧪+ |
 
 ### 构建与渲染演进
 
-| 特性 | 16 | 17 | 18 | 19 | 20 |
-|------|----|----|----|----|-----|
-| esbuild 构建器 | 🧪 | ✅ 默认 | ✅ | ✅ | ✅ |
-| 新控制流 @if/@for | — | 🧪 | ✅ | ✅ | ✅ |
-| @defer | — | 🧪 | ✅ | ✅ | ✅ |
-| SSR 水合 | 🧪 | ✅ | ✅ | ✅ | ✅ |
-| 增量水合 | — | — | — | 🧪 | 🧪+ |
-| Zoneless | — | — | 🧪 | 🧪 | ✅ |
-| Standalone 默认 | — | 默认生成 | 默认生成 | 默认值 true | ✅ |
+| 特性 | 16 | 17 | 18 | 19 | 20 | 21 | 22 |
+|------|----|----|----|----|-----|----|----|
+| esbuild 构建器 | 🧪 | ✅ 默认 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 新控制流 @if/@for | - | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| @defer | - | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| SSR 水合 | 🧪 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 增量水合 | - | - | - | 🧪 | 🧪+ | ✅ | ✅ 默认 |
+| Zoneless | - | - | 🧪 | 🧪 | ✅ | ✅ 默认 | ✅ |
+| Standalone 默认 | - | 默认生成 | 默认生成 | 默认值 true | ✅ | ✅ | ✅ |
+| 默认 OnPush | - | - | - | - | - | - | ✅ |
 
 ### 版本依赖要求
 
@@ -706,10 +865,12 @@ Angular 21 目前处于开发阶段，以下是基于 Angular 团队路线图和
 | 18 | 5.4 | 18.19+ | 7.4+ |
 | 19 | 5.5 - 5.6 | 18.19+ | 7.4+ |
 | 20 | 5.7 - 5.8 | 20+ | 7.4+ |
+| 21 | 5.8 - 5.9 | 20+ | 7.4+ |
+| 22 | 6.0+ | 20+ | 7.4+ |
 
 ---
 
-## 从 Angular 13 到 20 的完整升级路径
+## 从 Angular 13 到 22 的完整升级路径
 
 ### 推荐策略：逐版本升级
 
@@ -722,6 +883,8 @@ ng update @angular/core@17 @angular/cli@17
 ng update @angular/core@18 @angular/cli@18
 ng update @angular/core@19 @angular/cli@19
 ng update @angular/core@20 @angular/cli@20
+ng update @angular/core@21 @angular/cli@21
+ng update @angular/core@22 @angular/cli@22
 ```
 
 ### 每个版本的关键迁移动作
@@ -735,6 +898,8 @@ ng update @angular/core@20 @angular/cli@20
 | 18 | — | 尝试 Zoneless |
 | 19 | — | 全面拥抱 Signals（input/output/model）|
 | 20 | 更新 Node.js 到 20+ | 启用 Zoneless，使用 resource/httpResource |
+| 21 | — | 使用 Signal Forms，迁移到 Vitest |
+| 22 | 移除 ComponentFactory 用法，更新 TypeScript 到 6.0+ | 迁移到 OnPush，移除 Hammer.js 依赖 |
 
 ### 官方升级工具
 
@@ -747,4 +912,4 @@ Angular 官方提供了交互式升级指南，会根据你的当前版本和目
 > 系列文章：
 > - [（一）Angular 13-15 新特性详解](/posts/angular-features-13-to-15)
 > - [（二）Angular 16-18 新特性详解](/posts/angular-features-16-to-18)
-> - **（三）Angular 19-21 新特性详解**（本文）
+> - **（三）Angular 19-22 新特性详解**（本文）
