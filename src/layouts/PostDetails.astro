@@ -27,7 +27,9 @@ const {
   tags,
 } = post.data;
 
-const { Content } = await post.render();
+const { Content, headings, remarkPluginFrontmatter } = await post.render();
+const minutesRead = remarkPluginFrontmatter?.minutesRead;
+const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
@@ -73,8 +75,21 @@ const layoutProps = {
       modDatetime={modDatetime}
       size="lg"
       className="my-2"
+      readingTime={minutesRead}
     />
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
+      {tocHeadings.length >= 3 && (
+        <details class="toc" open>
+          <summary class="cursor-pointer font-bold">目录</summary>
+          <ul class="mt-2">
+            {tocHeadings.map(h => (
+              <li style={`margin-left: ${(h.depth - 2) * 1}rem`}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
       <Content />
     </article>
 

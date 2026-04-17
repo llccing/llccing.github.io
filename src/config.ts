@@ -1,7 +1,7 @@
 import type { Site, SocialObjects } from "./types";
 
 export const SITE: Site = {
-  website: "https://llccing.github.io", // replace this with your deployed domain
+  website: "https://rowanliu.com",
   base: '/',  // This line ensures correct asset paths
   author: "Rowan Liu",
   desc: "日常碎碎念的地方，记录工作生活过程中的各种有意义的事情。",
@@ -13,8 +13,8 @@ export const SITE: Site = {
 };
 
 export const LOCALE = {
-  lang: "en", // html lang code. Set this empty and default will be "en"
-  langTag: ["en-EN"], // BCP 47 Language Tags. Set this empty [] to use the environment default
+  lang: "zh-CN", // html lang code. Set this empty and default will be "en"
+  langTag: ["zh-CN"], // BCP 47 Language Tags. Set this empty [] to use the environment default
 } as const;
 
 export const LOGO_IMAGE = {

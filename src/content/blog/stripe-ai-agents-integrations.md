@@ -5,7 +5,7 @@ slug: stripe-ai-agents-integrations
 featured: false
 draft: false
 tags:
-  - ai
+  - AI
   - stripe
   - translation
 description: "本文翻译自 Stripe 官方博客，Stripe 构建了一个包含 102 个真实集成任务的基准测试，来检验 AI 编码智能体能否构建生产级别的 Stripe 集成。"

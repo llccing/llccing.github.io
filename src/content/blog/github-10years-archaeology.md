@@ -3,7 +3,7 @@ title: "10年前端考古：从 Vue 到 AI，我的 GitHub 学习轨迹"
 description: "回顾10年来在 GitHub 上留下的98个仓库，记录从 Vue 新手到 AI 全栈的成长历程。"
 pubDatetime: 2026-03-22T10:00:00Z
 tags:
-  - 前端开发
+  - frontend
   - GitHub
   - 学习历程
   - AI
