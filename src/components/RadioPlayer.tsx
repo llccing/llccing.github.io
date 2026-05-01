@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { Howl } from "howler";
-import type { RadioCategory, RadioTrack } from "@pages/radio/radio-data";
+import type { RadioCategory, RadioTrack } from "../data/radio-data";
 
 /* ───────── helpers ───────── */
 
@@ -50,9 +50,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
 
   const [selectedCategoryId, setSelectedCategoryId] =
     useState(defaultCategoryId);
-  const [currentTrackId, setCurrentTrackId] = useState<string | null>(
-    categories.find(c => c.id === defaultCategoryId)?.tracks[0]?.id ?? null
-  );
+  const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [progressPercent, setProgressPercent] = useState(0);
@@ -72,11 +70,8 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
   );
 
   const currentTrack: RadioTrack | undefined = useMemo(() => {
-    if (!currentCategory) return undefined;
-    return (
-      currentCategory.tracks.find(t => t.id === currentTrackId) ??
-      currentCategory.tracks[0]
-    );
+    if (!currentCategory || !currentTrackId) return undefined;
+    return currentCategory.tracks.find(t => t.id === currentTrackId);
   }, [currentCategory, currentTrackId]);
 
   /* ── progress timer ── */
@@ -118,12 +113,12 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
       return;
     }
     if (
-      !currentTrack ||
-      !currentCategory.tracks.some(t => t.id === currentTrack.id)
+      currentTrackId &&
+      !currentCategory.tracks.some(t => t.id === currentTrackId)
     ) {
       setCurrentTrackId(currentCategory.tracks[0]?.id ?? null);
     }
-  }, [currentCategory, currentTrack]);
+  }, [currentCategory, currentTrackId]);
 
   useEffect(() => {
     if (!currentTrack) {
@@ -195,13 +190,11 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
 
   const getAdjacentTrackId = (dir: "next" | "prev"): string | null => {
     if (!currentCategory || !currentTrack) return null;
-    const idx = currentCategory.tracks.findIndex(
-      t => t.id === currentTrack.id
-    );
+    const idx = currentCategory.tracks.findIndex(t => t.id === currentTrack.id);
     if (idx === -1) return currentCategory.tracks[0]?.id ?? null;
     return dir === "next"
-      ? currentCategory.tracks[idx + 1]?.id ?? null
-      : currentCategory.tracks[idx - 1]?.id ?? null;
+      ? (currentCategory.tracks[idx + 1]?.id ?? null)
+      : (currentCategory.tracks[idx - 1]?.id ?? null);
   };
 
   const handleNext = () => {
@@ -223,14 +216,18 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
     setElapsedSeconds(0);
     setDurationSeconds(0);
     setSelectedCategoryId(categoryId);
-    const cat = categories.find(c => c.id === categoryId);
-    setCurrentTrackId(cat?.tracks[0]?.id ?? null);
+    setCurrentTrackId(null);
   };
 
   const handlePlayAll = () => {
     if (!currentCategory?.tracks.length) return;
     const firstId = currentCategory.tracks[0].id;
-    if (currentTrackId === firstId && howlRef.current?.playing()) return;
+    if (currentTrackId === firstId && howlRef.current) {
+      if (!howlRef.current.playing()) {
+        howlRef.current.play();
+      }
+      return;
+    }
     setCurrentTrackId(firstId);
   };
 
@@ -295,10 +292,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
               disabled={!trackCount}
               className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-500/25 transition hover:bg-emerald-600 active:scale-95 disabled:opacity-40"
             >
-              <svg
-                className="h-4 w-4 fill-current"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
               Play All
@@ -516,18 +510,12 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                         />
                       </svg>
                     ) : isPlaying ? (
-                      <svg
-                        className="h-5 w-5 fill-current"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
                         <rect x={6} y={5} width={4} height={14} rx={1} />
                         <rect x={14} y={5} width={4} height={14} rx={1} />
                       </svg>
                     ) : (
-                      <svg
-                        className="h-5 w-5 fill-current"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}

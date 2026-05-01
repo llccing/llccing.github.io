@@ -1,12 +1,13 @@
 {
   "name": "zany-zenith",
   "version": "4.2.0",
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "astro dev --host",
     "start": "astro dev",
     "build": "astro check && astro build && jampack ./dist",
     "postbuild": "cp .nojekyll dist/.nojekyll",
-    "predeploy": "npm run build",
+    "predeploy": "pnpm build",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
