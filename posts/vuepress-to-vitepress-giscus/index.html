@@ -1,0 +1,519 @@
+<!DOCTYPE html><html lang="zh-CN" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://rowanliu.com/posts/vuepress-to-vitepress-giscus/"><meta name="generator" content="Astro v4.16.18"><!-- General Meta Tags --><title>VuePress 退场，VitePress 登场：2026 年技术文档站的最优解 | Rowan's Blog</title><meta name="title" content="VuePress 退场，VitePress 登场：2026 年技术文档站的最优解 | Rowan's Blog"><meta name="description" content="VuePress 1/2 时代的终结与 VitePress 的崛起。本文详解 VitePress 核心优势、从 VuePress 的迁移路径、Giscus 评论系统接入，以及搜索、国际化、自定义主题等实战配置。"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="VuePress 退场，VitePress 登场：2026 年技术文档站的最优解 | Rowan's Blog"><meta property="og:description" content="VuePress 1/2 时代的终结与 VitePress 的崛起。本文详解 VitePress 核心优势、从 VuePress 的迁移路径、Giscus 评论系统接入，以及搜索、国际化、自定义主题等实战配置。"><meta property="og:url" content="https://rowanliu.com/posts/vuepress-to-vitepress-giscus/"><meta property="og:image" content="https://rowanliu.com/posts/vuepress-%E9%80%80%E5%9C%BAvitepress-%E7%99%BB%E5%9C%BA2026-%E5%B9%B4%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3%E7%AB%99%E7%9A%84%E6%9C%80%E4%BC%98%E8%A7%A3.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-05-01T14:00:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://rowanliu.com/posts/vuepress-to-vitepress-giscus/"><meta property="twitter:title" content="VuePress 退场，VitePress 登场：2026 年技术文档站的最优解 | Rowan's Blog"><meta property="twitter:description" content="VuePress 1/2 时代的终结与 VitePress 的崛起。本文详解 VitePress 核心优势、从 VuePress 的迁移路径、Giscus 评论系统接入，以及搜索、国际化、自定义主题等实战配置。"><meta property="twitter:image" content="https://rowanliu.com/posts/vuepress-%E9%80%80%E5%9C%BAvitepress-%E7%99%BB%E5%9C%BA2026-%E5%B9%B4%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3%E7%AB%99%E7%9A%84%E6%9C%80%E4%BC%98%E8%A7%A3.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><!-- Google tag (gtag.js) --><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1X5E9W6VJ2"></script> <script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-1X5E9W6VJ2");
+</script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.CzgqvkTP.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (min-width:640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.Cj6ph0Em.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (min-width:640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (min-width:640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:vuepress-退场vitepress-登场2026-年技术文档站的最优解}@layer astro{::view-transition-old(vuepress-退场vitepress-登场2026-年技术文档站的最优解){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(vuepress-退场vitepress-登场2026-年技术文档站的最优解){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(vuepress-退场vitepress-登场2026-年技术文档站的最优解){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(vuepress-退场vitepress-登场2026-年技术文档站的最优解){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:vitepress}@layer astro{::view-transition-old(vitepress){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(vitepress){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(vitepress){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(vitepress){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:vuepress}@layer astro{::view-transition-old(vuepress){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(vuepress){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(vuepress){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(vuepress){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-4]{view-transition-name:documentation}@layer astro{::view-transition-old(documentation){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(documentation){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(documentation){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(documentation){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-5]{view-transition-name:vue}@layer astro{::view-transition-old(vue){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(vue){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(vue){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(vue){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/short-stories/" class="astro-3ef6ksr2">
+Short Stories
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex justify-start max-w-3xl mx-auto px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">VuePress 退场，VitePress 登场：2026 年技术文档站的最优解</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-01T14:00:00.000Z">2026年5月1日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">22:00</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>4 min read</span></span></div> <article id="article" role="article" class="astro-vj4tpspi max-w-3xl mx-auto mt-8 prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#前言" class="astro-vj4tpspi">前言</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#一vuepress-的困境" class="astro-vj4tpspi">一、VuePress 的困境</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#11-vuepress-1x-的局限" class="astro-vj4tpspi">1.1 VuePress 1.x 的局限</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#12-vuepress-2x-的现实处境" class="astro-vj4tpspi">1.2 VuePress 2.x 的现实处境</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#13-vssue-vs-giscus" class="astro-vj4tpspi">1.3 Vssue vs Giscus</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#二vitepress-的核心优势" class="astro-vj4tpspi">二、VitePress 的核心优势</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#21-性能飞跃" class="astro-vj4tpspi">2.1 性能飞跃</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#22-vue-3-内核" class="astro-vj4tpspi">2.2 Vue 3 内核</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#23-极简配置" class="astro-vj4tpspi">2.3 极简配置</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#三从-vuepress-迁移" class="astro-vj4tpspi">三、从 VuePress 迁移</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#31-目录结构对比" class="astro-vj4tpspi">3.1 目录结构对比</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#32-frontmatter-差异" class="astro-vj4tpspi">3.2 frontmatter 差异</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#33-配置-api-对照" class="astro-vj4tpspi">3.3 配置 API 对照</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#34-自定义主题迁移" class="astro-vj4tpspi">3.4 自定义主题迁移</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#四giscus-评论系统接入" class="astro-vj4tpspi">四、Giscus 评论系统接入</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#41-准备工作" class="astro-vj4tpspi">4.1 准备工作</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#42-创建-giscus-组件" class="astro-vj4tpspi">4.2 创建 Giscus 组件</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#43-在-layout-中注入评论区" class="astro-vj4tpspi">4.3 在 Layout 中注入评论区</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#五搜索配置" class="astro-vj4tpspi">五、搜索配置</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#51-本地搜索minisearch" class="astro-vj4tpspi">5.1 本地搜索（MiniSearch）</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#52-algolia-docsearch适合大型文档" class="astro-vj4tpspi">5.2 Algolia DocSearch（适合大型文档）</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#六国际化配置" class="astro-vj4tpspi">六、国际化配置</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#七自定义主题layout-slots-与-css-变量" class="astro-vj4tpspi">七、自定义主题：Layout Slots 与 CSS 变量</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#71-layout-slots" class="astro-vj4tpspi">7.1 Layout Slots</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#72-css-变量覆盖" class="astro-vj4tpspi">7.2 CSS 变量覆盖</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#八部署到-github-pages" class="astro-vj4tpspi">八、部署到 GitHub Pages</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#总结" class="astro-vj4tpspi">总结</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#参考资料" class="astro-vj4tpspi">参考资料</a> </li> </ul> </details> <h2 id="前言">前言</h2>
+<p>2019 年我写过一篇 VuePress + Vssue 搭建文档站并接入评论系统的文章。当时 VuePress 1.x 是 Vue 生态文档站的不二之选，Vssue 则是基于 GitHub Issues 的评论方案。</p>
+<p>几年过去，主流选择已经明显变化：Vue 生态的新文档站大量转向 <strong>VitePress</strong>，评论方案也从 Vssue 逐步迁移到 <strong>Giscus</strong>（基于 GitHub Discussions）。</p>
+<p>这次替换不是小版本迭代，而是从根基到上层的全面升级，值得单独写一篇。</p>
+<hr>
+<h2 id="一vuepress-的困境">一、VuePress 的困境</h2>
+<h3 id="11-vuepress-1x-的局限">1.1 VuePress 1.x 的局限</h3>
+<p>VuePress 1.x 基于 Webpack + Vue 2，随着 Vue 3 和 Vite 的兴起，问题越来越突出：</p>
+<ul>
+<li><strong>冷启动慢</strong>：Webpack 构建，数百页文档冷启动需要 30-60 秒</li>
+<li><strong>Vue 2 依赖</strong>：无法享用 Vue 3 的 Composition API 和 <code>&lt;script setup&gt;</code></li>
+<li><strong>配置繁琐</strong>：需要 <code>.vuepress/config.js</code> + <code>enhanceApp.js</code> + 各种 webpack 配置</li>
+</ul>
+<h3 id="12-vuepress-2x-的现实处境">1.2 VuePress 2.x 的现实处境</h3>
+<p>VuePress 2.x 切换到 Vue 3 + Vite，并由社区团队持续维护。它并没有“消失”，但在 Vue 官方文档与大量新项目实践中，VitePress 的心智占比更高，迁移讨论也更多围绕 VitePress 展开。</p>
+<h3 id="13-vssue-vs-giscus">1.3 Vssue vs Giscus</h3>
+<p>Vssue 基于 GitHub <strong>Issues</strong> 存储评论，问题是：</p>
+<ul>
+<li>Issues 的通知系统不适合评论场景</li>
+<li>没有嵌套回复</li>
+<li>需要用户授权 OAuth App</li>
+</ul>
+<p>Giscus 基于 GitHub <strong>Discussions</strong>（2021 年推出），优势明显：</p>
+<ul>
+<li>Discussions 天生适合评论/讨论场景</li>
+<li>支持表情回应、嵌套回复</li>
+<li>基于 <code>&lt;script&gt;</code> 标签，无需 OAuth 配置</li>
+</ul>
+<hr>
+<h2 id="二vitepress-的核心优势">二、VitePress 的核心优势</h2>
+<p><a href="https://vitepress.dev/">VitePress</a> 是 Evan You 主导开发的 Vue 官方文档站工具，Vue 3 官方文档本身就是用 VitePress 搭建的。</p>
+<h3 id="21-性能飞跃">2.1 性能飞跃</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>指标</th><th>VuePress 1</th><th>VitePress</th></tr></thead><tbody><tr><td>冷启动</td><td>30-60s（Webpack）</td><td>1-3s（Vite ESM）</td></tr><tr><td>HMR 更新</td><td>2-5s</td><td>&lt;100ms</td></tr><tr><td>生产构建</td><td>慢</td><td>快（Rollup）</td></tr><tr><td>包体积</td><td>较大</td><td>极小（SSG + 代码分割）</td></tr></tbody></table>
+<h3 id="22-vue-3-内核">2.2 Vue 3 内核</h3>
+<p>VitePress 主题完全用 Vue 3 + <code>&lt;script setup&gt;</code> 编写，可以直接在 Markdown 中使用 Vue 3 组件：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#7F848E;font-style:italic">&lt;!-- docs/guide/demo.md --&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75"># 交互式演示</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">&lt;MyInteractiveDemo /&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">&lt;script setup&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">import MyInteractiveDemo from '../components/MyInteractiveDemo.vue'</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/script&gt;</span></span>
+<span class="line"></span></code></pre>
+<h3 id="23-极简配置">2.3 极简配置</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// docs/.vitepress/config.ts — 最小配置，开箱即用</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">defineConfig</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "vitepress"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> default</span><span style="color:#61AFEF"> defineConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  title</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"我的文档"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  description</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"这是一个文档站"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  themeConfig</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    nav</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">      { </span><span style="color:#E06C75">text</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"指南"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"/guide/"</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">      { </span><span style="color:#E06C75">text</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"API"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"/api/"</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">    ],</span></span>
+<span class="line"><span style="color:#E06C75">    sidebar</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#98C379">      "/guide/"</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">        { </span><span style="color:#E06C75">text</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"快速开始"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"/guide/getting-started"</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">        { </span><span style="color:#E06C75">text</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"配置"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"/guide/config"</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">      ],</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#E06C75">    socialLinks</span><span style="color:#ABB2BF">: [{ </span><span style="color:#E06C75">icon</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"github"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"https://github.com/myorg/myrepo"</span><span style="color:#ABB2BF"> }],</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="三从-vuepress-迁移">三、从 VuePress 迁移</h2>
+<h3 id="31-目录结构对比">3.1 目录结构对比</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span># VuePress 1.x 结构</span></span>
+<span class="line"><span>docs/</span></span>
+<span class="line"><span>├── .vuepress/</span></span>
+<span class="line"><span>│   ├── config.js</span></span>
+<span class="line"><span>│   ├── enhanceApp.js</span></span>
+<span class="line"><span>│   ├── components/</span></span>
+<span class="line"><span>│   └── public/</span></span>
+<span class="line"><span>├── guide/</span></span>
+<span class="line"><span>│   └── README.md     ← 使用 README.md 作为目录索引</span></span>
+<span class="line"><span>└── README.md</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># VitePress 结构</span></span>
+<span class="line"><span>docs/</span></span>
+<span class="line"><span>├── .vitepress/</span></span>
+<span class="line"><span>│   ├── config.ts</span></span>
+<span class="line"><span>│   └── theme/         ← 自定义主题（可选）</span></span>
+<span class="line"><span>│       ├── index.ts</span></span>
+<span class="line"><span>│       └── Layout.vue</span></span>
+<span class="line"><span>├── guide/</span></span>
+<span class="line"><span>│   └── index.md      ← 使用 index.md 作为目录索引</span></span>
+<span class="line"><span>└── index.md</span></span>
+<span class="line"><span></span></span></code></pre>
+<h3 id="32-frontmatter-差异">3.2 frontmatter 差异</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#E06C75">## &lt;!-- VuePress 1.x --&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">title: 快速开始</span></span>
+<span class="line"><span style="color:#ABB2BF">sidebar: auto</span></span>
+<span class="line"><span style="color:#ABB2BF">prev: false</span></span>
+<span class="line"><span style="color:#ABB2BF">next:</span></span>
+<span class="line"><span style="color:#ABB2BF">text: '配置'</span></span>
+<span class="line"><span style="color:#ABB2BF">link: '/guide/config'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">---</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">## &lt;!-- VitePress（等价配置）--&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">title: 快速开始</span></span>
+<span class="line"><span style="color:#ABB2BF">outline: deep</span></span>
+<span class="line"><span style="color:#ABB2BF">prev: false</span></span>
+<span class="line"><span style="color:#ABB2BF">next:</span></span>
+<span class="line"><span style="color:#ABB2BF">text: '配置'</span></span>
+<span class="line"><span style="color:#ABB2BF">link: /guide/config</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">---</span></span>
+<span class="line"></span></code></pre>
+<h3 id="33-配置-api-对照">3.3 配置 API 对照</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>VuePress 1.x</th><th>VitePress</th></tr></thead><tbody><tr><td><code>themeConfig.nav</code></td><td><code>themeConfig.nav</code></td></tr><tr><td><code>themeConfig.sidebar</code></td><td><code>themeConfig.sidebar</code></td></tr><tr><td><code>themeConfig.logo</code></td><td><code>themeConfig.logo</code></td></tr><tr><td><code>enhanceApp.js</code></td><td><code>.vitepress/theme/index.ts</code></td></tr><tr><td><code>@vuepress/plugin-search</code></td><td>内置 <code>search: { provider: 'local' }</code></td></tr><tr><td><code>@vuepress/plugin-back-to-top</code></td><td>内置</td></tr><tr><td><code>@vuepress/plugin-medium-zoom</code></td><td>默认主题可用中图缩放（需要时可按主题二次定制）</td></tr></tbody></table>
+<h3 id="34-自定义主题迁移">3.4 自定义主题迁移</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="javascript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// VuePress enhanceApp.js</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> default</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75;font-style:italic">Vue</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">router</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">siteData</span><span style="color:#ABB2BF"> }) </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  Vue</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">component</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"MyComponent"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">MyComponent</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// VitePress .vitepress/theme/index.ts</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E06C75"> DefaultTheme</span><span style="color:#C678DD"> from</span><span style="color:#98C379"> "vitepress/theme"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E06C75"> MyComponent</span><span style="color:#C678DD"> from</span><span style="color:#98C379"> "./components/MyComponent.vue"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> default</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  extends</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">DefaultTheme</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#61AFEF">  enhanceApp</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75;font-style:italic">app</span><span style="color:#ABB2BF"> }) {</span></span>
+<span class="line"><span style="color:#E5C07B">    app</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">component</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"MyComponent"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">MyComponent</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="四giscus-评论系统接入">四、Giscus 评论系统接入</h2>
+<h3 id="41-准备工作">4.1 准备工作</h3>
+<ol>
+<li><strong>确保仓库是公开的</strong>（私有仓库 Giscus 不可用）</li>
+<li>在仓库 <strong>Settings → Features → Discussions</strong> 中开启 Discussions</li>
+<li>安装 <a href="https://github.com/apps/giscus">Giscus GitHub App</a> 并授权该仓库</li>
+<li>访问 <a href="https://giscus.app/zh-CN">giscus.app</a> 生成配置代码</li>
+</ol>
+<h3 id="42-创建-giscus-组件">4.2 创建 Giscus 组件</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="vue"><code><span class="line"><span style="color:#7F848E;font-style:italic">&lt;!-- .vitepress/theme/components/GiscusComments.vue --&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;</span><span style="color:#E06C75">div</span><span style="color:#D19A66"> class</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"giscus-wrapper"</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E06C75">component</span></span>
+<span class="line"><span style="color:#ABB2BF">      :</span><span style="color:#D19A66">is</span><span style="color:#ABB2BF">=</span><span style="color:#ABB2BF">"</span><span style="color:#98C379">'script'</span><span style="color:#ABB2BF">"</span></span>
+<span class="line"><span style="color:#D19A66">      src</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"https://giscus.app/client.js"</span></span>
+<span class="line"><span style="color:#ABB2BF">      :</span><span style="color:#D19A66">data-repo</span><span style="color:#ABB2BF">=</span><span style="color:#ABB2BF">"</span><span style="color:#E06C75">repo</span><span style="color:#ABB2BF">"</span></span>
+<span class="line"><span style="color:#ABB2BF">      :</span><span style="color:#D19A66">data-repo-id</span><span style="color:#ABB2BF">=</span><span style="color:#ABB2BF">"</span><span style="color:#E06C75">repoId</span><span style="color:#ABB2BF">"</span></span>
+<span class="line"><span style="color:#ABB2BF">      :</span><span style="color:#D19A66">data-category</span><span style="color:#ABB2BF">=</span><span style="color:#ABB2BF">"</span><span style="color:#E06C75">category</span><span style="color:#ABB2BF">"</span></span>
+<span class="line"><span style="color:#ABB2BF">      :</span><span style="color:#D19A66">data-category-id</span><span style="color:#ABB2BF">=</span><span style="color:#ABB2BF">"</span><span style="color:#E06C75">categoryId</span><span style="color:#ABB2BF">"</span></span>
+<span class="line"><span style="color:#D19A66">      data-mapping</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"pathname"</span></span>
+<span class="line"><span style="color:#D19A66">      data-strict</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"0"</span></span>
+<span class="line"><span style="color:#D19A66">      data-reactions-enabled</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"1"</span></span>
+<span class="line"><span style="color:#D19A66">      data-emit-metadata</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"0"</span></span>
+<span class="line"><span style="color:#D19A66">      data-input-position</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"top"</span></span>
+<span class="line"><span style="color:#ABB2BF">      :</span><span style="color:#D19A66">data-theme</span><span style="color:#ABB2BF">=</span><span style="color:#ABB2BF">"</span><span style="color:#E06C75">theme</span><span style="color:#ABB2BF">"</span></span>
+<span class="line"><span style="color:#D19A66">      data-lang</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"zh-CN"</span></span>
+<span class="line"><span style="color:#D19A66">      crossorigin</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"anonymous"</span></span>
+<span class="line"><span style="color:#D19A66">      async</span></span>
+<span class="line"><span style="color:#ABB2BF">    /&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;/</span><span style="color:#E06C75">div</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/</span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">script</span><span style="color:#D19A66"> setup</span><span style="color:#D19A66"> lang</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"ts"</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">computed</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">watch</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "vue"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">useData</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "vitepress"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> props</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> defineProps</span><span style="color:#ABB2BF">&lt;{</span></span>
+<span class="line"><span style="color:#E06C75">  repo</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  repoId</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  category</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  categoryId</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">}&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#ABB2BF"> { </span><span style="color:#E5C07B">isDark</span><span style="color:#ABB2BF"> } </span><span style="color:#56B6C2">=</span><span style="color:#61AFEF"> useData</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 跟随站点明暗主题</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> theme</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">isDark</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">value</span><span style="color:#C678DD"> ?</span><span style="color:#98C379"> "dark"</span><span style="color:#C678DD"> :</span><span style="color:#98C379"> "light"</span><span style="color:#ABB2BF">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 主题切换时通知 Giscus iframe</span></span>
+<span class="line"><span style="color:#61AFEF">watch</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">theme</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">newTheme</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> iframe</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> document</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">querySelector</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">HTMLIFrameElement</span><span style="color:#ABB2BF">&gt;(</span></span>
+<span class="line"><span style="color:#98C379">    "iframe.giscus-frame"</span></span>
+<span class="line"><span style="color:#ABB2BF">  );</span></span>
+<span class="line"><span style="color:#E5C07B">  iframe</span><span style="color:#ABB2BF">?.</span><span style="color:#E5C07B">contentWindow</span><span style="color:#ABB2BF">?.</span><span style="color:#61AFEF">postMessage</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#ABB2BF">    { </span><span style="color:#E06C75">giscus</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">setConfig</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">theme</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">newTheme</span><span style="color:#ABB2BF"> } } },</span></span>
+<span class="line"><span style="color:#98C379">    "https://giscus.app"</span></span>
+<span class="line"><span style="color:#ABB2BF">  );</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/</span><span style="color:#E06C75">script</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"></span></code></pre>
+<h3 id="43-在-layout-中注入评论区">4.3 在 Layout 中注入评论区</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="vue"><code><span class="line"><span style="color:#7F848E;font-style:italic">&lt;!-- .vitepress/theme/Layout.vue --&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;</span><span style="color:#E06C75">DefaultTheme.Layout</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E06C75">template</span><span style="color:#ABB2BF"> #</span><span style="color:#D19A66">doc-after</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;</span><span style="color:#E06C75">GiscusComments</span></span>
+<span class="line"><span style="color:#D19A66">        repo</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"myorg/myrepo"</span></span>
+<span class="line"><span style="color:#D19A66">        repo-id</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"R_kgDOxxxxxx"</span></span>
+<span class="line"><span style="color:#D19A66">        category</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"Announcements"</span></span>
+<span class="line"><span style="color:#D19A66">        category-id</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"DIC_kwDOxxxxxx"</span></span>
+<span class="line"><span style="color:#ABB2BF">      /&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;/</span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;/</span><span style="color:#E06C75">DefaultTheme.Layout</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/</span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">script</span><span style="color:#D19A66"> setup</span><span style="color:#D19A66"> lang</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">"ts"</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E06C75"> DefaultTheme</span><span style="color:#C678DD"> from</span><span style="color:#98C379"> "vitepress/theme"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E06C75"> GiscusComments</span><span style="color:#C678DD"> from</span><span style="color:#98C379"> "./components/GiscusComments.vue"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/</span><span style="color:#E06C75">script</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// .vitepress/theme/index.ts</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E06C75"> DefaultTheme</span><span style="color:#C678DD"> from</span><span style="color:#98C379"> "vitepress/theme"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E06C75"> Layout</span><span style="color:#C678DD"> from</span><span style="color:#98C379"> "./Layout.vue"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> default</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  extends</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">DefaultTheme</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  Layout</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">};</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="五搜索配置">五、搜索配置</h2>
+<h3 id="51-本地搜索minisearch">5.1 本地搜索（MiniSearch）</h3>
+<p>VitePress 内置了基于 <a href="https://lucaong.github.io/minisearch/">MiniSearch</a> 的本地搜索，零配置：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// .vitepress/config.ts</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> default</span><span style="color:#61AFEF"> defineConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  themeConfig</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    search</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      provider</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"local"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      options</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        locales</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">          root</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">            translations</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">              button</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">                buttonText</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"搜索文档"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">                buttonAriaLabel</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"搜索文档"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">              },</span></span>
+<span class="line"><span style="color:#E06C75">              modal</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">                noResultsText</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"无法找到相关结果"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">                resetButtonTitle</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"清除查询条件"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">                footer</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">                  selectText</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"选择"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">                  navigateText</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"切换"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">                },</span></span>
+<span class="line"><span style="color:#ABB2BF">              },</span></span>
+<span class="line"><span style="color:#ABB2BF">            },</span></span>
+<span class="line"><span style="color:#ABB2BF">          },</span></span>
+<span class="line"><span style="color:#ABB2BF">        },</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<h3 id="52-algolia-docsearch适合大型文档">5.2 Algolia DocSearch（适合大型文档）</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#E06C75">themeConfig</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">  search</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    provider</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'algolia'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    options</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      appId</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'YOUR_APP_ID'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      apiKey</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'YOUR_SEARCH_API_KEY'</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      indexName</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'YOUR_INDEX_NAME'</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>Algolia DocSearch 对开源项目免费，但需要<a href="https://docsearch.algolia.com/apply/">申请</a>。</p>
+<hr>
+<h2 id="六国际化配置">六、国际化配置</h2>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// .vitepress/config.ts</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> default</span><span style="color:#61AFEF"> defineConfig</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  locales</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    root</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      label</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"简体中文"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      lang</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"zh-CN"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      themeConfig</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        nav</span><span style="color:#ABB2BF">: [{ </span><span style="color:#E06C75">text</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"指南"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"/guide/"</span><span style="color:#ABB2BF"> }],</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#E06C75">    en</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      label</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"English"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      lang</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"en-US"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"/en/"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      themeConfig</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        nav</span><span style="color:#ABB2BF">: [{ </span><span style="color:#E06C75">text</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Guide"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">link</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"/en/guide/"</span><span style="color:#ABB2BF"> }],</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>目录结构：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>docs/</span></span>
+<span class="line"><span>├── guide/          ← 中文文档（根路径）</span></span>
+<span class="line"><span>├── en/</span></span>
+<span class="line"><span>│   └── guide/      ← 英文文档</span></span>
+<span class="line"><span>└── index.md</span></span>
+<span class="line"><span></span></span></code></pre>
+<hr>
+<h2 id="七自定义主题layout-slots-与-css-变量">七、自定义主题：Layout Slots 与 CSS 变量</h2>
+<h3 id="71-layout-slots">7.1 Layout Slots</h3>
+<p>VitePress 默认主题提供了丰富的插槽：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="vue"><code><span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">DefaultTheme</span><span style="color:#ABB2BF">.</span><span style="color:#D19A66">Layout</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;!-- 导航栏左侧 --&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;template #nav-bar-title-after&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;Badge type="tip" text="Beta" /&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;/template&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;!-- 侧边栏顶部 --&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;template #sidebar-nav-before&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;div class="sidebar-announcement"&gt;🎉 v2.0 发布！&lt;/div&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;/template&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;!-- 文章底部 --&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;template #doc-after&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;GiscusComments ... /&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;/template&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;!-- 首页英雄区之后 --&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;template #home-hero-after&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;MyFeatureShowcase /&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;/template&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/DefaultTheme.Layout&gt;</span></span>
+<span class="line"></span></code></pre>
+<h3 id="72-css-变量覆盖">7.2 CSS 变量覆盖</h3>
+<p>VitePress 主题的所有颜色都通过 CSS 变量定义，覆盖很简单：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#7F848E;font-style:italic">/* .vitepress/theme/custom.css */</span></span>
+<span class="line"><span style="color:#56B6C2">:root</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  --vp-c-brand-1</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">#646cff</span><span style="color:#ABB2BF">; </span><span style="color:#7F848E;font-style:italic">/* 主题色 */</span></span>
+<span class="line"><span style="color:#E06C75">  --vp-c-brand-2</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">#747bff</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  --vp-font-family-base</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"PingFang SC"</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">"Microsoft YaHei"</span><span style="color:#ABB2BF">, </span><span style="color:#D19A66">sans-serif</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">/* 中文字体优化 */</span></span>
+<span class="line"><span style="color:#D19A66">.vp-doc</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">  line-height: </span><span style="color:#D19A66">1.8</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">  font-size: </span><span style="color:#D19A66">15</span><span style="color:#E06C75">px</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="八部署到-github-pages">八、部署到 GitHub Pages</h2>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#7F848E;font-style:italic"># .github/workflows/docs.yml</span></span>
+<span class="line"><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">Deploy Docs</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D19A66">on</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">  push</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">    branches</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">main</span><span style="color:#ABB2BF">]</span></span>
+<span class="line"><span style="color:#E06C75">  workflow_dispatch</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">permissions</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">  contents</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">read</span></span>
+<span class="line"><span style="color:#E06C75">  pages</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">write</span></span>
+<span class="line"><span style="color:#E06C75">  id-token</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">write</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">jobs</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">  build</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">    runs-on</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">ubuntu-latest</span></span>
+<span class="line"><span style="color:#E06C75">    steps</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#E06C75">uses</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">actions/checkout@v4</span></span>
+<span class="line"><span style="color:#E06C75">        with</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">          fetch-depth</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">0</span><span style="color:#7F848E;font-style:italic"> # 用于 git log 生成 lastUpdated</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#E06C75">uses</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">pnpm/action-setup@v4</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#E06C75">uses</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">actions/setup-node@v4</span></span>
+<span class="line"><span style="color:#E06C75">        with</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">          node-version</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">22</span></span>
+<span class="line"><span style="color:#E06C75">          cache</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">pnpm</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#E06C75">run</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">pnpm install --frozen-lockfile</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#E06C75">run</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">pnpm docs:build</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#E06C75">uses</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">actions/upload-pages-artifact@v3</span></span>
+<span class="line"><span style="color:#E06C75">        with</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">          path</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">docs/.vitepress/dist</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">  deploy</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">    needs</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">build</span></span>
+<span class="line"><span style="color:#E06C75">    runs-on</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">ubuntu-latest</span></span>
+<span class="line"><span style="color:#E06C75">    environment</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">github-pages</span></span>
+<span class="line"><span style="color:#E06C75">      url</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">${{ steps.deployment.outputs.page_url }}</span></span>
+<span class="line"><span style="color:#E06C75">    steps</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#E06C75">uses</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">actions/deploy-pages@v4</span></span>
+<span class="line"><span style="color:#E06C75">        id</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">deployment</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="总结">总结</h2>
+<p>VitePress 相比 VuePress 的提升是全方位的：构建速度快 10 倍以上，配置简洁，Vue 3 原生，内置功能更完整。Giscus 则是目前静态站点评论系统的最优解：基于 GitHub Discussions，无需服务器，体验优雅。</p>
+<p>如果你现在还在用 VuePress 1.x，迁移成本远比你想象的低，大多数文档只需要把 <code>README.md</code> 重命名为 <code>index.md</code>，调整一下 <code>config.ts</code> 结构即可。</p>
+<hr>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a href="https://vitepress.dev/">VitePress 官方文档</a></li>
+<li><a href="https://vitepress.dev/guide/migration-from-vuepress">从 VuePress 迁移到 VitePress</a></li>
+<li><a href="https://giscus.app/zh-CN">Giscus 官网</a></li>
+<li><a href="https://vuejs.org/">Vue 3 官方文档（VitePress 驱动）</a></li>
+<li><a href="https://vitepress.dev/reference/default-theme-layout">VitePress 主题 API</a></li>
+</ul> </article> <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/vitepress/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">vitepress</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/vuepress/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">vuepress</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/documentation/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">documentation</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/vue/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-5"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">vue</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://rowanliu.com/posts/vuepress-to-vitepress-giscus/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://rowanliu.com/posts/vuepress-to-vitepress-giscus/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://rowanliu.com/posts/vuepress-to-vitepress-giscus/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://rowanliu.com/posts/vuepress-to-vitepress-giscus/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://rowanliu.com/posts/vuepress-to-vitepress-giscus/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://rowanliu.com/posts/vuepress-to-vitepress-giscus/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
+</script><astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <a href="/rss.xml" class="astro-sz7xmlte rss-link" aria-label="RSS Feed"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-sz7xmlte rss-icon" viewBox="0 0 24 24" width="16" height="16"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z" fill="currentColor" class="astro-sz7xmlte"></path> </svg>
+RSS
+</a> </div> </div> </footer>     <script>function createProgressBar(){const o=document.createElement("div");o.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const e=document.createElement("div");e.className="progress-bar h-1 w-0 bg-skin-accent",e.id="myBar",o.appendChild(e),document.body.appendChild(o)}createProgressBar();function updateScrollProgress(){const o=document.body.scrollTop||document.documentElement.scrollTop,e=document.documentElement.scrollHeight-document.documentElement.clientHeight,n=o/e*100;if(document){const t=document.getElementById("myBar");t&&(t.style.width=n+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let o=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let e of o){e.classList.add("group");let n=document.createElement("a");n.innerText="#",n.className="heading-link hidden group-hover:inline-block ml-2",n.href="#"+e.id,n.ariaHidden="true",e.appendChild(n)}}addHeadingLinks();function attachCopyButtons(){let o="Copy",e=Array.from(document.querySelectorAll("pre"));for(let t of e){let c=document.createElement("div");c.style.position="relative";let d=document.createElement("button");d.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",d.innerHTML=o,t.setAttribute("tabindex","0"),t.appendChild(d),t?.parentNode?.insertBefore(c,t),c.appendChild(t),d.addEventListener("click",async()=>{await n(t,d)})}async function n(t,c){let r=t.querySelector("code")?.innerText;await navigator.clipboard.writeText(r??""),c.innerText="Copied",setTimeout(()=>{c.innerText=o},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();
+</script></body></html>

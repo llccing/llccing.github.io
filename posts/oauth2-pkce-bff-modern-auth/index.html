@@ -1,0 +1,550 @@
+<!DOCTYPE html><html lang="zh-CN" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/"><meta name="generator" content="Astro v4.16.18"><!-- General Meta Tags --><title>从 OAuth 2.0 到 OAuth 2.1：PKCE、BFF 与现代前端认证的正确姿势 | Rowan's Blog</title><meta name="title" content="从 OAuth 2.0 到 OAuth 2.1：PKCE、BFF 与现代前端认证的正确姿势 | Rowan's Blog"><meta name="description" content="回顾 2020 年 OAuth 2.0 方案的安全隐患，深入讲解 OAuth 2.1 的核心变化、PKCE 流程、BFF 模式，以及如何用 NestJS + Passport 构建安全的现代认证网关。"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="从 OAuth 2.0 到 OAuth 2.1：PKCE、BFF 与现代前端认证的正确姿势 | Rowan's Blog"><meta property="og:description" content="回顾 2020 年 OAuth 2.0 方案的安全隐患，深入讲解 OAuth 2.1 的核心变化、PKCE 流程、BFF 模式，以及如何用 NestJS + Passport 构建安全的现代认证网关。"><meta property="og:url" content="https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/"><meta property="og:image" content="https://rowanliu.com/posts/%E4%BB%8E-oauth-20-%E5%88%B0-oauth-21pkcebff-%E4%B8%8E%E7%8E%B0%E4%BB%A3%E5%89%8D%E7%AB%AF%E8%AE%A4%E8%AF%81%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-05-01T10:00:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/"><meta property="twitter:title" content="从 OAuth 2.0 到 OAuth 2.1：PKCE、BFF 与现代前端认证的正确姿势 | Rowan's Blog"><meta property="twitter:description" content="回顾 2020 年 OAuth 2.0 方案的安全隐患，深入讲解 OAuth 2.1 的核心变化、PKCE 流程、BFF 模式，以及如何用 NestJS + Passport 构建安全的现代认证网关。"><meta property="twitter:image" content="https://rowanliu.com/posts/%E4%BB%8E-oauth-20-%E5%88%B0-oauth-21pkcebff-%E4%B8%8E%E7%8E%B0%E4%BB%A3%E5%89%8D%E7%AB%AF%E8%AE%A4%E8%AF%81%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><!-- Google tag (gtag.js) --><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1X5E9W6VJ2"></script> <script>window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-1X5E9W6VJ2");
+</script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.CzgqvkTP.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (min-width:640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.Cj6ph0Em.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (min-width:640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (min-width:640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:从-oauth-20-到-oauth-21pkcebff-与现代前端认证的正确姿势}@layer astro{::view-transition-old(从-oauth-20-到-oauth-21pkcebff-与现代前端认证的正确姿势){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(从-oauth-20-到-oauth-21pkcebff-与现代前端认证的正确姿势){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(从-oauth-20-到-oauth-21pkcebff-与现代前端认证的正确姿势){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(从-oauth-20-到-oauth-21pkcebff-与现代前端认证的正确姿势){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:oauth}@layer astro{::view-transition-old(oauth){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(oauth){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(oauth){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(oauth){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:security}@layer astro{::view-transition-old(security){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(security){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(security){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(security){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-4]{view-transition-name:nestjs}@layer astro{::view-transition-old(nestjs){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(nestjs){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(nestjs){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(nestjs){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-5]{view-transition-name:frontend}@layer astro{::view-transition-old(frontend){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(frontend){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(frontend){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(frontend){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/short-stories/" class="astro-3ef6ksr2">
+Short Stories
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex justify-start max-w-3xl mx-auto px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">从 OAuth 2.0 到 OAuth 2.1：PKCE、BFF 与现代前端认证的正确姿势</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-01T10:00:00.000Z">2026年5月1日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">18:00</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>6 min read</span></span></div> <article id="article" role="article" class="astro-vj4tpspi max-w-3xl mx-auto mt-8 prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#前言" class="astro-vj4tpspi">前言</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#一2020-年的方案为什么不够安全" class="astro-vj4tpspi">一、2020 年的方案为什么不够安全</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#11-implicit-flow-的致命缺陷" class="astro-vj4tpspi">1.1 Implicit Flow 的致命缺陷</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#12-密码凭证ropc的问题" class="astro-vj4tpspi">1.2 密码凭证（ROPC）的问题</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#二oauth-21-的核心变化" class="astro-vj4tpspi">二、OAuth 2.1 的核心变化</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#三pkce-完整流程图解" class="astro-vj4tpspi">三、PKCE 完整流程图解</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#31-核心原理" class="astro-vj4tpspi">3.1 核心原理</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#32-完整流程" class="astro-vj4tpspi">3.2 完整流程</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#33-前端代码示例" class="astro-vj4tpspi">3.3 前端代码示例</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#四oidc-在前端的落地" class="astro-vj4tpspi">四、OIDC 在前端的落地</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#41-id_token-vs-access_token" class="astro-vj4tpspi">4.1 id_token vs access_token</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#42-userinfo-端点" class="astro-vj4tpspi">4.2 userinfo 端点</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#五bffbackend-for-frontend模式" class="astro-vj4tpspi">五、BFF（Backend For Frontend）模式</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#51-为什么-spa-不应该持有-token" class="astro-vj4tpspi">5.1 为什么 SPA 不应该持有 token</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#52-bff-的职责" class="astro-vj4tpspi">5.2 BFF 的职责</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#六nestjs--passport-实现-bff-认证网关" class="astro-vj4tpspi">六、NestJS + Passport 实现 BFF 认证网关</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#61-依赖安装" class="astro-vj4tpspi">6.1 依赖安装</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#62-oidc-strategy" class="astro-vj4tpspi">6.2 OIDC Strategy</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#63-auth-controller" class="astro-vj4tpspi">6.3 Auth Controller</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#64-api-代理中间件" class="astro-vj4tpspi">6.4 API 代理中间件</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#七refresh-token-轮换rotation" class="astro-vj4tpspi">七、Refresh Token 轮换（Rotation）</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#八常见陷阱与最佳实践" class="astro-vj4tpspi">八、常见陷阱与最佳实践</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#81-cors-与-cookie" class="astro-vj4tpspi">8.1 CORS 与 Cookie</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#82-cookie-安全配置" class="astro-vj4tpspi">8.2 Cookie 安全配置</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#83-state-参数防-csrf" class="astro-vj4tpspi">8.3 State 参数防 CSRF</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#84-csp-头部" class="astro-vj4tpspi">8.4 CSP 头部</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#总结" class="astro-vj4tpspi">总结</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#参考资料" class="astro-vj4tpspi">参考资料</a> </li> </ul> </details> <h2 id="前言">前言</h2>
+<p>2020 年，如果你在公司内部搜索 “前端登录接入 OAuth”，大概率会看到这样的方案：前端直接使用 Implicit Flow 获取 <code>access_token</code>，或者后端用 Resource Owner Password Credentials（密码凭证）模式直接换取令牌。这些方案在当时的教程里随处可见，但放到今天来看，它们都存在严重的安全隐患。</p>
+<p>OAuth 2.1 草案（<a href="https://datatracker.ietf.org/doc/draft-ietf-oauth-v2-1/">draft-ietf-oauth-v2-1</a>）将这些不安全的 Flow 明确移出推荐路径，并强化了 PKCE 的要求。与此同时，OAuth 2.0 Security BCP 也长期不再推荐这些旧方案。BFF（Backend For Frontend）架构模式因此越来越成为 SPA 应用的主流答案。</p>
+<p>本文从实际问题出发，带你完整理解这套现代认证体系。</p>
+<hr>
+<h2 id="一2020-年的方案为什么不够安全">一、2020 年的方案为什么不够安全</h2>
+<h3 id="11-implicit-flow-的致命缺陷">1.1 Implicit Flow 的致命缺陷</h3>
+<p>Implicit Flow 的设计初衷是简化 SPA 的认证流程——直接在重定向 URL 的 fragment（<code>#</code>）中返回 <code>access_token</code>，省去后端换码这一步。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>https://app.example.com/callback#access_token=eyJ...&amp;token_type=Bearer&amp;expires_in=3600</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>问题在于：</p>
+<ul>
+<li><strong>token 暴露在 URL 中</strong>：浏览器历史记录、Referer 请求头、日志服务都可能记录这段 URL</li>
+<li><strong>无法验证令牌接收方</strong>：任何拿到这个 token 的人都可以使用它</li>
+<li><strong>无 refresh_token</strong>：Implicit Flow 规范上不允许颁发 refresh token，导致用户频繁重登</li>
+</ul>
+<p>2019 年，OAuth 工作组发布了 <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics">OAuth 2.0 Security Best Current Practice</a>，明确建议<strong>不再使用 Implicit Flow</strong>。</p>
+<h3 id="12-密码凭证ropc的问题">1.2 密码凭证（ROPC）的问题</h3>
+<p>Resource Owner Password Credentials 模式让客户端直接收集用户名和密码，然后发给授权服务器换取 token：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="http"><code><span class="line"><span style="color:#C678DD">POST</span><span style="color:#ABB2BF"> /token</span></span>
+<span class="line"><span style="color:#E06C75">Content-Type</span><span style="color:#C678DD">:</span><span style="color:#98C379"> application/x-www-form-urlencoded</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">grant_type=password&amp;username=alice&amp;password=secret123&amp;client_id=my-app</span></span>
+<span class="line"></span></code></pre>
+<p>这个模式的问题显而易见：<strong>用户需要把密码交给第三方客户端</strong>，从根本上违背了 OAuth 的初衷（OAuth 的核心价值就是让用户不必把密码给客户端）。在 OAuth 2.1 草案与 Security BCP 的语境下，这个 Flow 已不再推荐。</p>
+<hr>
+<h2 id="二oauth-21-的核心变化">二、OAuth 2.1 的核心变化</h2>
+<p>OAuth 2.1 并不是全新的协议，而是对 OAuth 2.0 的一次”清理与加固”。主要变化：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>变化点</th><th>OAuth 2.0</th><th>OAuth 2.1</th></tr></thead><tbody><tr><td>Implicit Flow</td><td>允许</td><td><strong>移除</strong></td></tr><tr><td>ROPC（密码凭证）</td><td>允许</td><td><strong>移除</strong></td></tr><tr><td>PKCE</td><td>可选</td><td><strong>Authorization Code Flow 强制要求</strong></td></tr><tr><td>redirect_uri</td><td>允许模糊匹配</td><td><strong>要求精确匹配</strong></td></tr><tr><td>refresh token</td><td>可复用</td><td><strong>推荐轮换（Rotation）</strong></td></tr><tr><td>Bearer token in URL</td><td>允许</td><td><strong>禁止</strong></td></tr></tbody></table>
+<p>现在，<strong>所有客户端（包括公共客户端如 SPA）都应使用带 PKCE 的 Authorization Code Flow</strong>。</p>
+<hr>
+<h2 id="三pkce-完整流程图解">三、PKCE 完整流程图解</h2>
+<p>PKCE（Proof Key for Code Exchange，<a href="https://datatracker.ietf.org/doc/html/rfc7636">RFC 7636</a>）最初是为移动端 App 设计的，目的是防止授权码被拦截后滥用。现在它成了所有 OAuth 流程的标配。</p>
+<h3 id="31-核心原理">3.1 核心原理</h3>
+<p>PKCE 在标准 Authorization Code Flow 的基础上，增加了一对随机生成的密钥：</p>
+<ul>
+<li><strong>code_verifier</strong>：客户端随机生成的高熵字符串（43-128 字符）</li>
+<li><strong>code_challenge</strong>：<code>BASE64URL(SHA256(code_verifier))</code></li>
+</ul>
+<h3 id="32-完整流程">3.2 完整流程</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│  浏览器（SPA）                                                    │</span></span>
+<span class="line"><span>│  1. 生成 code_verifier = random(43-128 chars)                    │</span></span>
+<span class="line"><span>│  2. code_challenge = BASE64URL(SHA256(code_verifier))            │</span></span>
+<span class="line"><span>│  3. 跳转授权端点：                                               │</span></span>
+<span class="line"><span>│     GET /authorize?                                              │</span></span>
+<span class="line"><span>│       response_type=code                                         │</span></span>
+<span class="line"><span>│       &amp;client_id=my-spa                                          │</span></span>
+<span class="line"><span>│       &amp;redirect_uri=https://app.example.com/callback            │</span></span>
+<span class="line"><span>│       &amp;scope=openid profile email                                │</span></span>
+<span class="line"><span>│       &amp;state=random-csrf-token                                   │</span></span>
+<span class="line"><span>│       &amp;code_challenge=BASE64URL(SHA256(verifier))               │</span></span>
+<span class="line"><span>│       &amp;code_challenge_method=S256                                │</span></span>
+<span class="line"><span>└────────────────────────┬────────────────────────────────────────┘</span></span>
+<span class="line"><span>                         │ 用户登录并授权</span></span>
+<span class="line"><span>                         ▼</span></span>
+<span class="line"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│  授权服务器                                                       │</span></span>
+<span class="line"><span>│  - 验证 code_challenge，存储                                     │</span></span>
+<span class="line"><span>│  - 重定向回：                                                    │</span></span>
+<span class="line"><span>│    https://app.example.com/callback?code=AUTH_CODE&amp;state=...    │</span></span>
+<span class="line"><span>└────────────────────────┬────────────────────────────────────────┘</span></span>
+<span class="line"><span>                         │</span></span>
+<span class="line"><span>                         ▼</span></span>
+<span class="line"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│  浏览器收到 code，发起 token 请求：                               │</span></span>
+<span class="line"><span>│  POST /token                                                     │</span></span>
+<span class="line"><span>│    code=AUTH_CODE                                                │</span></span>
+<span class="line"><span>│    &amp;code_verifier=ORIGINAL_VERIFIER   ← 关键！授权服务器验证    │</span></span>
+<span class="line"><span>│    &amp;client_id=my-spa                                             │</span></span>
+<span class="line"><span>│    &amp;redirect_uri=https://app.example.com/callback               │</span></span>
+<span class="line"><span>└────────────────────────┬────────────────────────────────────────┘</span></span>
+<span class="line"><span>                         │</span></span>
+<span class="line"><span>                         ▼</span></span>
+<span class="line"><span>                  返回 access_token + refresh_token + id_token</span></span>
+<span class="line"><span></span></span></code></pre>
+<p><strong>关键安全保障</strong>：即使攻击者拦截了 <code>AUTH_CODE</code>，没有 <code>code_verifier</code> 也无法换取 token，因为授权服务器会验证 <code>SHA256(code_verifier) === code_challenge</code>。</p>
+<h3 id="33-前端代码示例">3.3 前端代码示例</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// pkce.ts — 浏览器端 PKCE 工具</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> generateRandomString</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">length</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">number</span><span style="color:#ABB2BF">): </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> array</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> Uint8Array</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">length</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E5C07B">  crypto</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRandomValues</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">array</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#E5C07B"> Array</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">from</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">array</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">byte</span><span style="color:#C678DD"> =&gt;</span><span style="color:#E5C07B"> byte</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">toString</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">16</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">padStart</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">"0"</span><span style="color:#ABB2BF">)).</span><span style="color:#61AFEF">join</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">""</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">async</span><span style="color:#C678DD"> function</span><span style="color:#61AFEF"> generateCodeChallenge</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">codeVerifier</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">): </span><span style="color:#E5C07B">Promise</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt; {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> encoder</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> TextEncoder</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> data</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> encoder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">encode</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">codeVerifier</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> digest</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#E5C07B"> crypto</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">subtle</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">digest</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"SHA-256"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">data</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#61AFEF"> btoa</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">String</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">fromCharCode</span><span style="color:#ABB2BF">(...</span><span style="color:#C678DD">new</span><span style="color:#61AFEF"> Uint8Array</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">digest</span><span style="color:#ABB2BF">)))</span></span>
+<span class="line"><span style="color:#ABB2BF">    .</span><span style="color:#61AFEF">replace</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">/</span><span style="color:#56B6C2">\+</span><span style="color:#E06C75">/</span><span style="color:#C678DD">g</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">"-"</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">    .</span><span style="color:#61AFEF">replace</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">/</span><span style="color:#56B6C2">\/</span><span style="color:#E06C75">/</span><span style="color:#C678DD">g</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">"_"</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">    .</span><span style="color:#61AFEF">replace</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">/=</span><span style="color:#D19A66">+</span><span style="color:#C678DD">$</span><span style="color:#E06C75">/</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">""</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> async</span><span style="color:#C678DD"> function</span><span style="color:#61AFEF"> initiateLogin</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">  authServerUrl</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">  clientId</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">  redirectUri</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span></span>
+<span class="line"><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> codeVerifier</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> generateRandomString</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">64</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> codeChallenge</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#61AFEF"> generateCodeChallenge</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">codeVerifier</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> state</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> generateRandomString</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">16</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 存储到 sessionStorage（注意：不要存 localStorage，避免 XSS 窃取）</span></span>
+<span class="line"><span style="color:#E5C07B">  sessionStorage</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setItem</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"pkce_code_verifier"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">codeVerifier</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E5C07B">  sessionStorage</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setItem</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"oauth_state"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">state</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> params</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> URLSearchParams</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">    response_type</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"code"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    client_id</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">clientId</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    redirect_uri</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">redirectUri</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    scope</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"openid profile email"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    state</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    code_challenge</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">codeChallenge</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    code_challenge_method</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"S256"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">  window</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">location</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">href</span><span style="color:#56B6C2"> =</span><span style="color:#98C379"> `</span><span style="color:#C678DD">${</span><span style="color:#E06C75">authServerUrl</span><span style="color:#C678DD">}</span><span style="color:#98C379">/authorize?</span><span style="color:#C678DD">${</span><span style="color:#E06C75">params</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="四oidc-在前端的落地">四、OIDC 在前端的落地</h2>
+<p>OAuth 2.0 解决的是<strong>授权</strong>问题（你能做什么），而 OIDC（OpenID Connect）在其基础上解决的是<strong>认证</strong>问题（你是谁）。</p>
+<p>OIDC 在 OAuth 2.0 的基础上增加了 <code>id_token</code>（一个 JWT）和 <code>userinfo</code> 端点。</p>
+<h3 id="41-id_token-vs-access_token">4.1 id_token vs access_token</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>id_token</th><th>access_token</th></tr></thead><tbody><tr><td><strong>用途</strong></td><td>证明用户身份</td><td>访问资源服务器</td></tr><tr><td><strong>受众（aud）</strong></td><td>客户端（你的 App）</td><td>资源服务器（你的 API）</td></tr><tr><td><strong>谁来验证</strong></td><td>客户端自行验证签名</td><td>资源服务器验证</td></tr><tr><td><strong>应该发给 API 吗</strong></td><td><strong>否！</strong></td><td>是</td></tr></tbody></table>
+<p>一个常见的错误是把 <code>id_token</code> 发给后端 API 做鉴权。正确做法是：只把 <code>access_token</code> 发给 API，用 <code>id_token</code> 在前端解析用户信息。</p>
+<h3 id="42-userinfo-端点">4.2 userinfo 端点</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// 获取用户信息</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> userInfo</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#61AFEF"> fetch</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"https://auth.example.com/userinfo"</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#E06C75">  headers</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">Authorization</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`Bearer </span><span style="color:#C678DD">${</span><span style="color:#E06C75">accessToken</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">}).</span><span style="color:#61AFEF">then</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">r</span><span style="color:#C678DD"> =&gt;</span><span style="color:#E5C07B"> r</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">json</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// 返回类似：</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//   sub: "user-123",</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//   name: "Alice",</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//   email: "alice@example.com",</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//   picture: "https://..."</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// }</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="五bffbackend-for-frontend模式">五、BFF（Backend For Frontend）模式</h2>
+<h3 id="51-为什么-spa-不应该持有-token">5.1 为什么 SPA 不应该持有 token</h3>
+<p>即使有了 PKCE，如果 <code>access_token</code> 和 <code>refresh_token</code> 存储在浏览器的 <code>localStorage</code> 或 <code>sessionStorage</code>，它们仍然面临 <strong>XSS 攻击</strong>的威胁。一旦页面被注入恶意脚本，攻击者就能读取这些 token。</p>
+<p>BFF 模式的核心思路：<strong>把 token 管理从浏览器移到服务器，浏览器只持有 HttpOnly Cookie 中的 session。</strong></p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│  传统 SPA 架构                                                │</span></span>
+<span class="line"><span>│                                                              │</span></span>
+<span class="line"><span>│  Browser ──── access_token (localStorage) ──── API          │</span></span>
+<span class="line"><span>│                                                              │</span></span>
+<span class="line"><span>│  风险：XSS 可窃取 token                                      │</span></span>
+<span class="line"><span>└──────────────────────────────────────────────────────────────┘</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="line"><span>│  BFF 架构                                                    │</span></span>
+<span class="line"><span>│                                                              │</span></span>
+<span class="line"><span>│  Browser ──── HttpOnly Cookie (session_id) ──── BFF Server  │</span></span>
+<span class="line"><span>│                                                BFF Server ── token store ──── API</span></span>
+<span class="line"><span>│                                                              │</span></span>
+<span class="line"><span>│  Browser 永远看不到 token                                    │</span></span>
+<span class="line"><span>└──────────────────────────────────────────────────────────────┘</span></span>
+<span class="line"><span></span></span></code></pre>
+<h3 id="52-bff-的职责">5.2 BFF 的职责</h3>
+<ol>
+<li>处理 OAuth Authorization Code + PKCE 流程</li>
+<li>将换回的 token 存储在服务器内存或 Redis</li>
+<li>向浏览器返回 <code>HttpOnly; Secure; SameSite=Strict</code> 的 session cookie</li>
+<li>代理前端 API 请求，自动注入 Bearer token</li>
+<li>静默刷新 token（对浏览器完全透明）</li>
+</ol>
+<hr>
+<h2 id="六nestjs--passport-实现-bff-认证网关">六、NestJS + Passport 实现 BFF 认证网关</h2>
+<h3 id="61-依赖安装">6.1 依赖安装</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">pnpm</span><span style="color:#98C379"> add</span><span style="color:#98C379"> @nestjs/passport</span><span style="color:#98C379"> passport</span><span style="color:#98C379"> passport-oauth2</span><span style="color:#98C379"> openid-client</span><span style="color:#98C379"> express-session</span><span style="color:#98C379"> connect-redis</span></span>
+<span class="line"><span style="color:#61AFEF">pnpm</span><span style="color:#98C379"> add</span><span style="color:#D19A66"> -D</span><span style="color:#98C379"> @types/passport</span><span style="color:#98C379"> @types/express-session</span></span>
+<span class="line"></span></code></pre>
+<h3 id="62-oidc-strategy">6.2 OIDC Strategy</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// auth/oidc.strategy.ts</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Injectable</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "@nestjs/common"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">PassportStrategy</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "@nestjs/passport"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Strategy</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">TokenSet</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">UserinfoResponse</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "openid-client"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">ConfigService</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "@nestjs/config"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Injectable</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> OidcStrategy</span><span style="color:#C678DD"> extends</span><span style="color:#61AFEF"> PassportStrategy</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">Strategy</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">"oidc"</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">    client</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">any</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#C678DD">    private</span><span style="color:#E06C75;font-style:italic"> configService</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">ConfigService</span></span>
+<span class="line"><span style="color:#ABB2BF">  ) {</span></span>
+<span class="line"><span style="color:#E5C07B;font-style:italic">    super</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">      client</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      params</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        scope</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"openid profile email"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        redirect_uri</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">configService</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">get</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"OIDC_REDIRECT_URI"</span><span style="color:#ABB2BF">),</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#E06C75">      usePKCE</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// 开启 PKCE</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  async</span><span style="color:#61AFEF"> validate</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">tokenSet</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">TokenSet</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">userinfo</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">UserinfoResponse</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 这里可以将用户信息写入数据库，或做权限初始化</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">      sub</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">userinfo</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">sub</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      email</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">userinfo</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">email</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">userinfo</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      accessToken</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">tokenSet</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">access_token</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      refreshToken</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">tokenSet</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">refresh_token</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      expiresAt</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">tokenSet</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">expires_at</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    };</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="63-auth-controller">6.3 Auth Controller</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// auth/auth.controller.ts</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Controller</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">Get</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">Req</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">Res</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">UseGuards</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "@nestjs/common"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">AuthGuard</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "@nestjs/passport"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Request</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">Response</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "express"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Controller</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"auth"</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> AuthController</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 1. 发起登录 → 重定向到授权服务器</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">Get</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"login"</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">UseGuards</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">AuthGuard</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"oidc"</span><span style="color:#ABB2BF">))</span></span>
+<span class="line"><span style="color:#61AFEF">  login</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // Passport 自动处理重定向，此处不需要实现</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 2. 授权服务器回调</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">Get</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"callback"</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">UseGuards</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">AuthGuard</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"oidc"</span><span style="color:#ABB2BF">))</span></span>
+<span class="line"><span style="color:#C678DD">  async</span><span style="color:#61AFEF"> callback</span><span style="color:#ABB2BF">(@</span><span style="color:#61AFEF">Req</span><span style="color:#ABB2BF">() </span><span style="color:#E06C75;font-style:italic">req</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Request</span><span style="color:#ABB2BF">, @</span><span style="color:#61AFEF">Res</span><span style="color:#ABB2BF">() </span><span style="color:#E06C75;font-style:italic">res</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Response</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 用户信息已由 OidcStrategy.validate() 处理</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // Passport 将其挂到 req.user</span></span>
+<span class="line"><span style="color:#E5C07B">    req</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">session</span><span style="color:#ABB2BF">[</span><span style="color:#98C379">"user"</span><span style="color:#ABB2BF">] </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> req</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">user</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E5C07B">    res</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">redirect</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"/"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 3. 登出</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">Get</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"logout"</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#61AFEF">  logout</span><span style="color:#ABB2BF">(@</span><span style="color:#61AFEF">Req</span><span style="color:#ABB2BF">() </span><span style="color:#E06C75;font-style:italic">req</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Request</span><span style="color:#ABB2BF">, @</span><span style="color:#61AFEF">Res</span><span style="color:#ABB2BF">() </span><span style="color:#E06C75;font-style:italic">res</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Response</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E5C07B">    req</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">session</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">destroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">      res</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">clearCookie</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"connect.sid"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E5C07B">      res</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">redirect</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"/"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 4. 获取当前用户（供前端调用）</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">Get</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"me"</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#61AFEF">  me</span><span style="color:#ABB2BF">(@</span><span style="color:#61AFEF">Req</span><span style="color:#ABB2BF">() </span><span style="color:#E06C75;font-style:italic">req</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Request</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> user</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> req</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">session</span><span style="color:#ABB2BF">[</span><span style="color:#98C379">"user"</span><span style="color:#ABB2BF">];</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#ABB2BF"> (</span><span style="color:#56B6C2">!</span><span style="color:#E06C75">user</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">return</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">authenticated</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">false</span><span style="color:#ABB2BF"> };</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 注意：不要把 accessToken 返回给前端！</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">      authenticated</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      sub</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">sub</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      email</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">email</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    };</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="64-api-代理中间件">6.4 API 代理中间件</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// proxy/api-proxy.middleware.ts</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  Injectable</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  NestMiddleware</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  UnauthorizedException</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">} </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "@nestjs/common"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Request</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">Response</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">NextFunction</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "express"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">createProxyMiddleware</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "http-proxy-middleware"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Injectable</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> ApiProxyMiddleware</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> NestMiddleware</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#61AFEF">  use</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">req</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Request</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">res</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Response</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">next</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">NextFunction</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> user</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> req</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">session</span><span style="color:#ABB2BF">?.[</span><span style="color:#98C379">"user"</span><span style="color:#ABB2BF">];</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#ABB2BF"> (</span><span style="color:#56B6C2">!</span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">?.</span><span style="color:#E06C75">accessToken</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">      throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> UnauthorizedException</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"Not authenticated"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 将 access_token 注入到发往后端 API 的请求头</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> proxy</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> createProxyMiddleware</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">      target</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">process</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">env</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">API_BASE_URL</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      changeOrigin</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      pathRewrite</span><span style="color:#ABB2BF">: { </span><span style="color:#98C379">"^/api"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">""</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#E06C75">      on</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#61AFEF">        proxyReq</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75;font-style:italic">proxyReq</span><span style="color:#C678DD"> =&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">          proxyReq</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setHeader</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"Authorization"</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">`Bearer </span><span style="color:#C678DD">${</span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">accessToken</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">        },</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">    proxy</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">req</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">res</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">next</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="七refresh-token-轮换rotation">七、Refresh Token 轮换（Rotation）</h2>
+<p>OAuth 2.1 推荐 refresh token 使用轮换策略：每次使用 refresh token 刷新后，颁发新的 refresh token，并<strong>使旧的失效</strong>。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// auth/token-refresh.service.ts</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Injectable</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "@nestjs/common"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> { </span><span style="color:#E06C75">Issuer</span><span style="color:#ABB2BF"> } </span><span style="color:#C678DD">from</span><span style="color:#98C379"> "openid-client"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Injectable</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> TokenRefreshService</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  async</span><span style="color:#61AFEF"> refreshTokens</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">refreshToken</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">client</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">any</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> tokenSet</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#E5C07B"> client</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">refresh</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">refreshToken</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 授权服务器返回新的 refresh_token（轮换）</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 必须存储新的 refresh_token，旧的已经失效</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">      accessToken</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">tokenSet</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">access_token</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      refreshToken</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">tokenSet</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">refresh_token</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// ← 新的</span></span>
+<span class="line"><span style="color:#E06C75">      expiresAt</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">tokenSet</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">expires_at</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">    };</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>在 BFF 的 API 代理层，可以加入自动刷新逻辑：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">async</span><span style="color:#C678DD"> function</span><span style="color:#61AFEF"> getValidAccessToken</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">session</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">any</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">client</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">any</span><span style="color:#ABB2BF">): </span><span style="color:#E5C07B">Promise</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt; {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> now</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> Math</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">floor</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">Date</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">now</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">/</span><span style="color:#D19A66"> 1000</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> bufferSeconds</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 60</span><span style="color:#ABB2BF">; </span><span style="color:#7F848E;font-style:italic">// 提前 60 秒刷新</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  if</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">session</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">expiresAt</span><span style="color:#56B6C2"> -</span><span style="color:#E06C75"> now</span><span style="color:#56B6C2"> &lt;</span><span style="color:#E06C75"> bufferSeconds</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // Token 即将过期，静默刷新</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> newTokens</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> await</span><span style="color:#E5C07B"> tokenRefreshService</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">refreshTokens</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#E5C07B">      session</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">refreshToken</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      client</span></span>
+<span class="line"><span style="color:#ABB2BF">    );</span></span>
+<span class="line"><span style="color:#E5C07B">    session</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">user</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> { ...</span><span style="color:#E5C07B">session</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">user</span><span style="color:#ABB2BF">, ...</span><span style="color:#E06C75">newTokens</span><span style="color:#ABB2BF"> };</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#E5C07B"> session</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">user</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">accessToken</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<hr>
+<h2 id="八常见陷阱与最佳实践">八、常见陷阱与最佳实践</h2>
+<h3 id="81-cors-与-cookie">8.1 CORS 与 Cookie</h3>
+<p>BFF 架构下，前端和 BFF 必须<strong>同源</strong>（或在允许凭证的跨源配置下）。如果前端是 <code>app.example.com</code>，BFF 是 <code>api.example.com</code>，需要：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// NestJS CORS 配置</span></span>
+<span class="line"><span style="color:#E5C07B">app</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">enableCors</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">  origin</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"https://app.example.com"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  credentials</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// 允许携带 Cookie</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>前端 fetch 请求也需要带上 <code>credentials: 'include'</code>：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#61AFEF">fetch</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"/auth/me"</span><span style="color:#ABB2BF">, { </span><span style="color:#E06C75">credentials</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"include"</span><span style="color:#ABB2BF"> });</span></span>
+<span class="line"></span></code></pre>
+<h3 id="82-cookie-安全配置">8.2 Cookie 安全配置</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#E5C07B">app</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">use</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#61AFEF">  session</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#E06C75">    secret</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">process</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">env</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">SESSION_SECRET</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    resave</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">false</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    saveUninitialized</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">false</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    cookie</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      httpOnly</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// JS 无法读取，防 XSS</span></span>
+<span class="line"><span style="color:#E06C75">      secure</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// 仅 HTTPS</span></span>
+<span class="line"><span style="color:#E06C75">      sameSite</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"strict"</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// 防 CSRF</span></span>
+<span class="line"><span style="color:#E06C75">      maxAge</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">24</span><span style="color:#56B6C2"> *</span><span style="color:#D19A66"> 60</span><span style="color:#56B6C2"> *</span><span style="color:#D19A66"> 60</span><span style="color:#56B6C2"> *</span><span style="color:#D19A66"> 1000</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// 24 小时</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#E06C75">    store</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">redisStore</span><span style="color:#ABB2BF">, </span><span style="color:#7F848E;font-style:italic">// 生产环境用 Redis</span></span>
+<span class="line"><span style="color:#ABB2BF">  })</span></span>
+<span class="line"><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span></code></pre>
+<h3 id="83-state-参数防-csrf">8.3 State 参数防 CSRF</h3>
+<p>发起授权请求时务必带上随机 <code>state</code> 参数，并在 callback 时验证：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// 发起时存储</span></span>
+<span class="line"><span style="color:#E5C07B">sessionStorage</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setItem</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"oauth_state"</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">randomState</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">// callback 时验证</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> returnedState</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> URLSearchParams</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">window</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">location</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">search</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">get</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"state"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">if</span><span style="color:#ABB2BF"> (</span><span style="color:#E06C75">returnedState</span><span style="color:#56B6C2"> !==</span><span style="color:#E5C07B"> sessionStorage</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getItem</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"oauth_state"</span><span style="color:#ABB2BF">)) {</span></span>
+<span class="line"><span style="color:#C678DD">  throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> Error</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"State mismatch — possible CSRF attack"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="84-csp-头部">8.4 CSP 头部</h3>
+<p>添加 Content-Security-Policy 限制脚本来源，减少 XSS 注入面：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Content-Security-Policy:</span></span>
+<span class="line"><span>  default-src 'self';</span></span>
+<span class="line"><span>  script-src 'self' 'nonce-{random}';</span></span>
+<span class="line"><span>  connect-src 'self' https://auth.example.com;</span></span>
+<span class="line"><span></span></span></code></pre>
+<hr>
+<h2 id="总结">总结</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>场景</th><th>推荐方案</th></tr></thead><tbody><tr><td>SPA + 公共客户端</td><td>Authorization Code Flow + PKCE + BFF</td></tr><tr><td>原生 App（iOS/Android）</td><td>Authorization Code Flow + PKCE</td></tr><tr><td>服务间（Machine-to-Machine）</td><td>Client Credentials Flow</td></tr><tr><td>旧系统 Implicit Flow</td><td><strong>立即迁移</strong></td></tr><tr><td>旧系统 ROPC</td><td><strong>立即迁移</strong></td></tr></tbody></table>
+<p>OAuth 2.1 并不是一次革命，而是把过去几年安全最佳实践正式写进规范。配合 PKCE 和 BFF，你的前端认证体系就能在 2026 年的安全标准下安心运行。</p>
+<hr>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a href="https://datatracker.ietf.org/doc/draft-ietf-oauth-v2-1/">OAuth 2.1 Draft</a> — IETF OAuth Working Group</li>
+<li><a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics">OAuth 2.0 Security Best Current Practice</a> — Torsten Lodderstedt et al.</li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7636">RFC 7636 — PKCE</a> — N. Sakimura et al.</li>
+<li><a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps">The BFF Pattern</a> — OAuth for Browser-Based Apps</li>
+<li><a href="https://docs.nestjs.com/security/authentication">NestJS Authentication Docs</a></li>
+<li><a href="https://github.com/panva/node-openid-client">openid-client npm package</a></li>
+</ul> </article> <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/oauth/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">oauth</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/security/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">security</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/nestjs/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">nestjs</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/frontend/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-5"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">frontend</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://rowanliu.com/posts/oauth2-pkce-bff-modern-auth/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
+</script><astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <a href="/rss.xml" class="astro-sz7xmlte rss-link" aria-label="RSS Feed"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-sz7xmlte rss-icon" viewBox="0 0 24 24" width="16" height="16"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z" fill="currentColor" class="astro-sz7xmlte"></path> </svg>
+RSS
+</a> </div> </div> </footer>     <script>function createProgressBar(){const o=document.createElement("div");o.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const e=document.createElement("div");e.className="progress-bar h-1 w-0 bg-skin-accent",e.id="myBar",o.appendChild(e),document.body.appendChild(o)}createProgressBar();function updateScrollProgress(){const o=document.body.scrollTop||document.documentElement.scrollTop,e=document.documentElement.scrollHeight-document.documentElement.clientHeight,n=o/e*100;if(document){const t=document.getElementById("myBar");t&&(t.style.width=n+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let o=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let e of o){e.classList.add("group");let n=document.createElement("a");n.innerText="#",n.className="heading-link hidden group-hover:inline-block ml-2",n.href="#"+e.id,n.ariaHidden="true",e.appendChild(n)}}addHeadingLinks();function attachCopyButtons(){let o="Copy",e=Array.from(document.querySelectorAll("pre"));for(let t of e){let c=document.createElement("div");c.style.position="relative";let d=document.createElement("button");d.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",d.innerHTML=o,t.setAttribute("tabindex","0"),t.appendChild(d),t?.parentNode?.insertBefore(c,t),c.appendChild(t),d.addEventListener("click",async()=>{await n(t,d)})}async function n(t,c){let r=t.querySelector("code")?.innerText;await navigator.clipboard.writeText(r??""),c.innerText="Copied",setTimeout(()=>{c.innerText=o},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();
+</script></body></html>
