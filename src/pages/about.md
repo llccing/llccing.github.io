@@ -13,6 +13,9 @@ title: "About"
 
 详细的工作经历请 >>> <a href="/assets/resume.pdf" target="_blank">查看PDF简历</a> <<<。
 
+想看更现代、带交互动画的在线版本，可以访问 >>> <a href="/portfolio/">Animated Portfolio</a> <<<。
+
+
 ## History Blogs
 - <a href="https://rowanliu.com/FrontEnd" target="_blank"><strong>知识点总结</strong></a>
 - <a href="https://juejin.cn/user/3227821867281079" target="_blank"><strong>掘金</strong></a>
@@ -31,4 +34,3 @@ title: "About"
 | 2019.11 ~ 2020.07 | 北京嘀嘀无限      | 高级前端研发工程师       | 北京  |
 | 2017.09 ~ 2019-11 | 北京京东尚科      | 前端开发工程师           | 北京 |
 | 2016.03 ~ 2017.08 | 北京博图纵横      | 前端开发工程师           | 北京 | -->
-
