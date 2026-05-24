@@ -1,0 +1,122 @@
+{
+  "profile": {
+    "name": "Rowan Liu",
+    "chineseName": "刘春峰",
+    "headline": "Frontend-leaning Full-stack Engineer",
+    "tagline": "I build heavy enterprise systems with a soft, minimal interface: Angular, Node.js BFF, production debugging, and AI-assisted delivery.",
+    "location": "Shanghai, China",
+    "email": "lcf33123@163.com",
+    "website": "https://rowanliu.com",
+    "targetRole": "Full-stack Developer / Angular + Node.js Engineer",
+    "summary": "10 years across Vue, React and Angular; currently focused on modern Angular, Node.js BFF, enterprise check-in flows, document scanning and production troubleshooting."
+  },
+  "design": {
+    "direction": "Tech Minimalism",
+    "inspiration": "Sean Halpin-style playful minimalism adapted for a hardcore full-stack resume",
+    "principles": [
+      "Soft light background and rounded 2xl/3xl cards",
+      "Programmer-native 2D visuals: terminal, code blocks, Angular/Vue abstract marks",
+      "Progressive disclosure: one-line impact summaries first, deep technical details in expanded cards",
+      "Micro-interactions: floating cards, magnetic hover, smooth shared-layout modal transitions"
+    ],
+    "palette": {
+      "background": "#f6f3ec",
+      "surface": "#fffaf0",
+      "mint": "#d8f3dc",
+      "sky": "#dff3ff",
+      "peach": "#ffe2c8",
+      "lavender": "#eee7ff",
+      "ink": "#202124",
+      "muted": "#6f6b63"
+    }
+  },
+  "skills": {
+    "primary": ["Angular", "TypeScript", "Node.js BFF", "Vue", "React", "Tailwind CSS"],
+    "systems": ["Enterprise Web Apps", "API composition", "Data filtering", "Document scanning", "Production troubleshooting", "Kibana / Analytics"],
+    "workflow": ["English Agile collaboration", "GitHub Copilot", "Figma MCP", "AI-agent code review", "CI/CD awareness"]
+  },
+  "experiences": [
+    {
+      "id": "accenture-cathay-checkin",
+      "type": "work",
+      "company": "Accenture China",
+      "role": "Full-stack / Senior Frontend Engineer",
+      "period": "2024.10 — Present",
+      "summary": "Building Cathay Pacific's customer-facing online check-in system with Angular + Node.js BFF under an English agile workflow.",
+      "accent": "sky",
+      "icon": "terminal",
+      "details": [
+        "Develop modern Angular frontend modules for passenger-facing online check-in flows.",
+        "Contribute to Node.js BFF API composition and data filtering between frontend flows and backend services.",
+        "Integrate Scandit-based document scanning for passports, Hong Kong/Macau permits, China residence permits and visas.",
+        "Troubleshoot production issues with analytics and Kibana signals, connecting user behavior to system-level root causes.",
+        "Collaborate in an English agile team, translating product requirements and Figma details into reliable production UI."
+      ],
+      "tech": ["Angular", "TypeScript", "Node.js", "BFF", "Scandit", "Kibana", "Analytics", "Agile"],
+      "impact": "A heavy enterprise travel workflow presented as clear, resilient customer-facing interactions."
+    },
+    {
+      "id": "ai-assisted-engineering",
+      "type": "capability",
+      "company": "AI-assisted Delivery System",
+      "role": "Engineering Workflow",
+      "period": "Current practice",
+      "summary": "Using Copilot, Figma MCP and agent-based review to compress the design-to-code-to-review loop without losing engineering judgment.",
+      "accent": "lavender",
+      "icon": "code",
+      "details": [
+        "Use GitHub Copilot for implementation acceleration while keeping code ownership and review discipline.",
+        "Use Figma MCP to bridge design context and frontend implementation details.",
+        "Apply AI-agent review patterns for pre-commit checks, risk spotting and refactoring feedback.",
+        "Prefer AI as an engineering amplifier, not a replacement for architecture, debugging or product judgment."
+      ],
+      "tech": ["GitHub Copilot", "Figma MCP", "AI review", "Prompted workflows", "Code quality"],
+      "impact": "A modern delivery loop that keeps craft high while moving faster."
+    },
+    {
+      "id": "julianna-literacy",
+      "type": "project",
+      "company": "Magic Literacy Garden",
+      "role": "Personal Product / Full-stack exploration",
+      "period": "Personal focus",
+      "summary": "A child literacy and character-recognition product idea designed around a real first user: Julianna.",
+      "accent": "mint",
+      "icon": "blocks",
+      "details": [
+        "Explore product loops for children learning characters through friendly, repeatable interactions.",
+        "Use Julianna as the initial user group to keep the product grounded in real behavior instead of abstract features.",
+        "Potentially combine frontend play patterns, progress tracking, speech/recognition and AI-assisted content generation.",
+        "Positioned as a warm personal product that also demonstrates full-stack product ownership."
+      ],
+      "tech": ["Product thinking", "Frontend UX", "Learning loops", "AI-assisted content", "Family-first testing"],
+      "impact": "A personal project with product taste, empathy and practical user feedback built in."
+    }
+  ],
+  "projects": [
+    {
+      "id": "frontend-archive",
+      "name": "10-year Frontend Knowledge Base",
+      "summary": "A long-running technical blog covering Vue internals, Angular evolution, CSS, JavaScript, Node.js and frontend architecture.",
+      "tech": ["Astro", "Markdown", "Vue", "Angular", "JavaScript", "Architecture"],
+      "details": [
+        "Uses the personal blog as a durable engineering memory across frameworks and years.",
+        "Shows breadth from foundational JavaScript/CSS to Angular SSR, hydration and BFF topics."
+      ]
+    }
+  ],
+  "componentPlan": {
+    "nextJsTarget": [
+      "app/portfolio/page.tsx",
+      "components/portfolio/PortfolioHero.tsx",
+      "components/portfolio/ExperienceCard.tsx",
+      "components/portfolio/ExperienceModal.tsx",
+      "components/portfolio/TechGlyph.tsx",
+      "data/resume.json"
+    ],
+    "astroRepoImplementation": [
+      "src/pages/portfolio.astro",
+      "src/components/portfolio/PortfolioExperience.tsx",
+      "src/data/portfolio.resume.json"
+    ]
+  }
+}
