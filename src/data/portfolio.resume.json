@@ -2,13 +2,17 @@
   "profile": {
     "name": "Rowan Liu",
     "chineseName": "刘春峰",
-    "headline": "Frontend-leaning Full-stack Engineer",
-    "tagline": "I build heavy enterprise systems with a soft, minimal interface: Angular, Node.js BFF, production debugging, and AI-assisted delivery.",
+    "birthday": "1992.01.10",
+    "headline": "Angular-focused Full-stack Engineer",
+    "tagline": "I turn complex enterprise workflows into reliable customer-facing products: modern Angular, Node.js BFF, production troubleshooting, and AI-assisted delivery.",
     "location": "Shanghai, China",
     "email": "lcf33123@163.com",
+    "phone": "15542461419",
     "website": "https://rowanliu.com",
     "targetRole": "Full-stack Developer / Angular + Node.js Engineer",
-    "summary": "10 years across Vue, React and Angular; currently focused on modern Angular, Node.js BFF, enterprise check-in flows, document scanning and production troubleshooting."
+    "summary": "10 years across Vue, Angular, React-adjacent frontend systems and backend integration. Currently building Cathay Pacific customer-facing online check-in with Angular and Node.js BFF in an English agile team.",
+    "education": "B.S. Computer Science and Technology, Heilongjiang Bayi Agricultural University · 2012.09 — 2016.06",
+    "languages": ["English: workable / CET-4", "Chinese: native"]
   },
   "design": {
     "direction": "Tech Minimalism",
@@ -30,11 +34,36 @@
       "muted": "#6f6b63"
     }
   },
+  "metrics": [
+    { "value": "10y", "label": "Frontend / full-stack delivery" },
+    { "value": "80+", "label": "Enterprise pages rebuilt at JD IDC" },
+    { "value": "100k", "label": "Lines migrated in Vue rewrite" },
+    { "value": "2w", "label": "Sprint cadence in English agile team" }
+  ],
   "skills": {
-    "primary": ["Angular", "TypeScript", "Node.js BFF", "Vue", "React", "Tailwind CSS"],
-    "systems": ["Enterprise Web Apps", "API composition", "Data filtering", "Document scanning", "Production troubleshooting", "Kibana / Analytics"],
-    "workflow": ["English Agile collaboration", "GitHub Copilot", "Figma MCP", "AI-agent code review", "CI/CD awareness"]
+    "primary": ["Angular", "TypeScript", "Node.js BFF", "Vue.js", "Tailwind CSS", "RxJS"],
+    "systems": ["Enterprise Web Apps", "API composition", "Data filtering", "Document scanning", "Production troubleshooting", "Kibana / Analytics", "Dynamic forms", "Component libraries"],
+    "backend": ["Node.js", "NestJS", "Spring Boot", "TypeORM", "ABP", "Keycloak"],
+    "miniPrograms": ["Uniapp", "MPX", "WeChat Mini Program"],
+    "workflow": ["English Agile collaboration", "Sprint planning / review / retro", "Story grooming", "UAT / regression support", "Code Review", "GitHub Copilot", "Claude", "Figma MCP", "AI-agent code review"]
   },
+  "featuredSystems": [
+    {
+      "name": "Cathay Pacific online check-in",
+      "summary": "Customer-facing travel workflow built with Angular + Node.js BFF, including document scanning and production issue analysis.",
+      "tags": ["Angular", "Node.js BFF", "Scandit", "Kibana"]
+    },
+    {
+      "name": "JD IDC infrastructure platform",
+      "summary": "Vue.js rewrite from 0 to 1 for an IDC operations platform, covering 80+ pages and roughly 100k lines of frontend code.",
+      "tags": ["Vue.js", "Scaffold", "Analytics", "Enterprise platform"]
+    },
+    {
+      "name": "iCluster Web",
+      "summary": "Angular + Tailwind + Spring Boot product work with design prototyping, Keycloak encapsulation and Angular 13 → 15 upgrade planning.",
+      "tags": ["Angular", "Tailwind", "Spring Boot", "Keycloak"]
+    }
+  ],
   "experiences": [
     {
       "id": "accenture-cathay-checkin",
@@ -42,6 +71,7 @@
       "company": "Accenture China",
       "role": "Full-stack / Senior Frontend Engineer",
       "period": "2024.10 — Present",
+      "location": "Shanghai",
       "summary": "Building Cathay Pacific's customer-facing online check-in system with Angular + Node.js BFF under an English agile workflow.",
       "accent": "sky",
       "icon": "terminal",
@@ -50,48 +80,118 @@
         "Contribute to Node.js BFF API composition and data filtering between frontend flows and backend services.",
         "Integrate Scandit-based document scanning for passports, Hong Kong/Macau permits, China residence permits and visas.",
         "Troubleshoot production issues with analytics and Kibana signals, connecting user behavior to system-level root causes.",
-        "Collaborate in an English agile team, translating product requirements and Figma details into reliable production UI."
+        "Work in a two-week Sprint cadence across Planning, Review and Retrospective; join Refinement / Story Grooming to clarify backlog scope.",
+        "Support UAT and regression testing while preserving buffer for urgent production or requirement changes.",
+        "Use GitHub Copilot, Claude and AI-agent review patterns to accelerate delivery while keeping human review discipline."
       ],
-      "tech": ["Angular", "TypeScript", "Node.js", "BFF", "Scandit", "Kibana", "Analytics", "Agile"],
+      "tech": ["Angular", "TypeScript", "Node.js", "BFF", "Scandit", "Kibana", "Analytics", "Agile", "Copilot", "Claude"],
       "impact": "A heavy enterprise travel workflow presented as clear, resilient customer-facing interactions."
     },
     {
-      "id": "ai-assisted-engineering",
-      "type": "capability",
-      "company": "AI-assisted Delivery System",
-      "role": "Engineering Workflow",
-      "period": "Current practice",
-      "summary": "Using Copilot, Figma MCP and agent-based review to compress the design-to-code-to-review loop without losing engineering judgment.",
+      "id": "linkstec-icluster",
+      "type": "work",
+      "company": "Linkstec / 凌翔创意软件",
+      "role": "Full-stack Engineer",
+      "period": "2022.04 — 2024.09",
+      "location": "Dalian",
+      "summary": "Led iCluster Web product development across Angular, Tailwind CSS and Spring Boot, including product prototyping and Angular upgrade work.",
       "accent": "lavender",
       "icon": "code",
       "details": [
-        "Use GitHub Copilot for implementation acceleration while keeping code ownership and review discipline.",
-        "Use Figma MCP to bridge design context and frontend implementation details.",
-        "Apply AI-agent review patterns for pre-commit checks, risk spotting and refactoring feedback.",
-        "Prefer AI as an engineering amplifier, not a replacement for architecture, debugging or product judgment."
+        "Led iCluster Web development with Angular, Tailwind CSS and Spring Boot.",
+        "Learned the JHipster toolchain and encapsulated Keycloak-related capabilities in Spring Boot to improve usability.",
+        "Analyzed requirements and used Figma to design product improvement prototypes.",
+        "Researched and planned an Angular upgrade from 13 to 15, including risk assessment, performance and developer-experience improvements."
       ],
-      "tech": ["GitHub Copilot", "Figma MCP", "AI review", "Prompted workflows", "Code quality"],
-      "impact": "A modern delivery loop that keeps craft high while moving faster."
+      "tech": ["Angular", "Tailwind CSS", "Spring Boot", "JHipster", "Keycloak", "Figma", "Upgrade planning"],
+      "impact": "Product-facing full-stack work: from requirements and prototypes to framework upgrades and backend integration."
     },
     {
-      "id": "julianna-literacy",
-      "type": "project",
-      "company": "Magic Literacy Garden",
-      "role": "Personal Product / Full-stack exploration",
-      "period": "Personal focus",
-      "summary": "A child literacy and character-recognition product idea designed around a real first user: Julianna.",
+      "id": "inno-abp-astrazeneca",
+      "type": "work",
+      "company": "Inno Research / 大连英诺瑞新科技",
+      "role": "Full-stack Engineer",
+      "period": "2020.07 — 2022.04",
+      "location": "Dalian",
+      "summary": "Built Angular/NestJS business systems, dynamic forms, ABP-based component libraries and AstraZeneca clinic mini-program / PC features.",
       "accent": "mint",
       "icon": "blocks",
       "details": [
-        "Explore product loops for children learning characters through friendly, repeatable interactions.",
-        "Use Julianna as the initial user group to keep the product grounded in real behavior instead of abstract features.",
-        "Potentially combine frontend play patterns, progress tracking, speech/recognition and AI-assisted content generation.",
-        "Positioned as a warm personal product that also demonstrates full-stack product ownership."
+        "Developed dynamic form features with Angular, NG-ZORRO, RxJS, NestJS and TypeORM.",
+        "Built mini-program and PC-side clinic project features for AstraZeneca with Uniapp and reusable common components.",
+        "Encapsulated business component libraries and frontend layout components based on ABP projects to improve reuse.",
+        "Handled effort estimation, task assignment, Code Review and mentoring for junior engineers."
       ],
-      "tech": ["Product thinking", "Frontend UX", "Learning loops", "AI-assisted content", "Family-first testing"],
-      "impact": "A personal project with product taste, empathy and practical user feedback built in."
+      "tech": ["Angular", "NG-ZORRO", "RxJS", "NestJS", "TypeORM", "Uniapp", "ABP", "Code Review"],
+      "impact": "Combined hands-on delivery with component reuse, estimation and team-level engineering support."
+    },
+    {
+      "id": "didi-driver-h5",
+      "type": "work",
+      "company": "DiDi / 北京嘀嘀无限科技",
+      "role": "Senior Frontend Engineer",
+      "period": "2019.11 — 2020.07",
+      "location": "Beijing",
+      "summary": "Delivered C-side H5 and mini-program activity pages for drivers, with strong design fidelity and fast framework learning.",
+      "accent": "peach",
+      "icon": "code",
+      "details": [
+        "Developed C-side H5 pages for driver daily activities and collaborated closely with designers to reach 99% design fidelity.",
+        "Researched Vue CLI upgrade paths for shared team plugins compatible with @vue/cli 4.",
+        "Quickly learned the MPX framework and delivered WeChat mini-program features on schedule."
+      ],
+      "tech": ["Vue", "H5", "MPX", "WeChat Mini Program", "Vue CLI", "Design fidelity"],
+      "impact": "Fast-moving consumer frontend delivery with high UI fidelity and quick adaptation to new internal frameworks."
+    },
+    {
+      "id": "jd-idc-platform",
+      "type": "work",
+      "company": "JD / 北京京东尚科信息技术",
+      "role": "Frontend Engineer",
+      "period": "2017.09 — 2019.11",
+      "location": "Beijing",
+      "summary": "Rebuilt the IDC infrastructure platform with Vue.js from 0 to 1: 80+ pages, around 100k lines, scaffolding and analytics.",
+      "accent": "sky",
+      "icon": "terminal",
+      "details": [
+        "Learned and used Vue.js to rebuild the IDC infrastructure platform from 0 to 1, covering 80+ pages and roughly 100k lines of code.",
+        "Developed work-order business modules with advanced Vue patterns to decouple code and support team collaboration.",
+        "Created the idc-cli scaffold for work-order templates to improve development efficiency.",
+        "Introduced analytics collection for pages and specified positions, giving PMs data support for feature usage analysis."
+      ],
+      "tech": ["Vue.js", "JavaScript", "Enterprise platform", "idc-cli", "Analytics", "Scaffolding"],
+      "impact": "A foundational enterprise rewrite that shows scale, ownership and platform thinking early in the career."
+    },
+    {
+      "id": "botu-foundation",
+      "type": "work",
+      "company": "Botu / 北京博图纵横科技",
+      "role": "Frontend Engineer",
+      "period": "2016.02 — 2017.08",
+      "location": "Beijing",
+      "summary": "Built frontend foundations with RequireJS, Bootstrap, jQuery, HTML/CSS and Gulp/browser-sync tooling.",
+      "accent": "lavender",
+      "icon": "blocks",
+      "details": [
+        "Set up project frontend structure with RequireJS, Bootstrap, jQuery, HTML and CSS3.",
+        "Introduced Gulp and browser-sync tooling to improve development efficiency."
+      ],
+      "tech": ["RequireJS", "Bootstrap", "jQuery", "HTML", "CSS3", "Gulp", "browser-sync"],
+      "impact": "Strong frontend fundamentals formed through hands-on framework setup and workflow automation."
     }
   ],
+  "personalLab": {
+    "name": "Magic Literacy Garden",
+    "role": "Personal product / full-stack exploration",
+    "summary": "A child literacy and character-recognition product idea designed around a real first user: Julianna.",
+    "details": [
+      "Explore product loops for children learning characters through friendly, repeatable interactions.",
+      "Use Julianna as the initial user group to keep the product grounded in real behavior instead of abstract features.",
+      "Potentially combine frontend play patterns, progress tracking, speech/recognition and AI-assisted content generation.",
+      "Positioned as a warm personal product that also demonstrates full-stack product ownership."
+    ],
+    "tech": ["Product thinking", "Frontend UX", "Learning loops", "AI-assisted content", "Family-first testing"]
+  },
   "projects": [
     {
       "id": "frontend-archive",
