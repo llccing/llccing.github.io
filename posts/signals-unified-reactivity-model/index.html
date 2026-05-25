@@ -1,0 +1,741 @@
+<!DOCTYPE html><html lang="zh-CN" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://rowanliu.com/posts/signals-unified-reactivity-model/"><meta name="generator" content="Astro v4.16.18"><!-- General Meta Tags --><title>Signals 内在原理：从 Vue Reactivity 到 Angular Signals 的响应式编程统一模型 | Rowan's Blog</title><meta name="title" content="Signals 内在原理：从 Vue Reactivity 到 Angular Signals 的响应式编程统一模型 | Rowan's Blog"><meta name="description" content="把 Vue 2/3、Angular Signals、Solid.js 与 TC39 Signals Proposal 放进同一张坐标系：依赖追踪、变化传播、副作用调度。理解不同框架响应式系统背后的共同模型，而不是只记 API。"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="Signals 内在原理：从 Vue Reactivity 到 Angular Signals 的响应式编程统一模型 | Rowan's Blog"><meta property="og:description" content="把 Vue 2/3、Angular Signals、Solid.js 与 TC39 Signals Proposal 放进同一张坐标系：依赖追踪、变化传播、副作用调度。理解不同框架响应式系统背后的共同模型，而不是只记 API。"><meta property="og:url" content="https://rowanliu.com/posts/signals-unified-reactivity-model/"><meta property="og:image" content="https://rowanliu.com/posts/signals-%E5%86%85%E5%9C%A8%E5%8E%9F%E7%90%86%E4%BB%8E-vue-reactivity-%E5%88%B0-angular-signals-%E7%9A%84%E5%93%8D%E5%BA%94%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%BB%9F%E4%B8%80%E6%A8%A1%E5%9E%8B.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-05-24T16:00:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://rowanliu.com/posts/signals-unified-reactivity-model/"><meta property="twitter:title" content="Signals 内在原理：从 Vue Reactivity 到 Angular Signals 的响应式编程统一模型 | Rowan's Blog"><meta property="twitter:description" content="把 Vue 2/3、Angular Signals、Solid.js 与 TC39 Signals Proposal 放进同一张坐标系：依赖追踪、变化传播、副作用调度。理解不同框架响应式系统背后的共同模型，而不是只记 API。"><meta property="twitter:image" content="https://rowanliu.com/posts/signals-%E5%86%85%E5%9C%A8%E5%8E%9F%E7%90%86%E4%BB%8E-vue-reactivity-%E5%88%B0-angular-signals-%E7%9A%84%E5%93%8D%E5%BA%94%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%BB%9F%E4%B8%80%E6%A8%A1%E5%9E%8B.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.a1rYq0Go.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (min-width:640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.Cj6ph0Em.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (min-width:640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (min-width:640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:signals-内在原理从-vue-reactivity-到-angular-signals-的响应式编程统一模型}@layer astro{::view-transition-old(signals-内在原理从-vue-reactivity-到-angular-signals-的响应式编程统一模型){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(signals-内在原理从-vue-reactivity-到-angular-signals-的响应式编程统一模型){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(signals-内在原理从-vue-reactivity-到-angular-signals-的响应式编程统一模型){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(signals-内在原理从-vue-reactivity-到-angular-signals-的响应式编程统一模型){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:vue}@layer astro{::view-transition-old(vue){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(vue){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(vue){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(vue){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:angular}@layer astro{::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-4]{view-transition-name:signals}@layer astro{::view-transition-old(signals){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(signals){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(signals){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(signals){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-5]{view-transition-name:frontend}@layer astro{::view-transition-old(frontend){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(frontend){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(frontend){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(frontend){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-5],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-5]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-6]{view-transition-name:reactivity}@layer astro{::view-transition-old(reactivity){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(reactivity){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(reactivity){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(reactivity){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-6],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-6]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-6],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-6]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-6],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-6]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-6],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-6]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/short-stories/" class="astro-3ef6ksr2">
+Short Stories
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex justify-start max-w-3xl mx-auto px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">Signals 内在原理：从 Vue Reactivity 到 Angular Signals 的响应式编程统一模型</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-24T16:00:00.000Z">2026年5月25日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">00:00</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>24 min read</span></span></div> <article id="article" role="article" class="astro-vj4tpspi max-w-3xl mx-auto mt-8 prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#前言" class="astro-vj4tpspi">前言</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#一为什么今天要重新理解响应式" class="astro-vj4tpspi">一、为什么今天要重新理解响应式</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#11-响应式从来不是语法糖" class="astro-vj4tpspi">1.1 响应式从来不是“语法糖”</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#12-框架真正难的不是知道值变了而是知道谁该更新" class="astro-vj4tpspi">1.2 框架真正难的，不是知道值变了，而是知道谁该更新</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#二统一模型依赖追踪---变化传播---副作用调度" class="astro-vj4tpspi">二、统一模型：依赖追踪 -&gt; 变化传播 -&gt; 副作用调度</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#21-第一阶段依赖追踪" class="astro-vj4tpspi">2.1 第一阶段：依赖追踪</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#22-第二阶段变化传播" class="astro-vj4tpspi">2.2 第二阶段：变化传播</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#23-第三阶段副作用调度" class="astro-vj4tpspi">2.3 第三阶段：副作用调度</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#三vue-的演进从-objectdefineproperty-到-proxy再到-signals-化思维" class="astro-vj4tpspi">三、Vue 的演进：从 Object.defineProperty 到 Proxy，再到 Signals 化思维</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#31-vue-2-的伟大之处是把对象属性变成了可观察单元" class="astro-vj4tpspi">3.1 Vue 2 的伟大之处，是把对象属性变成了可观察单元</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#32-vue-2-的限制不是理念错误而是宿主能力限制" class="astro-vj4tpspi">3.2 Vue 2 的限制，不是理念错误，而是宿主能力限制</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#33-vue-3-的-proxy-解决的是拦截对象操作不是替代依赖图" class="astro-vj4tpspi">3.3 Vue 3 的 Proxy 解决的是“拦截对象操作”，不是替代依赖图</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#34-ref-的出现说明-vue-自己也在走向-signal-cell-抽象" class="astro-vj4tpspi">3.4 ref() 的出现，说明 Vue 自己也在走向 signal cell 抽象</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#四angular-的演进从-zonejs-到-signals是把刷新责任收回状态图" class="astro-vj4tpspi">四、Angular 的演进：从 Zone.js 到 Signals，是把“刷新责任”收回状态图</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#41-zonejs-模式解决的是什么时候检查不是谁需要更新" class="astro-vj4tpspi">4.1 Zone.js 模式解决的是“什么时候检查”，不是“谁需要更新”</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#42-onpush-是剪枝不是改写底层模型" class="astro-vj4tpspi">4.2 OnPush 是剪枝，不是改写底层模型</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#43-signals-让-angular-获得了细粒度的状态图" class="astro-vj4tpspi">4.3 Signals 让 Angular 获得了细粒度的状态图</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#44-angular-不是在模仿-vue而是在补上自己长期缺失的那一层" class="astro-vj4tpspi">4.4 Angular 不是在“模仿 Vue”，而是在补上自己长期缺失的那一层</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#五refsignalcreatesignal它们究竟同构在哪里" class="astro-vj4tpspi">五、ref()、signal()、createSignal()：它们究竟同构在哪里</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#51-表面-api-不同核心角色却几乎一致" class="astro-vj4tpspi">5.1 表面 API 不同，核心角色却几乎一致</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#52-一个最小例子就足够看清统一抽象" class="astro-vj4tpspi">5.2 一个最小例子，就足够看清统一抽象</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#53-真正的差异发生在边界条件与宿主集成层" class="astro-vj4tpspi">5.3 真正的差异，发生在边界条件与宿主集成层</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#六pull-vs-push为什么现代-signals-几乎都不是纯粹的一边" class="astro-vj4tpspi">六、Pull vs Push：为什么现代 Signals 几乎都不是纯粹的一边</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#61-先澄清一个常见误解" class="astro-vj4tpspi">6.1 先澄清一个常见误解</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#62-computed-在-angular-官方语义里仍然是-lazy-的" class="astro-vj4tpspi">6.2 computed 在 Angular 官方语义里仍然是 lazy 的</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#63-真正更主动的是-invalidation-和-scheduling而不是求值本身" class="astro-vj4tpspi">6.3 真正更主动的，是 invalidation 和 scheduling，而不是求值本身</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#64-preact-signals-提醒我们懒求值真正省下的是无意义工作" class="astro-vj4tpspi">6.4 Preact Signals 提醒我们：懒求值真正省下的是无意义工作</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#65-为什么不能纯-push" class="astro-vj4tpspi">6.5 为什么不能纯 push</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#七为什么-glitch-free-如此重要从-diamond-problem-说起" class="astro-vj4tpspi">七、为什么 glitch-free 如此重要：从 diamond problem 说起</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#71-先看最小的-diamond" class="astro-vj4tpspi">7.1 先看最小的 diamond</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#72-现代-signals-系统的目标是最少计算--不暴露中间态" class="astro-vj4tpspi">7.2 现代 Signals 系统的目标，是“最少计算 + 不暴露中间态”</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#73-signals-不是流而是当前值单元" class="astro-vj4tpspi">7.3 Signals 不是流，而是“当前值单元”</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#八tc39-signals-proposal标准化的不是框架-api而是底层语义" class="astro-vj4tpspi">八、TC39 Signals Proposal：标准化的不是框架 API，而是底层语义</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#81-为什么-tc39-会开始讨论-signals" class="astro-vj4tpspi">8.1 为什么 TC39 会开始讨论 Signals</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#82-proposal-中最有意思的三层-api" class="astro-vj4tpspi">8.2 Proposal 中最有意思的三层 API</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#83-proposal-其实把我们前面的统一模型写成了语言草图" class="astro-vj4tpspi">8.3 Proposal 其实把我们前面的统一模型写成了语言草图</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#84-proposal-对前端框架意味着什么" class="astro-vj4tpspi">8.4 Proposal 对前端框架意味着什么</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#九如果-signals-成为原生特性vueangularreact-会怎样变化" class="astro-vj4tpspi">九、如果 Signals 成为原生特性，Vue、Angular、React 会怎样变化</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#91-vue对象响应式仍在但底层-signal-graph-可能更轻更统一" class="astro-vj4tpspi">9.1 Vue：对象响应式仍在，但底层 signal graph 可能更轻、更统一</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#92-angular收益可能最直接因为它本来就在重建底层反应性基础设施" class="astro-vj4tpspi">9.2 Angular：收益可能最直接，因为它本来就在重建底层反应性基础设施</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#93-react不会自动变成signal-框架但会获得新的共享基础设施可能性" class="astro-vj4tpspi">9.3 React：不会自动变成“Signal 框架”，但会获得新的共享基础设施可能性</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#十结语响应式系统真正统一的不是-api而是世界观" class="astro-vj4tpspi">十、结语：响应式系统真正统一的，不是 API，而是世界观</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#延伸阅读" class="astro-vj4tpspi">延伸阅读</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#参考" class="astro-vj4tpspi">参考</a> </li> </ul> </details> <h2 id="前言">前言</h2>
+<p>2019 年，我写过一组 Vue 源码分析文章，其中响应式系统是最让我着迷的一块。那时我们讨论的是 <code>Object.defineProperty</code>、<code>Dep</code>、<code>Watcher</code>，讨论的是“改了一个对象属性，DOM 为什么会自己更新”。</p>
+<p>几年之后，Angular 也把自己的核心更新机制推向了 <strong>Signals</strong>。表面上看，这是一个框架 API 的变化：<code>count</code> 变成了 <code>count()</code>，<code>@Input()</code> 旁边开始出现 <code>input()</code>，模板里的更新逻辑变得越来越“像 Vue，像 Solid，像 Preact”。</p>
+<p>但如果只把它理解成“Angular 学了 Vue”或者“前端框架又一次互相借鉴”，理解仍然停留在表层。</p>
+<p>真正值得写一篇长文的，是下面这个事实：</p>
+<blockquote>
+<p>Vue 3 的 <code>ref()</code>、Angular 的 <code>signal()</code>、Solid.js 的 <code>createSignal()</code>，虽然 API 细节不同，但它们正在收敛到同一类响应式编程模型。</p>
+</blockquote>
+<p>这类模型的核心，不是某个具体函数名，而是三件事：</p>
+<ol>
+<li><strong>依赖追踪</strong>：谁依赖谁？</li>
+<li><strong>变化传播</strong>：某个状态变化后，哪些结果可能失效？</li>
+<li><strong>副作用调度</strong>：什么时候真正去重算、渲染、执行副作用？</li>
+</ol>
+<p>如果把这三件事讲清楚，你会发现 Vue 2 到 Vue 3 的演进、Angular 从 Zone.js 到 Signals 的转向、TC39 为什么开始推进 Signals 标准化，背后其实是同一条技术路线。</p>
+<p>本文想做的，就是把这些看似分散的话题放回一张统一地图中。</p>
+<hr>
+<h2 id="一为什么今天要重新理解响应式">一、为什么今天要重新理解响应式</h2>
+<h3 id="11-响应式从来不是语法糖">1.1 响应式从来不是“语法糖”</h3>
+<p>很多开发者第一次接触响应式，会把它理解成一种框架能力：</p>
+<ul>
+<li>Vue 能监听数据变化</li>
+<li>Angular 能自动刷新模板</li>
+<li>Solid 能细粒度更新 DOM</li>
+</ul>
+<p>这种理解没有错，但不够深。</p>
+<p>响应式真正解决的问题是：<strong>程序中的“值之间的依赖关系”如何显式地、可维护地、可调度地运行起来。</strong></p>
+<p>看一个最小例子：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> count</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 1</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> isEven</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75"> count</span><span style="color:#56B6C2"> %</span><span style="color:#D19A66"> 2</span><span style="color:#56B6C2"> ===</span><span style="color:#D19A66"> 0</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> label</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75"> isEven</span><span style="color:#C678DD"> ?</span><span style="color:#98C379"> "even"</span><span style="color:#C678DD"> :</span><span style="color:#98C379"> "odd"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span></code></pre>
+<p>这是普通的命令式代码。它表达了依赖关系，但依赖关系只存在于“这一刻”的执行过程中：</p>
+<ul>
+<li><code>isEven</code> 依赖 <code>count</code></li>
+<li><code>label</code> 依赖 <code>isEven</code></li>
+</ul>
+<p>一旦 <code>count</code> 后续发生变化，这个依赖关系不会自己继续工作。你必须重新执行整段代码，或者手动写通知逻辑。</p>
+<p>响应式系统所做的事情，本质上是把这种“一次性的依赖关系”升级为“持续有效的依赖图”。</p>
+<h3 id="12-框架真正难的不是知道值变了而是知道谁该更新">1.2 框架真正难的，不是知道值变了，而是知道谁该更新</h3>
+<p>只知道“某个值变了”远远不够。</p>
+<p>真正复杂的是下面三个问题：</p>
+<ol>
+<li>一个派生值依赖了哪些基础状态？</li>
+<li>当基础状态变化后，哪些派生值只是“可能失效”，哪些必须立刻更新？</li>
+<li>当多个依赖链条交叉时，怎样避免重复计算和中间态错误？</li>
+</ol>
+<p>这正是为什么现代响应式框架最终都要面对同一批工程难题：</p>
+<ul>
+<li>动态依赖</li>
+<li>缓存失效</li>
+<li>调度时机</li>
+<li>glitch-free 执行</li>
+<li>生命周期与清理</li>
+</ul>
+<p>如果只盯着 <code>ref()</code>、<code>signal()</code> 或 <code>createSignal()</code> 这些表面 API，你会觉得它们“有点像”。</p>
+<p>如果盯着依赖图、脏标记、watcher/effect 调度，你会发现它们其实是在回答同一组问题。</p>
+<hr>
+<h2 id="二统一模型依赖追踪---变化传播---副作用调度">二、统一模型：依赖追踪 -&gt; 变化传播 -&gt; 副作用调度</h2>
+<h3 id="21-第一阶段依赖追踪">2.1 第一阶段：依赖追踪</h3>
+<p>任何 Signals 风格的系统，第一步都要回答一个问题：</p>
+<blockquote>
+<p>当我执行一个派生计算时，怎么知道它依赖了哪些源状态？</p>
+</blockquote>
+<p>最常见的答案是：<strong>在“当前正在计算的消费者”与“被读取的生产者”之间建立连接。</strong></p>
+<p>你可以把它想象成一套极简机制：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">let</span><span style="color:#E06C75"> activeConsumer</span><span style="color:#ABB2BF">: (() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> void</span><span style="color:#ABB2BF">) | </span><span style="color:#E5C07B">null</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> null</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> track</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">producer</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">Set</span><span style="color:#ABB2BF">&lt;() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> void</span><span style="color:#ABB2BF">&gt;) {</span></span>
+<span class="line"><span style="color:#C678DD">  if</span><span style="color:#ABB2BF"> (</span><span style="color:#E06C75">activeConsumer</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E5C07B">    producer</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">add</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">activeConsumer</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> runWithTracking</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt;(</span><span style="color:#61AFEF">consumer</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> T</span><span style="color:#ABB2BF">): </span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> prev</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75"> activeConsumer</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  activeConsumer</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75"> consumer</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">  try</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#61AFEF"> consumer</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">  } </span><span style="color:#C678DD">finally</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">    activeConsumer</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75"> prev</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>当一个 <code>computed</code>、<code>effect</code>、模板表达式开始执行时，它会把自己放到一个“当前活跃消费者”的上下文里。此后凡是被读取到的 signal/ref/state，都把这个消费者登记为自己的依赖者。</p>
+<p>这就是自动依赖追踪的核心。</p>
+<p>它的价值非常大：</p>
+<ul>
+<li>你不需要手写订阅列表</li>
+<li>依赖关系来自真实运行时读取，而不是靠人维护</li>
+<li>分支依赖可以动态切换</li>
+</ul>
+<p>例如：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> showCount</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">false</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> count</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> label</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#61AFEF"> showCount</span><span style="color:#ABB2BF">() </span><span style="color:#C678DD">?</span><span style="color:#98C379"> `count: </span><span style="color:#C678DD">${</span><span style="color:#61AFEF">count</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#C678DD"> :</span><span style="color:#98C379"> "hidden"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>当 <code>showCount()</code> 为 <code>false</code> 时，这个 <code>computed</code> 根本不会读取 <code>count()</code>，于是 <code>count</code> 就不会成为当前计算的依赖。</p>
+<p>这意味着：<strong>现代响应式系统记录的不是“静态源码引用”，而是“这一次真实执行所读到的依赖集合”。</strong></p>
+<h3 id="22-第二阶段变化传播">2.2 第二阶段：变化传播</h3>
+<p>依赖图建立之后，下一步不是立刻重算，而是先回答另一个问题：</p>
+<blockquote>
+<p>某个源状态写入后，应该怎样把“可能失效”这件事沿依赖图传播出去？</p>
+</blockquote>
+<p>这一步常被叫做：</p>
+<ul>
+<li>invalidation</li>
+<li>dirty marking</li>
+<li>propagation</li>
+<li>graph coloring</li>
+</ul>
+<p>最朴素的做法是“立刻重算所有下游”。</p>
+<p>这在小图里似乎没问题，但只要出现共享依赖，就会立刻暴露问题。</p>
+<p>看经典的 diamond dependency：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="text"><code><span class="line"><span>    count</span></span>
+<span class="line"><span>   /     \</span></span>
+<span class="line"><span>isEven  parityText</span></span>
+<span class="line"><span>   \     /</span></span>
+<span class="line"><span>    summary</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>如果 <code>count</code> 变化后采用 naive push：</p>
+<ol>
+<li>先推 <code>isEven</code></li>
+<li>再推 <code>parityText</code></li>
+<li>再分别触发 <code>summary</code></li>
+</ol>
+<p>那么 <code>summary</code> 很可能被计算两次，甚至短暂看到中间态。</p>
+<p>因此现代 Signals 系统通常不会在传播阶段就“执行最终计算”，而是先做更克制的事情：</p>
+<ul>
+<li>标记哪些节点脏了</li>
+<li>标记哪些节点可能脏了</li>
+<li>记录哪些 effect 或 watcher 需要未来某个时刻处理</li>
+</ul>
+<p>这一步的本质，不是生产最终值，而是<strong>把依赖图从 clean 状态推进到一个一致的待处理状态</strong>。</p>
+<h3 id="23-第三阶段副作用调度">2.3 第三阶段：副作用调度</h3>
+<p>第三阶段最容易被忽略，但它决定了框架工程体验。</p>
+<p>因为“值如何变化”和“什么时候执行副作用”其实是两层不同的问题。</p>
+<p>例如：</p>
+<ul>
+<li><code>computed</code> 什么时候重算？</li>
+<li>effect 什么时候重新运行？</li>
+<li>模板什么时候刷新？</li>
+<li>多次写入是合并、批处理，还是逐次暴露？</li>
+</ul>
+<p>这就是调度层。</p>
+<p>很多响应式误解都来自把第二阶段和第三阶段混为一谈：</p>
+<ul>
+<li>脏标记是传播，不等于立刻执行副作用</li>
+<li><code>computed</code> 失效不等于它已经重算</li>
+<li>effect 的存在不等于框架必须立刻执行 DOM 写入</li>
+</ul>
+<p>因此，一个统一的理解方式是：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="text"><code><span class="line"><span>读 -&gt; 建依赖</span></span>
+<span class="line"><span>写 -&gt; 传播失效</span></span>
+<span class="line"><span>调度 -&gt; 选择合适时机执行重算与副作用</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>把这个框架记住，后面所有 Vue、Angular、Solid、TC39 的差异，都会变得更好解释。</p>
+<hr>
+<h2 id="三vue-的演进从-objectdefineproperty-到-proxy再到-signals-化思维">三、Vue 的演进：从 Object.defineProperty 到 Proxy，再到 Signals 化思维</h2>
+<h3 id="31-vue-2-的伟大之处是把对象属性变成了可观察单元">3.1 Vue 2 的伟大之处，是把对象属性变成了可观察单元</h3>
+<p>Vue 2 的响应式系统之所以经典，是因为它在 ES5 能力边界内做到了极高完成度。</p>
+<p>它的核心思路并不神秘：</p>
+<ol>
+<li>用 <code>Object.defineProperty</code> 为每个属性注入 getter/setter</li>
+<li>getter 中做依赖收集</li>
+<li>setter 中做通知更新</li>
+</ol>
+<p>这也是我在 2019 年那篇 <a href="/posts/vue-analysis-responsive">Vue.js 深入响应式原理</a> 里重点拆过的部分。</p>
+<p>你可以把它抽象成：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="javascript"><code><span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> defineReactive</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">obj</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">key</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">val</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> dep</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> Dep</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">  Object</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">defineProperty</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">obj</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">key</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#61AFEF">    get</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#E5C07B">      dep</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">depend</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">      return</span><span style="color:#E06C75"> val</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#61AFEF">    set</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">newVal</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#E06C75">      val</span><span style="color:#56B6C2"> =</span><span style="color:#E06C75"> newVal</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E5C07B">      dep</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">notify</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>注意，这已经具备了我们上文说的三阶段雏形：</p>
+<ul>
+<li>getter 负责依赖追踪</li>
+<li>setter 负责变化传播</li>
+<li>watcher 队列负责异步调度和去重</li>
+</ul>
+<p>换句话说，Vue 2 并不是“没有 Signals”。</p>
+<p>更准确地说，<strong>Vue 2 的 signal 粒度仍然主要绑定在对象属性层面，而不是一个显式的一等 state cell。</strong></p>
+<h3 id="32-vue-2-的限制不是理念错误而是宿主能力限制">3.2 Vue 2 的限制，不是理念错误，而是宿主能力限制</h3>
+<p>Vue 2 的问题大家都很熟悉：</p>
+<ul>
+<li>无法原生拦截属性新增/删除</li>
+<li>数组变异方法需要特殊处理</li>
+<li>初始化时需要深度遍历对象做响应式转换</li>
+<li>响应式行为和对象结构强绑定</li>
+</ul>
+<p>这些缺点并不是 Vue 团队“不懂响应式”，而是 <code>Object.defineProperty</code> 时代的宿主能力决定的。</p>
+<p>也正因为如此，Vue 3 转向 Proxy 不是偶然事件，而是历史逻辑上的自然升级。</p>
+<h3 id="33-vue-3-的-proxy-解决的是拦截对象操作不是替代依赖图">3.3 Vue 3 的 Proxy 解决的是“拦截对象操作”，不是替代依赖图</h3>
+<p>在 <a href="/posts/translate-making-vue3">Vue 3 的开发进展</a> 里，Evan You 讲得很清楚：Proxy 的价值，在于能更完整地拦截对象操作，从而消除 Vue 2 中的一批响应式死角。</p>
+<p>但要特别注意一件事：</p>
+<blockquote>
+<p>Proxy 解决的是“怎么观察对象”，并不直接等于“完整的响应式系统已经成立”。</p>
+</blockquote>
+<p>因为响应式系统真正不可替代的部分仍然是：</p>
+<ul>
+<li>当前活跃 effect/computed 的上下文</li>
+<li>source -&gt; sink 的依赖图</li>
+<li>失效传播与调度</li>
+</ul>
+<p>Proxy 只是让“对象属性读取/写入”更容易进入这套机制。</p>
+<p>它不是响应式本身，最多只是响应式系统更好的入口。</p>
+<h3 id="34-ref-的出现说明-vue-自己也在走向-signal-cell-抽象">3.4 <code>ref()</code> 的出现，说明 Vue 自己也在走向 signal cell 抽象</h3>
+<p>很多人会把 Vue 3 的 <code>reactive()</code> 当成主角，但从响应式抽象层面看，<code>ref()</code> 更接近现代 Signals 模型。</p>
+<p>为什么？</p>
+<p>因为 <code>ref()</code> 把“一个可变值单元”显式抽了出来：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> count</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> ref</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> double</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> count</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">value</span><span style="color:#56B6C2"> *</span><span style="color:#D19A66"> 2</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span></code></pre>
+<p>这里的 <code>count</code> 不再是某个对象上的隐藏响应式属性，而是一个一等的、可被传递、可被组合、可被派生的状态单元。</p>
+<p>这正是 Signals 思维的关键一步。</p>
+<p>所以从历史上看，Vue 的路线其实是：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="text"><code><span class="line"><span>对象属性可观察</span></span>
+<span class="line"><span>-&gt; 对象操作可拦截</span></span>
+<span class="line"><span>-&gt; 状态单元显式化</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>这条路走到 <code>ref()</code> 这里，已经离现代 Signals 非常近了。</p>
+<hr>
+<h2 id="四angular-的演进从-zonejs-到-signals是把刷新责任收回状态图">四、Angular 的演进：从 Zone.js 到 Signals，是把“刷新责任”收回状态图</h2>
+<h3 id="41-zonejs-模式解决的是什么时候检查不是谁需要更新">4.1 Zone.js 模式解决的是“什么时候检查”，不是“谁需要更新”</h3>
+<p>Angular 老一代变更检测的核心思想，不是精确依赖追踪，而是：</p>
+<ol>
+<li>用 Zone.js patch 异步 API</li>
+<li>只要异步任务结束，就触发一次 change detection</li>
+<li>从根视图开始向下检查模板绑定</li>
+</ol>
+<p>这套模型在 DX 上非常成功，因为开发者几乎不用显式声明响应式依赖。</p>
+<p>但代价也很明显，正如我在 <a href="/posts/angular-zone">Angular Zone.js</a> 和 <a href="/posts/angular-signals-zoneless">Zone.js 谢幕，Signals 登场：Angular 17-19 变更检测完全指南</a> 里反复强调过的：</p>
+<ul>
+<li>框架知道“某些异步完成了”</li>
+<li>却不知道“具体哪块状态变了”</li>
+<li>更不知道“哪几个绑定真正依赖那块状态”</li>
+</ul>
+<p>于是它只能采用较粗粒度的策略：再检查一遍。</p>
+<h3 id="42-onpush-是剪枝不是改写底层模型">4.2 OnPush 是剪枝，不是改写底层模型</h3>
+<p><code>OnPush</code> 的历史意义很大，但它解决的是“检查太多”的问题，不是“依赖关系不透明”的问题。</p>
+<p><code>OnPush</code> 仍然活在 top-down change detection 世界里，只是尽量减少无意义遍历。</p>
+<p>因此它更像是：</p>
+<ul>
+<li>对已有框架调度模型做优化</li>
+<li>而不是让状态自己带着依赖图工作</li>
+</ul>
+<p>这也是为什么 Angular 需要 Signals。</p>
+<p>真正需要被改写的，不是“如何更快检查整棵树”，而是“为什么非要检查整棵树”。</p>
+<h3 id="43-signals-让-angular-获得了细粒度的状态图">4.3 Signals 让 Angular 获得了细粒度的状态图</h3>
+<p>Angular Signals 最重要的意义，不只是新增了 <code>signal()</code> / <code>computed()</code> / <code>effect()</code> 三个 API。</p>
+<p>更重要的是：Angular 首次在框架内部拥有了一张可显式维护的细粒度依赖图。</p>
+<p>这件事带来的变化是根本性的：</p>
+<ul>
+<li>模板读取 signal 时，框架知道这个 view 依赖了哪个状态</li>
+<li>signal 改变时，框架可以只标记相关 view</li>
+<li><code>computed</code> 可以沿状态图做失效传播和懒重算</li>
+<li>zoneless 才真正有现实基础</li>
+</ul>
+<p>Angular 官方文档对 <code>computed</code> 的表述非常明确：<strong>computed signals are both lazily evaluated and memoized</strong>。</p>
+<p>这点非常关键，因为它说明 Angular Signals 并不是简单地“写入即重算一切”，而是采用了更成熟的 push-pull 组合策略：</p>
+<ul>
+<li>写入时同步传播失效信息</li>
+<li>读取时按需拉取最新计算结果</li>
+<li>effect 与模板刷新由框架在合适时机调度</li>
+</ul>
+<p>这和 Zone.js 时代“任何异步都可能导致整棵树检查”的模型，已经不是一个级别的机制了。</p>
+<h3 id="44-angular-不是在模仿-vue而是在补上自己长期缺失的那一层">4.4 Angular 不是在“模仿 Vue”，而是在补上自己长期缺失的那一层</h3>
+<p>Angular Signals 推出时，社区里一个很常见的反应是：</p>
+<blockquote>
+<p>这不就是 Vue / Solid 早就有的东西吗？</p>
+</blockquote>
+<p>这个观察半对半错。</p>
+<p>对的部分在于：Signals 确实属于一条已经被 Vue、Solid、Preact 等生态验证过的技术路线。</p>
+<p>错的部分在于：Angular 不是简单照搬某个 API，而是在用自己的渲染器、view 模型、变更检测体系重构一套更细粒度的状态传播基础设施。</p>
+<p>Vue 的背景问题是“如何让对象状态自然地变成响应式”。</p>
+<p>Angular 的背景问题是“如何从一个依赖 Zone.js 的全局检查框架，演进到精确、细粒度、可 zoneless 的更新模型”。</p>
+<p>这两个出发点不同，但最后走向相似抽象，是因为问题最终收敛到了同一个数学对象：<strong>依赖图</strong>。</p>
+<hr>
+<h2 id="五refsignalcreatesignal它们究竟同构在哪里">五、<code>ref()</code>、<code>signal()</code>、<code>createSignal()</code>：它们究竟同构在哪里</h2>
+<h3 id="51-表面-api-不同核心角色却几乎一致">5.1 表面 API 不同，核心角色却几乎一致</h3>
+<p>先看三套最常见的 API：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>角色</th><th>Vue</th><th>Angular</th><th>Solid.js</th></tr></thead><tbody><tr><td>可写状态单元</td><td><code>ref()</code></td><td><code>signal()</code></td><td><code>createSignal()</code></td></tr><tr><td>派生值</td><td><code>computed()</code></td><td><code>computed()</code></td><td><code>createMemo()</code></td></tr><tr><td>副作用</td><td><code>watchEffect()</code></td><td><code>effect()</code></td><td><code>createEffect()</code></td></tr></tbody></table>
+<p>如果把命名去掉，它们其实都在表达三类节点：</p>
+<ol>
+<li>source node：手工写入的基础状态</li>
+<li>derived node：基于其他状态计算出的缓存值</li>
+<li>effect node：不产出新状态，只把变化投射到外部世界</li>
+</ol>
+<p>这三类节点，正好对应我们前面讲的统一模型。</p>
+<h3 id="52-一个最小例子就足够看清统一抽象">5.2 一个最小例子，就足够看清统一抽象</h3>
+<p>下面用同一个例子分别写三遍：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// Vue</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> count</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> ref</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> double</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> count</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">value</span><span style="color:#56B6C2"> *</span><span style="color:#D19A66"> 2</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#61AFEF">watchEffect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">double</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">value</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// Angular</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> count</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> double</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> count</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">*</span><span style="color:#D19A66"> 2</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#61AFEF">effect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">double</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#7F848E;font-style:italic">// Solid</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#ABB2BF"> [</span><span style="color:#E5C07B">count</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">setCount</span><span style="color:#ABB2BF">] </span><span style="color:#56B6C2">=</span><span style="color:#61AFEF"> createSignal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> double</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> createMemo</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> count</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">*</span><span style="color:#D19A66"> 2</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#61AFEF">createEffect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">  console</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">log</span><span style="color:#ABB2BF">(</span><span style="color:#61AFEF">double</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<p>这三段代码里，真正重要的不是读写语法，而是：</p>
+<ul>
+<li><code>double</code> 不自己维护依赖列表</li>
+<li>effect 不手动订阅 <code>double</code></li>
+<li>当 <code>count</code> 变化后，<code>double</code> 不一定立刻重算，但它一定失效</li>
+<li>effect 不一定同步执行，但最终会在合适时机看见一致的新值</li>
+</ul>
+<p>换句话说，它们共享的是<strong>自动追踪 + 有缓存的派生节点 + 调度化的副作用</strong>。</p>
+<h3 id="53-真正的差异发生在边界条件与宿主集成层">5.3 真正的差异，发生在边界条件与宿主集成层</h3>
+<p>这些框架真正不同的地方，主要不在 state/computed/effect 这三个基本角色，而在以下几层：</p>
+<ol>
+<li><strong>读写语法</strong>
+Vue 偏 <code>.value</code>，Angular 和 Solid 偏 getter function。</li>
+<li><strong>只读/可写分离</strong>
+Angular 在类型与 API 边界上更强调 <code>WritableSignal</code> 与只读 signal 的区分。</li>
+<li><strong>生命周期绑定</strong>
+Angular 的 effect 生命周期天然和 DI / <code>DestroyRef</code> / 组件上下文绑定得更紧。</li>
+<li><strong>模板集成方式</strong>
+Vue 倾向 template compiler + reactive render effect；Angular 倾向 signal read 与 view marking 集成；Solid 倾向极细粒度 DOM 级响应更新。</li>
+<li><strong>调度承诺</strong>
+不同框架对 effect 时机、批处理边界、渲染刷新时机的承诺强度并不相同。</li>
+</ol>
+<p>所以，一个更准确的说法是：</p>
+<blockquote>
+<p>它们共享的是响应式图模型，不共享全部宿主层语义。</p>
+</blockquote>
+<hr>
+<h2 id="六pull-vs-push为什么现代-signals-几乎都不是纯粹的一边">六、Pull vs Push：为什么现代 Signals 几乎都不是纯粹的一边</h2>
+<h3 id="61-先澄清一个常见误解">6.1 先澄清一个常见误解</h3>
+<p>谈 Signals 时，经常有人会说：</p>
+<ul>
+<li>某些框架是 push-based</li>
+<li>某些框架是 pull-based</li>
+<li>Angular 更 eager</li>
+<li>Preact 更 lazy</li>
+</ul>
+<p>这种说法如果不分层，会非常容易误导。</p>
+<p>因为“push 还是 pull”，至少要分三层看：</p>
+<ol>
+<li><strong>写入后的失效传播</strong> 是 push 还是 pull？</li>
+<li><strong>computed 的重新求值</strong> 是 push 还是 pull？</li>
+<li><strong>effect / render 的执行时机</strong> 是 push 还是 pull，或者是调度驱动？</li>
+</ol>
+<p>不把这三层分开，讨论很容易变成“术语正确，理解错误”。</p>
+<h3 id="62-computed-在-angular-官方语义里仍然是-lazy-的">6.2 <code>computed</code> 在 Angular 官方语义里仍然是 lazy 的</h3>
+<p>这一点必须说得非常明确。</p>
+<p>Angular 官方文档写得很直白：<code>computed</code> 是 <strong>lazily evaluated and memoized</strong>。</p>
+<p>也就是说：</p>
+<ul>
+<li>依赖变了，<code>computed</code> 的缓存会失效</li>
+<li>但不会因为依赖一变就立即重新执行计算函数</li>
+<li>真正的计算发生在下次有人读取它时</li>
+</ul>
+<p>这和 TC39 proposal 对 <code>Computed</code> 的方向其实非常一致：</p>
+<ul>
+<li>写入时同步传播脏信息</li>
+<li>读取时拉取最新值</li>
+</ul>
+<p>所以如果把“Angular 选择 eager evaluation”理解为“Angular 的 computed 本身是 eager 的”，那是不准确的。</p>
+<h3 id="63-真正更主动的是-invalidation-和-scheduling而不是求值本身">6.3 真正更主动的，是 invalidation 和 scheduling，而不是求值本身</h3>
+<p>Angular 和其他现代 Signals 方案的差异，更合理的比较点是：</p>
+<ul>
+<li>依赖变更后，系统是否同步把脏标记往下游推送</li>
+<li>effect 是否由框架统一调度</li>
+<li>模板刷新是否作为框架调度边界的一部分</li>
+</ul>
+<p>Angular RFC 在 effect scheduling 上刻意不给过强时序承诺，这背后反映的是一个明确取向：</p>
+<blockquote>
+<p>框架要保留 effect 与渲染整合的调度权，而不是把所有响应式时序语义都暴露给应用层。</p>
+</blockquote>
+<p>这对 Angular 是很合理的，因为 Angular 不是独立的 signals runtime，它是一个大型 UI 框架。</p>
+<p>它必须考虑：</p>
+<ul>
+<li>view 刷新时机</li>
+<li>生命周期一致性</li>
+<li>zoneless 兼容</li>
+<li>现有组件模型迁移</li>
+</ul>
+<p>因此 Angular 的工程重点不是“让 <code>computed</code> 尽可能早执行”，而是“让状态图足够精确，同时让框架保留调度整合能力”。</p>
+<h3 id="64-preact-signals-提醒我们懒求值真正省下的是无意义工作">6.4 Preact Signals 提醒我们：懒求值真正省下的是无意义工作</h3>
+<p>Preact Signals 官方文章把一个观点讲得非常好：Signals 的关键收益之一，是 <strong>lazy by default</strong> 和 <strong>optimal updates</strong>。</p>
+<p>这意味着：</p>
+<ul>
+<li>没人读的派生值不需要白算</li>
+<li>值没真正变化的链路不用继续更新</li>
+<li>更新成本应该跟状态图复杂度相关，而不是跟组件树大小绑定</li>
+</ul>
+<p>这恰好说明现代 Signals 不是“越 eager 越先进”，而是“越能精确推迟无意义工作越先进”。</p>
+<p>因此一个更准确的总结是：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="text"><code><span class="line"><span>现代 Signals 通常是：</span></span>
+<span class="line"><span>写入时 push invalidation</span></span>
+<span class="line"><span>读取时 pull recomputation</span></span>
+<span class="line"><span>副作用由框架或 runtime 调度</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>TC39 proposal 甚至直接把这种模式称作 <strong>push-pull construction</strong>。</p>
+<h3 id="65-为什么不能纯-push">6.5 为什么不能纯 push</h3>
+<p>如果完全 push：</p>
+<ul>
+<li>每次写入都立刻重算全部下游</li>
+<li>很容易重复计算</li>
+<li>很难避免中间态</li>
+<li>effect 与 DOM 写入容易过度频繁</li>
+</ul>
+<p>如果完全 pull：</p>
+<ul>
+<li>又无法及时知道哪些下游可能已过期</li>
+<li>effect 很难正确被调度</li>
+<li>依赖图上的“谁需要未来被处理”会变得不透明</li>
+</ul>
+<p>所以现代设计最终都落在中间：</p>
+<ul>
+<li>push 负责传播“你可能脏了”</li>
+<li>pull 负责“现在真的有人要读你，那你再算”</li>
+<li>调度层负责“副作用什么时候做最划算”</li>
+</ul>
+<p>这不是折中妥协，而是工程上最稳的分工。</p>
+<hr>
+<h2 id="七为什么-glitch-free-如此重要从-diamond-problem-说起">七、为什么 glitch-free 如此重要：从 diamond problem 说起</h2>
+<h3 id="71-先看最小的-diamond">7.1 先看最小的 diamond</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> price</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">100</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> quantity</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> subtotal</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> price</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">*</span><span style="color:#61AFEF"> quantity</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> tax</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> subtotal</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">*</span><span style="color:#D19A66"> 0.1</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> summary</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#98C379"> `</span><span style="color:#C678DD">${</span><span style="color:#61AFEF">subtotal</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379"> / </span><span style="color:#C678DD">${</span><span style="color:#61AFEF">tax</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span></code></pre>
+<p>现在把图改成更典型的菱形：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> count</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> signal</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> doubled</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> count</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">*</span><span style="color:#D19A66"> 2</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> tripled</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> count</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">*</span><span style="color:#D19A66"> 3</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">const</span><span style="color:#E5C07B"> total</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> doubled</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">+</span><span style="color:#61AFEF"> tripled</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"></span></code></pre>
+<p>当 <code>count</code> 从 <code>1</code> 变为 <code>2</code> 时，<code>total</code> 的正确值应该从 <code>5</code> 变到 <code>10</code>。</p>
+<p>问题在于，如果采用 naive eager push，可能会出现下面的过程：</p>
+<ol>
+<li><code>doubled</code> 先更新为 <code>4</code></li>
+<li><code>total</code> 被触发一次，读到 <code>4 + 3 = 7</code></li>
+<li><code>tripled</code> 再更新为 <code>6</code></li>
+<li><code>total</code> 再被触发一次，读到 <code>4 + 6 = 10</code></li>
+</ol>
+<p>用户虽然最终看到正确结果，但系统暴露过一个中间态 <code>7</code>。这就是 glitch。</p>
+<h3 id="72-现代-signals-系统的目标是最少计算--不暴露中间态">7.2 现代 Signals 系统的目标，是“最少计算 + 不暴露中间态”</h3>
+<p>Angular RFC 明确把 glitch-free 作为设计目标之一。TC39 proposal 也把它写进 core features。</p>
+<p>这意味着两个约束要同时成立：</p>
+<ol>
+<li>不要重复跑没必要的计算</li>
+<li>不要让任何 consumer 观察到不一致图状态</li>
+</ol>
+<p>这通常要求系统具备：</p>
+<ul>
+<li>脏/检查中/干净等状态</li>
+<li>对依赖图的有序重算策略</li>
+<li>effect 不直接在传播阶段随手执行</li>
+</ul>
+<p>从抽象上讲，现代 signal runtime 更像一个小型增量计算引擎，而不是“状态变化时触发回调”的升级版事件系统。</p>
+<p>这也是它和 observable / pub-sub 最根本的区别之一。</p>
+<h3 id="73-signals-不是流而是当前值单元">7.3 Signals 不是流，而是“当前值单元”</h3>
+<p>TC39 proposal 对这个问题讲得很透：Signals 是 lossy 的。</p>
+<p>也就是说，如果你连续写两次：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#E5C07B">count</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">set</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E5C07B">count</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">set</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span></code></pre>
+<p>系统的目标不是保证所有中间值都被 effect 看见，而是保证“当前图状态一致”。</p>
+<p>这正是它和 RxJS/Observable 的边界：</p>
+<ul>
+<li>Observable 更像时间序列</li>
+<li>Signal 更像带依赖图的当前值寄存器</li>
+</ul>
+<p>理解这点之后，你就不会再把 Signals 误用成“轻量版流”。</p>
+<hr>
+<h2 id="八tc39-signals-proposal标准化的不是框架-api而是底层语义">八、TC39 Signals Proposal：标准化的不是框架 API，而是底层语义</h2>
+<h3 id="81-为什么-tc39-会开始讨论-signals">8.1 为什么 TC39 会开始讨论 Signals</h3>
+<p>Signals proposal 的背景非常值得注意。</p>
+<p>它不是某个单一框架试图把自己的 API 推成标准，而是多个框架作者在过去十多年响应式实践之后，开始尝试抽出一个共识层。</p>
+<p>截至 2026 年 5 月，TC39 Signals Proposal 处于 <strong>Stage 1</strong>。它的 README 非常明确：</p>
+<ul>
+<li>目标是让不同框架能共享底层 reactive model</li>
+<li>重点是统一 signal graph 和 auto-tracking semantics</li>
+<li>不是为普通应用开发者提供最终形态的统一 UI API</li>
+</ul>
+<p>这点非常关键。</p>
+<p>Signals 标准化要解决的，不是“所有人都叫 <code>.value</code> 还是 <code>()</code>”，而是：</p>
+<ul>
+<li>一个 state signal 应该有什么语义</li>
+<li>一个 computed 应该怎样 lazy、cache、glitch-free</li>
+<li>framework-level effect 应该建立在怎样的 watcher primitive 上</li>
+</ul>
+<h3 id="82-proposal-中最有意思的三层-api">8.2 Proposal 中最有意思的三层 API</h3>
+<p>TC39 proposal 的 API 可以粗略分成三层：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>层级</th><th>代表 API</th><th>作用</th></tr></thead><tbody><tr><td>基础状态</td><td><code>Signal.State</code></td><td>可写状态单元</td></tr><tr><td>派生状态</td><td><code>Signal.Computed</code></td><td>lazy、memoized、glitch-free 的派生值</td></tr><tr><td>调度基元</td><td><code>Signal.subtle.Watcher</code></td><td>为框架实现 effect/scheduler 提供底层钩子</td></tr></tbody></table>
+<p>一个最重要的设计决定是：<strong>proposal 没有直接把 <code>effect()</code> 作为语言标准的一部分。</strong></p>
+<p>这并不是缺失，而是克制。</p>
+<p>原因很简单：effect 从来不只是“依赖变化后执行函数”这么简单，它天然绑定：</p>
+<ul>
+<li>调度时机</li>
+<li>资源清理</li>
+<li>生命周期</li>
+<li>渲染系统</li>
+</ul>
+<p>这些都明显属于框架层，而不是语言层。</p>
+<h3 id="83-proposal-其实把我们前面的统一模型写成了语言草图">8.3 Proposal 其实把我们前面的统一模型写成了语言草图</h3>
+<p>如果用本文的三阶段去看 TC39 proposal，会发现它几乎是逐层对应的：</p>
+<ol>
+<li><strong>依赖追踪</strong>
+<code>Computed.get()</code> 在运行时追踪读取到的 sources。</li>
+<li><strong>变化传播</strong>
+<code>State.set()</code> 会同步把 sinks 标记为 dirty/checked/pending。</li>
+<li><strong>副作用调度</strong>
+<code>Watcher</code> 的 <code>notify</code> 只负责通知，真正 effect 何时读、何时重跑，由框架自己决定。</li>
+</ol>
+<p>这就是为什么我认为这个 proposal 的真正价值，不在 API 漂不漂亮，而在它第一次把“Signals 的共同语义”作为 JavaScript 语言层议题正式展开。</p>
+<h3 id="84-proposal-对前端框架意味着什么">8.4 Proposal 对前端框架意味着什么</h3>
+<p>如果 Signals 最终成为语言内建，框架层至少有三类收益：</p>
+<ol>
+<li><strong>共享语义基础</strong>
+不同框架不必各自维护一套完全独立的 auto-tracking 语义。</li>
+<li><strong>更好的互操作</strong>
+跨框架共享模型、工具、devtools 将更现实。</li>
+<li><strong>更低的重复实现成本</strong>
+框架可以把更多精力放到调度、渲染、ownership、SSR/hydration 等高层问题。</li>
+</ol>
+<p>但同时也要看到它的边界：</p>
+<blockquote>
+<p>Signals 就算进入语言，也不会把框架“消灭”成只剩模板语法。</p>
+</blockquote>
+<p>因为框架真正难的部分仍然包括：</p>
+<ul>
+<li>component lifecycle</li>
+<li>rendering scheduler</li>
+<li>ownership / cleanup</li>
+<li>async resources</li>
+<li>SSR / hydration / resumability</li>
+</ul>
+<p>TC39 proposal 只是把公共底盘变标准，不是替代整辆车。</p>
+<hr>
+<h2 id="九如果-signals-成为原生特性vueangularreact-会怎样变化">九、如果 Signals 成为原生特性，Vue、Angular、React 会怎样变化</h2>
+<h3 id="91-vue对象响应式仍在但底层-signal-graph-可能更轻更统一">9.1 Vue：对象响应式仍在，但底层 signal graph 可能更轻、更统一</h3>
+<p>Vue 不太可能放弃 <code>reactive()</code> 这种基于 Proxy 的高层开发体验，因为它非常符合 Vue 的 API 哲学。</p>
+<p>但如果底层 Signals 语义成为标准，Vue 的潜在简化路径会很明确：</p>
+<ul>
+<li>用原生 signal primitive 承载更底层的 cell</li>
+<li>让 <code>ref()</code> / <code>computed()</code> / <code>watchEffect()</code> 更像标准语义上的包装层</li>
+<li>减少框架私有响应式运行时在边界场景上的维护负担</li>
+</ul>
+<p>换句话说，Vue 很可能保留今天的高层 ergonomics，但把核心 graph semantics 尽量建立在标准基础上。</p>
+<h3 id="92-angular收益可能最直接因为它本来就在重建底层反应性基础设施">9.2 Angular：收益可能最直接，因为它本来就在重建底层反应性基础设施</h3>
+<p>Angular Signals 的战略价值，本来就不是单个 API，而是为整个 framework reactivity 打底。</p>
+<p>所以如果原生 Signals 可用，Angular 可能是收益最直接的框架之一：</p>
+<ul>
+<li>状态图的基础语义可下沉到语言层</li>
+<li>对 framework-private reactive graph 的维护压力下降</li>
+<li>zoneless、signal inputs、resources、view marking 等高层能力可以更专注于框架宿主集成</li>
+</ul>
+<p>但 Angular 仍然会保留大量框架特有能力，因为它的核心竞争力不只是“有个 signal runtime”，而是“把它和模板、视图、DI、生命周期、编译器绑定成一体”。</p>
+<h3 id="93-react不会自动变成signal-框架但会获得新的共享基础设施可能性">9.3 React：不会自动变成“Signal 框架”，但会获得新的共享基础设施可能性</h3>
+<p>React 当前的设计重心并不在 fine-grained signal graph，而在 component tree、scheduler、concurrent rendering、compiler 等层面。</p>
+<p>因此即便 Signals 成为语言特性，也不意味着 React 会立刻改成 Vue/Angular/Solid 那种写法。</p>
+<p>更现实的可能是：</p>
+<ul>
+<li>第三方状态库更容易基于标准 signal primitive 实现</li>
+<li>React compiler / store integration 有了更统一的反应性底层</li>
+<li>React 自身是否采纳，仍取决于其调度和渲染模型的整体战略</li>
+</ul>
+<p>所以我们不该把 Signals 标准化理解为“所有框架会变得一模一样”。</p>
+<p>更准确的说法是：<strong>它们会共享更接近的底层语义，但继续保留不同的宿主层哲学。</strong></p>
+<hr>
+<h2 id="十结语响应式系统真正统一的不是-api而是世界观">十、结语：响应式系统真正统一的，不是 API，而是世界观</h2>
+<p>如果回头看过去十多年主流前端框架的演进，会发现一个很有意思的现象：</p>
+<ul>
+<li>Vue 从对象属性拦截，逐步走向显式状态单元</li>
+<li>Angular 从 Zone.js 驱动的全局检查，走向 signal graph 驱动的细粒度更新</li>
+<li>Solid、Preact 等则更早把 signal cell 作为核心抽象</li>
+<li>TC39 开始尝试把这套共同语义抽到语言层</li>
+</ul>
+<p>这不是巧合。</p>
+<p>它说明行业正在逐步形成一个共识：</p>
+<blockquote>
+<p>一个现代 UI 框架，最终都需要一种能够显式表达依赖、精确传播失效、并把副作用调度与状态计算解耦的反应性基础设施。</p>
+</blockquote>
+<p>这套基础设施在 Vue 世界里叫 Reactivity，在 Angular 世界里叫 Signals，在其他地方也许有别的名字。</p>
+<p>但它们共享的核心世界观已经越来越清晰：</p>
+<ul>
+<li>状态不是随处可变的普通变量</li>
+<li>派生值不是手工维护的缓存</li>
+<li>更新也不应该依赖整个组件树的重复遍历</li>
+</ul>
+<p>而应该由一张持续存在的依赖图来承担“谁影响谁”这件事。</p>
+<p>理解这一点之后，再看 <code>ref()</code>、<code>signal()</code>、<code>createSignal()</code>，你就不会把它们当成“不同框架各写各的状态 API”。</p>
+<p>你会把它们看成同一类思想在不同宿主环境中的实现：</p>
+<p><strong>让数据变化本身，成为程序控制流的一部分。</strong></p>
+<p>这才是 Signals 真正值得讨论的地方。</p>
+<h2 id="延伸阅读">延伸阅读</h2>
+<ul>
+<li><a href="/posts/vue-analysis-responsive">Vue.js 深入响应式原理</a></li>
+<li><a href="/posts/translate-making-vue3">Vue 3 的开发进展</a></li>
+<li><a href="/posts/vue3-six-years-retrospective">Vue 3 六年回顾：从革命性重写到生态成熟，2020-2026 发生了什么？</a></li>
+<li><a href="/posts/angular-zone">Angular Zone.js 解析</a></li>
+<li><a href="/posts/angular-signals-zoneless">Zone.js 谢幕，Signals 登场：Angular 17-19 变更检测完全指南</a></li>
+<li><a href="/posts/angular-features-19-to-21">Angular 19-21 新特性详解</a></li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://angular.dev/guide/signals">Angular Signals 官方文档</a></li>
+<li><a href="https://github.com/angular/angular/discussions/49685">Angular Signals RFC 总览</a></li>
+<li><a href="https://github.com/angular/angular/discussions/49683">Angular Signals API RFC</a></li>
+<li><a href="https://github.com/tc39/proposal-signals">TC39 JavaScript Signals Proposal</a></li>
+<li><a href="https://preactjs.com/blog/introducing-signals/">Introducing Signals - Preact</a></li>
+<li><a href="https://www.pzuraq.com/blog/what-is-reactivity">What is Reactivity?</a></li>
+</ul> </article> <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/vue/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">vue</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/signals/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">signals</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/frontend/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-5"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">frontend</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/reactivity/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-6"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">reactivity</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://rowanliu.com/posts/signals-unified-reactivity-model/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://rowanliu.com/posts/signals-unified-reactivity-model/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://rowanliu.com/posts/signals-unified-reactivity-model/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://rowanliu.com/posts/signals-unified-reactivity-model/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://rowanliu.com/posts/signals-unified-reactivity-model/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://rowanliu.com/posts/signals-unified-reactivity-model/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
+</script><astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <a href="/rss.xml" class="astro-sz7xmlte rss-link" aria-label="RSS Feed"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-sz7xmlte rss-icon" viewBox="0 0 24 24" width="16" height="16"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z" fill="currentColor" class="astro-sz7xmlte"></path> </svg>
+RSS
+</a> </div> </div> </footer>     <script>function createProgressBar(){const o=document.createElement("div");o.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const e=document.createElement("div");e.className="progress-bar h-1 w-0 bg-skin-accent",e.id="myBar",o.appendChild(e),document.body.appendChild(o)}createProgressBar();function updateScrollProgress(){const o=document.body.scrollTop||document.documentElement.scrollTop,e=document.documentElement.scrollHeight-document.documentElement.clientHeight,n=o/e*100;if(document){const t=document.getElementById("myBar");t&&(t.style.width=n+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let o=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let e of o){e.classList.add("group");let n=document.createElement("a");n.innerText="#",n.className="heading-link hidden group-hover:inline-block ml-2",n.href="#"+e.id,n.ariaHidden="true",e.appendChild(n)}}addHeadingLinks();function attachCopyButtons(){let o="Copy",e=Array.from(document.querySelectorAll("pre"));for(let t of e){let c=document.createElement("div");c.style.position="relative";let d=document.createElement("button");d.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",d.innerHTML=o,t.setAttribute("tabindex","0"),t.appendChild(d),t?.parentNode?.insertBefore(c,t),c.appendChild(t),d.addEventListener("click",async()=>{await n(t,d)})}async function n(t,c){let r=t.querySelector("code")?.innerText;await navigator.clipboard.writeText(r??""),c.innerText="Copied",setTimeout(()=>{c.innerText=o},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();
+</script></body></html>
