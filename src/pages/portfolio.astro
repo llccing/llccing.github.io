@@ -1,6 +1,8 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import PortfolioExperience from "@components/portfolio/PortfolioExperience";
+import PortfolioExperience, {
+  type PortfolioData,
+} from "@components/portfolio/PortfolioExperience";
 import resume from "../data/portfolio.resume.json";
 ---
 
@@ -9,5 +11,5 @@ import resume from "../data/portfolio.resume.json";
   description="Frontend-leaning full-stack engineer portfolio for Rowan Liu: Angular, Node.js BFF, enterprise systems and AI-assisted delivery."
   scrollSmooth={true}
 >
-  <PortfolioExperience client:load data={resume} />
+  <PortfolioExperience client:load data={resume as PortfolioData} />
 </Layout>

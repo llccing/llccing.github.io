@@ -6,7 +6,7 @@
     "dev": "astro dev --host",
     "start": "astro dev",
     "build": "astro check && astro build && jampack ./dist",
-    "postbuild": "cp .nojekyll dist/.nojekyll",
+    "postbuild": "node -e \"require('node:fs').copyFileSync('.nojekyll', 'dist/.nojekyll')\"",
     "predeploy": "pnpm build",
     "preview": "astro preview",
     "sync": "astro sync",

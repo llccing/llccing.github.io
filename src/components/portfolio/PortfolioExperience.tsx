@@ -7,7 +7,7 @@ import {
 } from "framer-motion";
 import { useState } from "react";
 
-interface PortfolioItem {
+export interface PortfolioItem {
   id: string;
   type: string;
   company: string;
@@ -22,7 +22,7 @@ interface PortfolioItem {
   impact: string;
 }
 
-interface PortfolioData {
+export interface PortfolioData {
   profile: {
     name: string;
     chineseName: string;
@@ -165,7 +165,9 @@ function MagneticCard({
       </p>
       <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#202124]">
         Open details
-        <span className="transition-transform group-hover:translate-x-1">→</span>
+        <span className="transition-transform group-hover:translate-x-1">
+          →
+        </span>
       </div>
     </motion.button>
   );
@@ -241,7 +243,9 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
             </p>
             <h1 className="max-w-4xl text-5xl font-black leading-[0.92] tracking-[-0.08em] sm:text-7xl lg:text-8xl">
               {data.profile.name}
-              <span className="block text-[#7c7468]">{data.profile.chineseName}</span>
+              <span className="block text-[#7c7468]">
+                {data.profile.chineseName}
+              </span>
             </h1>
             <p className="mt-8 max-w-3xl text-xl leading-9 text-[#4c463d]">
               {data.profile.tagline}
@@ -314,7 +318,9 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
                 <h3 className="text-2xl font-black tracking-[-0.05em]">
                   {system.name}
                 </h3>
-                <p className="mt-4 leading-7 text-[#5f584f]">{system.summary}</p>
+                <p className="mt-4 leading-7 text-[#5f584f]">
+                  {system.summary}
+                </p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {system.tags.map(tag => (
                     <span
@@ -365,7 +371,10 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
           />
           <SkillCloud
             title="Workflow"
-            skills={[...(data.skills.miniPrograms ?? []), ...data.skills.workflow]}
+            skills={[
+              ...(data.skills.miniPrograms ?? []),
+              ...data.skills.workflow,
+            ]}
           />
         </section>
 
