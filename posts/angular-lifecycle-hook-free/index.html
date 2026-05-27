@@ -1,0 +1,590 @@
+<!DOCTYPE html><html lang="zh-CN" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://riegler.fr/blog/2024-12-31-lifecycle-hook-less"><meta name="generator" content="Astro v4.16.18"><!-- General Meta Tags --><title>[译] 无生命周期钩子的 Angular —— 使用现代 API 构建组件 | Rowan's Blog</title><meta name="title" content="[译] 无生命周期钩子的 Angular —— 使用现代 API 构建组件 | Rowan's Blog"><meta name="description" content="探索如何使用 Angular 最新的信号（Signals）、DestroyRef、afterRender 等现代 API 替代传统的生命周期钩子，编写更简洁、可维护的组件。"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="[译] 无生命周期钩子的 Angular —— 使用现代 API 构建组件 | Rowan's Blog"><meta property="og:description" content="探索如何使用 Angular 最新的信号（Signals）、DestroyRef、afterRender 等现代 API 替代传统的生命周期钩子，编写更简洁、可维护的组件。"><meta property="og:url" content="https://riegler.fr/blog/2024-12-31-lifecycle-hook-less"><meta property="og:image" content="https://rowanliu.com/posts/%E8%AF%91-%E6%97%A0%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E9%92%A9%E5%AD%90%E7%9A%84-angular--%E4%BD%BF%E7%94%A8%E7%8E%B0%E4%BB%A3-api-%E6%9E%84%E5%BB%BA%E7%BB%84%E4%BB%B6.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-05-26T05:00:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://riegler.fr/blog/2024-12-31-lifecycle-hook-less"><meta property="twitter:title" content="[译] 无生命周期钩子的 Angular —— 使用现代 API 构建组件 | Rowan's Blog"><meta property="twitter:description" content="探索如何使用 Angular 最新的信号（Signals）、DestroyRef、afterRender 等现代 API 替代传统的生命周期钩子，编写更简洁、可维护的组件。"><meta property="twitter:image" content="https://rowanliu.com/posts/%E8%AF%91-%E6%97%A0%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E9%92%A9%E5%AD%90%E7%9A%84-angular--%E4%BD%BF%E7%94%A8%E7%8E%B0%E4%BB%A3-api-%E6%9E%84%E5%BB%BA%E7%BB%84%E4%BB%B6.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.BB6lZDpa.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (min-width:640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.Cj6ph0Em.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (min-width:640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (min-width:640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem;transition:max-width .3s}main:where(.astro-vj4tpspi).comparison-active{max-width:90rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}.toggle-btn:where(.astro-vj4tpspi){cursor:pointer;text-align:center;--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));border-radius:.375rem;flex:1;padding:.375rem .75rem;font-size:.875rem;font-weight:500;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.toggle-btn:where(.astro-vj4tpspi).active{--tw-bg-opacity:1;background-color:rgba(var(--color-accent),var(--tw-bg-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-fill),var(--tw-text-opacity,1))}.toggle-btn:where(.astro-vj4tpspi):not(.active):hover{--tw-bg-opacity:1;background-color:rgba(var(--color-card-muted),var(--tw-bg-opacity,1))}#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr 1fr;gap:2rem;display:grid}@media (max-width:640px){#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr}}#translation-container:where(.astro-vj4tpspi).comparison-mode article:where(.astro-vj4tpspi){max-width:none}</style><script type="module" src="/_astro/hoisted.Y8xAeTHN.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:译-无生命周期钩子的-angular--使用现代-api-构建组件}@layer astro{::view-transition-old(译-无生命周期钩子的-angular--使用现代-api-构建组件){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(译-无生命周期钩子的-angular--使用现代-api-构建组件){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(译-无生命周期钩子的-angular--使用现代-api-构建组件){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(译-无生命周期钩子的-angular--使用现代-api-构建组件){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:angular}@layer astro{::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:前端}@layer astro{::view-transition-old(前端){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(前端){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(前端){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(前端){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/short-stories/" class="astro-3ef6ksr2">
+Short Stories
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex max-w-3xl mx-auto justify-start px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">[译] 无生命周期钩子的 Angular —— 使用现代 API 构建组件</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-26T05:00:00.000Z">2026年5月26日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">13:00</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>6 min read</span></span></div>  <div class="astro-vj4tpspi flex items-center bg-opacity-60 bg-skin-card gap-1 max-w-3xl mt-4 mx-auto p-1 rounded-lg translation-controls"> <button class="astro-vj4tpspi toggle-btn active" data-view="translated">
+译文
+</button> <button class="astro-vj4tpspi toggle-btn" data-view="original">
+原文
+</button> <button class="astro-vj4tpspi toggle-btn" data-view="comparison">
+对照
+</button> </div> <div id="translation-container" class="astro-vj4tpspi mt-8"> <article id="article-original" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose" hidden=""> <p><img src="/blog-images/angular-lifecycle-hook-free/cemrecan-yurtman-hmwvM0BuFOE-unsplash.jpg.jpg" alt="Lifecycle-Hook-Free Angular" fetchpriority="high" decoding="async" width="800" height="533"></p>
+<h1 id="lifecycle-hook-free-angular">Lifecycle-Hook-Free Angular</h1>
+<p><strong>Building Components with Modern APIs</strong></p>
+<p>Matthieu Riegler - Dec 31, 2024</p>
+<p>Angular is introducing new non-breaking features at a fast pace in the last 2-4 versions. While they don’t break the way your existing components work, they will reshape the way we will author components in the future.</p>
+<p>One of those type of APIs that will be discussed in this article, are the components/directives lifecycle-hooks.</p>
+<h2 id="lifecycle-hooks">Lifecycle hooks</h2>
+<p>A component’s lifecycle is the sequence of steps that happen between the component’s creation and its destruction. Each step represents a different part of Angular’s process for rendering components and checking them for updates over time.</p>
+<p>Angular components &amp; directives have 8 different lifecycle hooks.</p>
+<ol>
+<li><code>ngOnInit()</code></li>
+<li><code>ngOnDestroy()</code></li>
+<li><code>ngOnChanges(changes: SimpleChanges)</code></li>
+<li><code>ngAfterContentInit()</code></li>
+<li><code>ngAfterContentChecked()</code></li>
+<li><code>ngAfterViewInit()</code></li>
+<li><code>ngAfterViewChecked()</code></li>
+<li><code>ngDoCheck()</code></li>
+</ol>
+<p>We’ll go through the list, see what they are used for today and what are the new alternatives.</p>
+<h2 id="ngoninit"><code>ngOnInit</code></h2>
+<p><code>ngOnInit</code> is called once after the component is initialized. It is mainly used for initializing component data or fetching initial resources.</p>
+<p>Developers often reach out to this hook when they want to read inputs as it is only after init that we are sure that inputs have been set.</p>
+<h4 id="ngoninit-example"><code>ngOnInit</code> example</h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /* ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">class</span><span style="color:#E5C07B"> UserComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">Input</span><span style="color:#ABB2BF">() </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  lastname</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // inputs aren't set yet.</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  ngOnInit</span><span style="color:#ABB2BF">(): </span><span style="color:#E5C07B">void</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // can read inputs</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>Up <a href="https://v17.angular.io/guide/lifecycle-hooks#initializing-a-component-or-directive">until v17</a>, the official recommendation was</p>
+<blockquote>
+<p>Components should be cheap and safe to construct. You should not, for example, fetch data in a component constructor.[…] ngOnInit() is a good place for a component to fetch its initial data.</p>
+</blockquote>
+<p>The main argument behind that was the input weren’t available for hitting that hook.</p>
+<p>With signals, new opportunities have arisen. It is now possible to access the inputs in a safe manner.</p>
+<p>One of the ways is by declaring a state derivation, like in a computed:</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#61AFEF">computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">myInput</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"></span></code></pre>
+<p>Computed signals, like any other derivation (<code>linkedSignal</code>, <code>resource</code>) are lazily evaluated. When you declare such a derivation, and consume it in a template, Angular makes sure that the input will be read after it has been set.</p>
+<p>Other common consumers of signals are <code>effect</code>. As I explained in <a href="https://riegler.fr/blog/2024-10-15-effect-context/">this article</a>, effects declared in components are scheduled to execute once the component is init and everytime a signal changes but before the component is sync’d.</p>
+<p>To sum-up how what we can achieve with signals to replace <code>ngOnInit</code> here is an extensive example that relies on state derivation and <code>effect</code>.</p>
+<h4 id="with-signals">With signals</h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`fullName()`</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">class</span><span style="color:#E5C07B"> UserComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"><span style="color:#E06C75">  lastname</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // sync &amp; async derivations, reading some required inputs.</span></span>
+<span class="line"><span style="color:#E06C75">  fullName</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#98C379"> `</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">name</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#C678DD"> ${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">lastName</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E06C75">  localState</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> linkedSignal</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">name</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#E06C75">  resource</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> resource</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">    request</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">userId</span><span style="color:#ABB2BF">() }),</span></span>
+<span class="line"><span style="color:#61AFEF">    loader</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75;font-style:italic">request</span><span style="color:#C678DD"> =&gt;</span></span>
+<span class="line"><span style="color:#E5C07B">      this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">httpClient</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`https://myendpoint.com/user/</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">id</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">),</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    effect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // This is a view effect</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // it is first executed after init</span></span>
+<span class="line"><span style="color:#E5C07B">      this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">name</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>As an extension of what previously presented, functions build on top of <code>effect</code> will benefit of the same advantages.</p>
+<p>A great example of this is the <code>toObservable</code> function which relies on <code>effect</code>.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /** ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  readonly</span><span style="color:#E06C75"> lang</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // This is fine</span></span>
+<span class="line"><span style="color:#61AFEF">    toObservable</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">lang</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">subscribe</span><span style="color:#ABB2BF">(</span><span style="color:#7F848E;font-style:italic">/** */</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>In this example here, the <code>input</code> will only be evaluated by the underlying <code>effect</code> and be read after the component is initialized.</p>
+<h2 id="ngonchanges"><code>ngOnChanges</code></h2>
+<p>The <code>ngOnChanges</code> is primarily used to be notified when one or several inputs have changed when running the sync process (formerly known as ChangeDetection).</p>
+<p>Listening to changes is at the heart of signal-based reactivity. By building your state via state derivation, you’re already making yourself ready. And for all other cases where derivation isn’t possible, <code>effect</code> is the tool you will reach out for to listen for any signal changes.</p>
+<h3 id="effect-scheduling">Effect scheduling</h3>
+<p>About <code>effect</code> scheduling there is one precision we can add. Depending on when you want the callback to run, you’ll either reach out to <code>effect</code> or <code>afterRenderEffect</code>.</p>
+<p>The former runs before the component is checked, the latter runs after the whole application (every component) has been rendered.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">( ... )</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    effect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... })</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><code>effect</code> runs before the component is sync’d.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">( ... )</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    afterRenderEffect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... })</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><code>afterRenderEffect</code> runs after the app is fully sync’d.</p>
+<p>To sum-up, in a signal world you can simply drop <code>ngOnChanges</code>.</p>
+<h2 id="ngondestroy">ngOnDestroy</h2>
+<p>The <code>ngOnDestroy</code> hook serves mostly to trigger cleanup operations on our components.</p>
+<p>Here an example with a simple timeout that needs to be cleared on destruction.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#7F848E;font-style:italic">/** ... */</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  intervalId</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#E06C75">    intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(...);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  ngOnDestroy</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>Since Angular 16, we have a new context-aware “service” <code>DestroyRef</code> to take care of clean up.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /** ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {}, </span><span style="color:#D19A66">1000</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#61AFEF">    inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">));</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>Its <code>onDestroy</code> method callback is invoked when the context is destroyed.</p>
+<p>The context in which they are invoked can be ranked in 3 categories:</p>
+<ul>
+<li><strong>Component</strong>: when injected in a component, <code>DestroyRef</code> will trigger the callback when the component is destroyed.</li>
+<li><strong>Root Service</strong>: when injection is a <code>providedIn: 'root'</code> service, the callback is invoked when the whole app is destroyed. This rarely happens and you can consider this as never happening in the context of a regular app.</li>
+<li><strong>Any other injector</strong>: When injected by another injector, the callback will be invoked when the said injector itself is destroyed. For example on a <code>EnvironmentInjector</code> when <code>destroy</code> is invoked.</li>
+</ul>
+<p>We can benefit from that context-aware cleanup in helper functions.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> myFunctionThatNeedsCleanUp</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> destroyRef</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> cleanUpOperation</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> someService</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">  destroyRef</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> cleanUpOperation</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>When run in an injection context, this function provides its own cleanup. This is exactly what framework provided functions like <code>toSignal()</code> do, by unsubscribing the observable when the context is destroyed.</p>
+<h2 id="the-after-hooks">The “After” hooks</h2>
+<p>Behind this category of hooks, we’ll discuss <code>ngAfterViewInit</code>, <code>ngAfterViewChecked</code>, <code>ngAfterContentInit</code>, <code>ngAfterContentChecked</code>.</p>
+<p>We mostly rely on those hooks to be notified when the component is rendered.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'&lt;canvas #myCanvas&gt;&lt;/canvas&gt;'</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  myCanvas</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> viewChild</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'myCanvas'</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // Runs once on creation</span></span>
+<span class="line"><span style="color:#61AFEF">  ngAfterViewInit</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    initCharts</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">myCanvas</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // Runs on every CD</span></span>
+<span class="line"><span style="color:#61AFEF">  ngAfterViewChecked</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#ABB2BF">    ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>Whenever you want to get notified that Angular has finished rendering the app, you can reach out to <code>afterNextRender()</code> and <code>afterRender()</code>. The former will run the callback only once while the latter will run after each rendering cycle.</p>
+<h3 id="run-once">Run once</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"&lt;canvas #myCanvas&gt;&lt;/canvas&gt;"</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  myCanvas</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> viewChild</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"myCanvas"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    afterNextRender</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // run once after the app rendered</span></span>
+<span class="line"><span style="color:#61AFEF">      initCharts</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">myCanvas</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>Replaces <code>ngAfterContentInit</code>, <code>ngAfterViewInit</code>.</p>
+<h3 id="run-everytime-the-app-is-rendered">Run everytime the app is rendered</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"&lt;canvas #myCanvas&gt;&lt;/canvas&gt;"</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  myChild</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> viewChild</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"childRef"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    afterRender</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // run everytime the app rendered</span></span>
+<span class="line"><span style="color:#61AFEF">      updateMyChild</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">myChild</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>Replaces <code>ngAfterContentChecked</code>, <code>ngAfterViewChecked</code>.</p>
+<p>This differs a bit from the lifecycle hooks, those were only scoped on components whereas the new APIs will wait for the whole app to be rendered.</p>
+<p>This makes the API more suitable for accessing the DOM, particularly in scenarios where you need to read box dimensions. These dimensions might change when sibling elements are rendered and cause a resize, such as when different flex rules are applied.</p>
+<p><code>after(Next)Render</code> offers another optimization, often overlooked: ordering of DOM access for better performance.</p>
+<p>Several DOM APIs are known to trigger costly layout reflows (<a href="https://gist.github.com/paulirish/5d52fb081b3570c81e3a">check this list</a>). Having mixed read/write APIs invoked may be responsible for unnecessary additional reflows.</p>
+<p>You can specify the semantics of your callbacks and help Angular to order them to ensure the best performance.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#61AFEF">afterRender</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">  earlyRead</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... },</span></span>
+<span class="line"><span style="color:#61AFEF">  read</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... },</span></span>
+<span class="line"><span style="color:#61AFEF">  mixedReadWrite</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... }, </span><span style="color:#7F848E;font-style:italic">// Default, worst in perfs</span></span>
+<span class="line"><span style="color:#61AFEF">  write</span><span style="color:#ABB2BF">() { ... }</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<h2 id="ngdocheck">ngDoCheck</h2>
+<p>The <code>ngDoCheck</code> hook is probably the least known one, you’ll normally reach out for it to implement a custom change detection implementation. Angular itself uses it in the <code>NgForOf</code> or the <code>NgClass</code> directive.</p>
+<p>Today, <code>ngDoCheck</code> would be naturally replaced by simply using signals and you would rely on <code>effect</code> for side effects.</p>
+<h2 id="code-collocation">Code collocation</h2>
+<p>If we come back to the <code>ngOnDestroy</code> example we explored earlier, we can see that one of the advantages of the new APIs is that they allow code collocation.</p>
+<h3 id="hook-based">Hook based</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#7F848E;font-style:italic">/** ... */</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  intervalId</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#E06C75">    intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(...);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  ngOnDestroy</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="code-collocation-with-destroyref">Code collocation with <code>DestroyRef</code></h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /** ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {}, </span><span style="color:#D19A66">1000</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#61AFEF">    inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">));</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">/***/</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> myFunctionThatNeedsCleanUp</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> destroyRef</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> cleanUpOperation</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> someService</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#E5C07B">  destroyRef</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> cleanUpOperation</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<ul>
+<li>No separate class member</li>
+<li>No additional method</li>
+<li>Whole feature is in 1 location</li>
+</ul>
+<h2 id="talk">Talk</h2>
+<p>You can find <a href="https://www.youtube.com/live/5m0eqGxrLUo?si=Rs-mD5Y_4zYBpSII&amp;t=23477">my talk on that topic ⏯</a> I did at NgGlühwein (Vienna, 🇦🇹, Dec. 2024)</p> </article> <article id="article-translated" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#生命周期钩子" class="astro-vj4tpspi">生命周期钩子</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#ngoninit" class="astro-vj4tpspi">ngOnInit</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#ngonchanges" class="astro-vj4tpspi">ngOnChanges</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#effect-调度" class="astro-vj4tpspi">Effect 调度</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#ngondestroy" class="astro-vj4tpspi">ngOnDestroy</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#after-钩子" class="astro-vj4tpspi">“After” 钩子</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#运行一次" class="astro-vj4tpspi">运行一次</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#每次应用渲染时运行" class="astro-vj4tpspi">每次应用渲染时运行</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#ngdocheck" class="astro-vj4tpspi">ngDoCheck</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#代码集中" class="astro-vj4tpspi">代码集中</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#基于钩子的方式" class="astro-vj4tpspi">基于钩子的方式</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#使用-destroyref-实现代码集中" class="astro-vj4tpspi">使用 DestroyRef 实现代码集中</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#演讲" class="astro-vj4tpspi">演讲</a> </li> </ul> </details> <blockquote>
+<p>原文地址: <a href="https://riegler.fr/blog/2024-12-31-lifecycle-hook-less">https://riegler.fr/blog/2024-12-31-lifecycle-hook-less</a></p>
+</blockquote>
+<p><img src="/blog-images/angular-lifecycle-hook-free/cemrecan-yurtman-hmwvM0BuFOE-unsplash.jpg.webp" alt="Lifecycle-Hook-Free Angular" loading="lazy" decoding="async" width="800" height="533"></p>
+<h1 id="无生命周期钩子的-angular">无生命周期钩子的 Angular</h1>
+<p><strong>使用现代 API 构建组件</strong></p>
+<p>Matthieu Riegler - 2024 年 12 月 31 日</p>
+<p>Angular 在最近的 2-4 个版本中以极快的速度引入了新的非破坏性特性。虽然这些特性不会破坏现有组件的工作方式，但它们将重塑我们未来编写组件的方式。</p>
+<p>本文将讨论的其中一类 API，就是组件/指令的生命周期钩子。</p>
+<h2 id="生命周期钩子">生命周期钩子</h2>
+<p>组件的生命周期是指从组件创建到销毁之间发生的一系列步骤。每个步骤代表 Angular 渲染组件并随时间检查更新过程中的不同部分。</p>
+<p>Angular 组件和指令共有 8 个不同的生命周期钩子：</p>
+<ol>
+<li><code>ngOnInit()</code></li>
+<li><code>ngOnDestroy()</code></li>
+<li><code>ngOnChanges(changes: SimpleChanges)</code></li>
+<li><code>ngAfterContentInit()</code></li>
+<li><code>ngAfterContentChecked()</code></li>
+<li><code>ngAfterViewInit()</code></li>
+<li><code>ngAfterViewChecked()</code></li>
+<li><code>ngDoCheck()</code></li>
+</ol>
+<p>我们将逐一介绍它们，了解它们目前的用途以及新的替代方案。</p>
+<h2 id="ngoninit"><code>ngOnInit</code></h2>
+<p><code>ngOnInit</code> 在组件初始化后调用一次。它主要用于初始化组件数据或获取初始资源。</p>
+<p>开发者经常使用这个钩子来读取输入（inputs），因为只有在初始化之后，我们才能确保输入已经被设置。</p>
+<h4 id="ngoninit-示例"><code>ngOnInit</code> 示例</h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /* ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">class</span><span style="color:#E5C07B"> UserComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">  @</span><span style="color:#61AFEF">Input</span><span style="color:#ABB2BF">() </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  lastname</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 输入尚未设置</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  ngOnInit</span><span style="color:#ABB2BF">(): </span><span style="color:#E5C07B">void</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 可以读取输入</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>直到 <a href="https://v17.angular.io/guide/lifecycle-hooks#initializing-a-component-or-directive">v17</a>，官方的建议都是：</p>
+<blockquote>
+<p>组件应该是易于构造且安全的。例如，你不应该在组件构造函数中获取数据。[……] <code>ngOnInit()</code> 是组件获取初始数据的好地方。</p>
+</blockquote>
+<p>这背后的主要论点是，在触发该钩子之前，输入还不可用。</p>
+<p>随着信号（Signals）的引入，新的可能性出现了。现在可以安全地访问输入。</p>
+<p>其中一种方式是声明状态派生，例如使用 <code>computed</code>：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#61AFEF">computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">myInput</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"></span></code></pre>
+<p>计算信号（Computed signals）和任何其他派生（<code>linkedSignal</code>、<code>resource</code>）一样，都是惰性求值的。当你声明这样一个派生并在模板中使用时，Angular 会确保输入在被读取之前已经被设置。</p>
+<p>另一个常见的信号消费者是 <code>effect</code>。正如我在<a href="https://riegler.fr/blog/2024-10-15-effect-context/">这篇文章</a>中解释的，在组件中声明的 effect 会在组件初始化后以及每次信号变化时（但在组件同步之前）被调度执行。</p>
+<p>总结一下，以下是一个使用信号替代 <code>ngOnInit</code> 的详尽示例，它依赖于状态派生和 <code>effect</code>。</p>
+<h4 id="使用信号">使用信号</h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">`fullName()`</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">class</span><span style="color:#E5C07B"> UserComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"><span style="color:#E06C75">  lastname</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 同步和异步派生，读取一些必需的输入。</span></span>
+<span class="line"><span style="color:#E06C75">  fullName</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> computed</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#98C379"> `</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">name</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#C678DD"> ${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">lastName</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E06C75">  localState</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> linkedSignal</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">name</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#E06C75">  resource</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> resource</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">    request</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> ({ </span><span style="color:#E06C75">id</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">userId</span><span style="color:#ABB2BF">() }),</span></span>
+<span class="line"><span style="color:#61AFEF">    loader</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75;font-style:italic">request</span><span style="color:#C678DD"> =&gt;</span></span>
+<span class="line"><span style="color:#E5C07B">      this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">httpClient</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">`https://myendpoint.com/user/</span><span style="color:#C678DD">${</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">id</span><span style="color:#C678DD">}</span><span style="color:#98C379">`</span><span style="color:#ABB2BF">),</span></span>
+<span class="line"><span style="color:#ABB2BF">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    effect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // 这是一个视图 effect</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // 它在初始化后首次执行</span></span>
+<span class="line"><span style="color:#E5C07B">      this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">name</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>作为之前介绍内容的扩展，基于 <code>effect</code> 构建的函数将享有同样的优势。</p>
+<p>一个很好的例子是 <code>toObservable</code> 函数，它依赖于 <code>effect</code>。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /** ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  readonly</span><span style="color:#E06C75"> lang</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 这样做是没问题的</span></span>
+<span class="line"><span style="color:#61AFEF">    toObservable</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">lang</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">subscribe</span><span style="color:#ABB2BF">(</span><span style="color:#7F848E;font-style:italic">/** */</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>在这个例子中，<code>input</code> 只会被底层的 <code>effect</code> 求值，并在组件初始化之后才被读取。</p>
+<h2 id="ngonchanges"><code>ngOnChanges</code></h2>
+<p><code>ngOnChanges</code> 主要用于在同步过程（以前称为变更检测）中，当一个或多个输入发生变化时收到通知。</p>
+<p>监听变化是基于信号的响应式编程的核心。通过状态派生构建你的状态，你就已经为此做好了准备。对于所有其他无法使用派生的情况，<code>effect</code> 就是你用来监听信号变化的工具。</p>
+<h3 id="effect-调度">Effect 调度</h3>
+<p>关于 <code>effect</code> 的调度，有一点精确的补充。根据你希望回调何时运行，你会使用 <code>effect</code> 或 <code>afterRenderEffect</code>。</p>
+<p>前者在组件被检查之前运行，后者在整个应用（每个组件）渲染完成之后运行。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">( ... )</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    effect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... })</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><code>effect</code> 在组件同步之前运行。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">( ... )</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  name</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> input</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">required</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">string</span><span style="color:#ABB2BF">&gt;();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    afterRenderEffect</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... })</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p><code>afterRenderEffect</code> 在应用完全同步之后运行。</p>
+<p>总结一下，在信号的世界中，你可以直接丢弃 <code>ngOnChanges</code>。</p>
+<h2 id="ngondestroy">ngOnDestroy</h2>
+<p><code>ngOnDestroy</code> 钩子主要用于在组件上触发清理操作。</p>
+<p>以下是一个简单的 timeout 需要在销毁时清除的例子：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#7F848E;font-style:italic">/** ... */</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  intervalId</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#E06C75">    intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(...);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  ngOnDestroy</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>从 Angular 16 开始，我们有了一个新的上下文感知”服务” <code>DestroyRef</code> 来处理清理工作。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /** ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {}, </span><span style="color:#D19A66">1000</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#61AFEF">    inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">));</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>它的 <code>onDestroy</code> 方法回调在上下文被销毁时调用。</p>
+<p>调用它们的上下文可以分为 3 类：</p>
+<ul>
+<li><strong>组件</strong>：当在组件中注入时，<code>DestroyRef</code> 会在组件销毁时触发回调。</li>
+<li><strong>根服务</strong>：当注入的是 <code>providedIn: 'root'</code> 服务时，回调在整个应用销毁时调用。这种情况很少发生，在常规应用的上下文中你可以认为它永远不会发生。</li>
+<li><strong>其他注入器</strong>：当被其他注入器注入时，回调将在该注入器本身被销毁时调用。例如在 <code>EnvironmentInjector</code> 上调用 <code>destroy</code> 时。</li>
+</ul>
+<p>我们可以在辅助函数中利用这种上下文感知的清理机制。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> myFunctionThatNeedsCleanUp</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> destroyRef</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> cleanUpOperation</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> someService</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">  destroyRef</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> cleanUpOperation</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>当在注入上下文中运行时，这个函数提供了自己的清理逻辑。这正是框架提供的函数（如 <code>toSignal()</code>）所做的事情——在上下文被销毁时取消订阅 observable。</p>
+<h2 id="after-钩子">“After” 钩子</h2>
+<p>在这类钩子中，我们将讨论 <code>ngAfterViewInit</code>、<code>ngAfterViewChecked</code>、<code>ngAfterContentInit</code>、<code>ngAfterContentChecked</code>。</p>
+<p>我们主要依赖这些钩子来在组件渲染完成时获得通知。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">'&lt;canvas #myCanvas&gt;&lt;/canvas&gt;'</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  myCanvas</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> viewChild</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'myCanvas'</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 创建时运行一次</span></span>
+<span class="line"><span style="color:#61AFEF">  ngAfterViewInit</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    initCharts</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">myCanvas</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 每次变更检测时运行</span></span>
+<span class="line"><span style="color:#61AFEF">  ngAfterViewChecked</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#ABB2BF">    ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>每当你想在 Angular 完成应用渲染时得到通知，你可以使用 <code>afterNextRender()</code> 和 <code>afterRender()</code>。前者只运行一次回调，而后者在每个渲染周期后都会运行。</p>
+<h3 id="运行一次">运行一次</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"&lt;canvas #myCanvas&gt;&lt;/canvas&gt;"</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  myCanvas</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> viewChild</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"myCanvas"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    afterNextRender</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // 在应用渲染后运行一次</span></span>
+<span class="line"><span style="color:#61AFEF">      initCharts</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">myCanvas</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>替代 <code>ngAfterContentInit</code>、<code>ngAfterViewInit</code>。</p>
+<h3 id="每次应用渲染时运行">每次应用渲染时运行</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">template</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"&lt;canvas #myCanvas&gt;&lt;/canvas&gt;"</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  myChild</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> viewChild</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"childRef"</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    afterRender</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      // 每次应用渲染后运行</span></span>
+<span class="line"><span style="color:#61AFEF">      updateMyChild</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">myChild</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    });</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>替代 <code>ngAfterContentChecked</code>、<code>ngAfterViewChecked</code>。</p>
+<p>这与生命周期钩子有些不同——那些钩子仅限于组件范围，而新 API 会等待整个应用渲染完成。</p>
+<p>这使得该 API 更适合访问 DOM，特别是在需要读取盒模型尺寸的场景中。当兄弟元素被渲染并导致尺寸变化时（例如应用了不同的 flex 规则），这些尺寸可能会改变。</p>
+<p><code>after(Next)Render</code> 还提供了另一个经常被忽视的优化：对 DOM 访问进行排序以获得更好的性能。</p>
+<p>一些 DOM API 已知会触发昂贵的布局重排（<a href="https://gist.github.com/paulirish/5d52fb081b3570c81e3a">查看此列表</a>）。混合调用读/写 API 可能会导致不必要的额外重排。</p>
+<p>你可以指定回调的语义，帮助 Angular 对它们进行排序以确保最佳性能。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#61AFEF">afterRender</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#61AFEF">  earlyRead</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... },</span></span>
+<span class="line"><span style="color:#61AFEF">  read</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... },</span></span>
+<span class="line"><span style="color:#61AFEF">  mixedReadWrite</span><span style="color:#ABB2BF">: () </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> { ... }, </span><span style="color:#7F848E;font-style:italic">// 默认值，性能最差</span></span>
+<span class="line"><span style="color:#61AFEF">  write</span><span style="color:#ABB2BF">() { ... }</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
+<h2 id="ngdocheck">ngDoCheck</h2>
+<p><code>ngDoCheck</code> 钩子可能是最不为人知的一个，你通常会使用它来实现自定义的变更检测。Angular 本身在 <code>NgForOf</code> 和 <code>NgClass</code> 指令中使用了它。</p>
+<p>如今，<code>ngDoCheck</code> 可以很自然地被信号取代，你可以使用 <code>effect</code> 来处理副作用。</p>
+<h2 id="代码集中">代码集中</h2>
+<p>如果我们回顾之前探讨的 <code>ngOnDestroy</code> 示例，可以看到新 API 的一个优势是它们允许代码集中（code collocation）。</p>
+<h3 id="基于钩子的方式">基于钩子的方式</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({ </span><span style="color:#7F848E;font-style:italic">/** ... */</span><span style="color:#ABB2BF"> })</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">  intervalId</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#E06C75">    intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(...);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  ngOnDestroy</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#61AFEF">    clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="使用-destroyref-实现代码集中">使用 <code>DestroyRef</code> 实现代码集中</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="typescript"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#61AFEF">Component</span><span style="color:#ABB2BF">({</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  /** ... */</span></span>
+<span class="line"><span style="color:#ABB2BF">})</span></span>
+<span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> FooComponent</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">  constructor</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#E5C07B"> intervalId</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> setInterval</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#ABB2BF"> {}, </span><span style="color:#D19A66">1000</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#61AFEF">    inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> clearInterval</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">intervalId</span><span style="color:#ABB2BF">));</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">/***/</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">function</span><span style="color:#61AFEF"> myFunctionThatNeedsCleanUp</span><span style="color:#ABB2BF">() {</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> destroyRef</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> inject</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">DestroyRef</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">  const</span><span style="color:#E5C07B"> cleanUpOperation</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> someService</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#E5C07B">  destroyRef</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">onDestroy</span><span style="color:#ABB2BF">(() </span><span style="color:#C678DD">=&gt;</span><span style="color:#61AFEF"> cleanUpOperation</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<ul>
+<li>不需要单独的类成员</li>
+<li>没有额外的方法</li>
+<li>整个功能集中在一个位置</li>
+</ul>
+<h2 id="演讲">演讲</h2>
+<p>你可以观看<a href="https://www.youtube.com/live/5m0eqGxrLUo?si=Rs-mD5Y_4zYBpSII&amp;t=23477">我关于这个话题的演讲 ⏯</a>，这是我在 NgGlühwein（2024 年 12 月，维也纳 🇦🇹）上做的分享。</p> </article> </div>  <ul class="astro-vj4tpspi my-8"> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/前端/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">前端</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://rowanliu.com/posts/angular-lifecycle-hook-free/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://rowanliu.com/posts/angular-lifecycle-hook-free/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://rowanliu.com/posts/angular-lifecycle-hook-free/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://rowanliu.com/posts/angular-lifecycle-hook-free/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://rowanliu.com/posts/angular-lifecycle-hook-free/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://rowanliu.com/posts/angular-lifecycle-hook-free/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
+</script><astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <a href="/rss.xml" class="astro-sz7xmlte rss-link" aria-label="RSS Feed"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-sz7xmlte rss-icon" viewBox="0 0 24 24" width="16" height="16"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z" fill="currentColor" class="astro-sz7xmlte"></path> </svg>
+RSS
+</a> </div> </div> </footer>     <script>function createProgressBar(){const t=document.createElement("div");t.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const n=document.createElement("div");n.className="progress-bar h-1 w-0 bg-skin-accent",n.id="myBar",t.appendChild(n),document.body.appendChild(t)}createProgressBar();function updateScrollProgress(){const t=document.body.scrollTop||document.documentElement.scrollTop,n=document.documentElement.scrollHeight-document.documentElement.clientHeight,o=t/n*100;if(document){const e=document.getElementById("myBar");e&&(e.style.width=o+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let t=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let n of t){n.classList.add("group");let o=document.createElement("a");o.innerText="#",o.className="heading-link hidden group-hover:inline-block ml-2",o.href="#"+n.id,o.ariaHidden="true",n.appendChild(o)}}addHeadingLinks();function attachCopyButtons(){let t="Copy",n=Array.from(document.querySelectorAll("pre"));for(let e of n){let a=document.createElement("div");a.style.position="relative";let c=document.createElement("button");c.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",c.innerHTML=t,e.setAttribute("tabindex","0"),e.appendChild(c),e?.parentNode?.insertBefore(a,e),a.appendChild(e),c.addEventListener("click",async()=>{await o(e,c)})}async function o(e,a){let i=e.querySelector("code")?.innerText;await navigator.clipboard.writeText(i??""),a.innerText="Copied",setTimeout(()=>{a.innerText=t},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();function initTranslationToggle(){var t=document.querySelector(".translation-controls");if(!t)return;var n=t.querySelectorAll(".toggle-btn"),o=document.getElementById("translation-container"),e=document.getElementById("article-translated"),a=document.getElementById("article-original"),c=document.getElementById("main-content");function i(r){n.forEach(function(s){s.classList.remove("active")});var d=t.querySelector('[data-view="'+r+'"]');d&&d.classList.add("active"),o.classList.remove("comparison-mode"),c.classList.remove("comparison-active"),r==="translated"?(e.hidden=!1,a.hidden=!0):r==="original"?(e.hidden=!0,a.hidden=!1):(e.hidden=!1,a.hidden=!1,o.classList.add("comparison-mode"),c.classList.add("comparison-active"));try{sessionStorage.setItem("translation-view-mode",r)}catch{}}n.forEach(function(r){r.addEventListener("click",function(){i(r.dataset.view)})});try{var l=sessionStorage.getItem("translation-view-mode");l&&l!=="translated"&&i(l)}catch{}}initTranslationToggle();
+</script></body></html>
