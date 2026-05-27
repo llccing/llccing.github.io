@@ -4,7 +4,7 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
-import type { CollectionEntry } from "astro:content";
+import { type CollectionEntry, getEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
 import Comments from "@components/Comments";
@@ -30,6 +30,18 @@ const {
 const { Content, headings, remarkPluginFrontmatter } = await post.render();
 const minutesRead = remarkPluginFrontmatter?.minutesRead;
 const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+
+// Translation support
+const isTranslation =
+  "isTranslation" in post.data && post.data.isTranslation === true;
+let OriginalContent: any = null;
+if (isTranslation) {
+  const originalEntry = await getEntry("originals", post.slug);
+  if (originalEntry) {
+    const result = await originalEntry.render();
+    OriginalContent = result.Content;
+  }
+}
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
@@ -77,21 +89,72 @@ const layoutProps = {
       className="my-2"
       readingTime={minutesRead}
     />
-    <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
-      {tocHeadings.length >= 3 && (
-        <details class="toc" open>
-          <summary class="cursor-pointer font-bold">目录</summary>
-          <ul class="mt-2">
-            {tocHeadings.map(h => (
-              <li style={`margin-left: ${(h.depth - 2) * 1}rem`}>
-                <a href={`#${h.slug}`}>{h.text}</a>
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
-      <Content />
-    </article>
+    {
+      isTranslation && OriginalContent ? (
+        <>
+          <div class="translation-controls mx-auto mt-4 flex max-w-3xl items-center gap-1 rounded-lg bg-skin-card bg-opacity-60 p-1">
+            <button class="toggle-btn active" data-view="translated">
+              译文
+            </button>
+            <button class="toggle-btn" data-view="original">
+              原文
+            </button>
+            <button class="toggle-btn" data-view="comparison">
+              对照
+            </button>
+          </div>
+          <div id="translation-container" class="mt-8">
+            <article
+              id="article-original"
+              role="article"
+              class="prose mx-auto max-w-3xl"
+              hidden
+            >
+              <OriginalContent />
+            </article>
+            <article
+              id="article-translated"
+              role="article"
+              class="prose mx-auto max-w-3xl"
+            >
+              {tocHeadings.length >= 3 && (
+                <details class="toc" open>
+                  <summary class="cursor-pointer font-bold">目录</summary>
+                  <ul class="mt-2">
+                    {tocHeadings.map(h => (
+                      <li style={`margin-left: ${(h.depth - 2) * 1}rem`}>
+                        <a href={`#${h.slug}`}>{h.text}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+              <Content />
+            </article>
+          </div>
+        </>
+      ) : (
+        <article
+          id="article"
+          role="article"
+          class="prose mx-auto mt-8 max-w-3xl"
+        >
+          {tocHeadings.length >= 3 && (
+            <details class="toc" open>
+              <summary class="cursor-pointer font-bold">目录</summary>
+              <ul class="mt-2">
+                {tocHeadings.map(h => (
+                  <li style={`margin-left: ${(h.depth - 2) * 1}rem`}>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <Content />
+        </article>
+      )
+    }
 
     <ul class="my-8">
       {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
@@ -123,9 +186,35 @@ const layoutProps = {
 <style>
   main {
     @apply mx-auto w-full max-w-3xl px-4 pb-12;
+    transition: max-width 0.3s ease;
+  }
+  main.comparison-active {
+    max-width: 90rem;
   }
   .post-title {
     @apply text-2xl font-semibold text-skin-accent;
+  }
+  .toggle-btn {
+    @apply flex-1 cursor-pointer rounded-md px-3 py-1.5 text-center text-sm font-medium text-skin-base transition-colors;
+  }
+  .toggle-btn.active {
+    @apply bg-skin-accent text-skin-inverted;
+  }
+  .toggle-btn:not(.active):hover {
+    @apply bg-skin-card-muted;
+  }
+  #translation-container.comparison-mode {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 640px) {
+    #translation-container.comparison-mode {
+      grid-template-columns: 1fr;
+    }
+  }
+  #translation-container.comparison-mode article {
+    max-width: none;
   }
 </style>
 
@@ -236,4 +325,57 @@ const layoutProps = {
     });
   }
   backToTop();
+
+  /** Translation view toggle */
+  function initTranslationToggle() {
+    var controls = document.querySelector(".translation-controls");
+    if (!controls) return;
+
+    var buttons = controls.querySelectorAll(".toggle-btn");
+    var container = document.getElementById("translation-container");
+    var translated = document.getElementById("article-translated");
+    var original = document.getElementById("article-original");
+    var main = document.getElementById("main-content");
+
+    function switchView(view) {
+      buttons.forEach(function (b) {
+        b.classList.remove("active");
+      });
+      var activeBtn = controls.querySelector('[data-view="' + view + '"]');
+      if (activeBtn) activeBtn.classList.add("active");
+
+      container.classList.remove("comparison-mode");
+      main.classList.remove("comparison-active");
+
+      if (view === "translated") {
+        translated.hidden = false;
+        original.hidden = true;
+      } else if (view === "original") {
+        translated.hidden = true;
+        original.hidden = false;
+      } else {
+        translated.hidden = false;
+        original.hidden = false;
+        container.classList.add("comparison-mode");
+        main.classList.add("comparison-active");
+      }
+
+      try {
+        sessionStorage.setItem("translation-view-mode", view);
+      } catch (e) {}
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        switchView(btn.dataset.view);
+      });
+    });
+
+    // Restore saved mode
+    try {
+      var saved = sessionStorage.getItem("translation-view-mode");
+      if (saved && saved !== "translated") switchView(saved);
+    } catch (e) {}
+  }
+  initTranslationToggle();
 </script>

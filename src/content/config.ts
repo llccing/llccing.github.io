@@ -11,6 +11,7 @@ const blog = defineCollection({
       title: z.string(),
       featured: z.boolean().optional(),
       draft: z.boolean().optional(),
+      isTranslation: z.boolean().optional(),
       tags: z.array(z.string()).default(["others"]),
       ogImage: image()
         .refine(img => img.width >= 1200 && img.height >= 630, {
@@ -45,4 +46,12 @@ const shortStories = defineCollection({
     }),
 });
 
-export const collections = { blog, "short-stories": shortStories };
+const originals = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    sourceUrl: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, "short-stories": shortStories, originals };
