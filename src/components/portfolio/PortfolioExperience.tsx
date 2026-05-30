@@ -22,6 +22,60 @@ export interface PortfolioItem {
   impact: string;
 }
 
+interface ZhProfile {
+  tagline?: string;
+  summary?: string;
+  targetRole?: string;
+  education?: string;
+}
+
+interface ZhExperience {
+  id: string;
+  role?: string;
+  summary?: string;
+  details?: string[];
+  impact?: string;
+}
+
+interface ZhFeaturedSystem {
+  name?: string;
+  summary?: string;
+}
+
+interface ZhPersonalLab {
+  name?: string;
+  role?: string;
+  summary?: string;
+  details?: string[];
+}
+
+interface ZhUi {
+  backBlog?: string;
+  featuredSystemsLabel?: string;
+  featuredSystemsHeading?: string;
+  careerLabel?: string;
+  careerHeading?: string;
+  careerSubtext?: string;
+  personalLabLabel?: string;
+  openDetails?: string;
+  close?: string;
+  education?: string;
+  skillLabels?: {
+    coreFrontend?: string;
+    systemsBackend?: string;
+    workflow?: string;
+  };
+}
+
+interface ZhData {
+  profile?: ZhProfile;
+  metrics?: Array<{ value: string; label: string }>;
+  featuredSystems?: ZhFeaturedSystem[];
+  experiences?: ZhExperience[];
+  personalLab?: ZhPersonalLab;
+  ui?: ZhUi;
+}
+
 export interface PortfolioData {
   profile: {
     name: string;
@@ -59,6 +113,7 @@ export interface PortfolioData {
     details: string[];
     tech: string[];
   };
+  zh?: ZhData;
 }
 
 const accentClass = {
@@ -115,9 +170,11 @@ function TechGlyph({ type }: { type: PortfolioItem["icon"] }) {
 
 function MagneticCard({
   item,
+  openLabel,
   onOpen,
 }: {
   item: PortfolioItem;
+  openLabel: string;
   onOpen: () => void;
 }) {
   const x = useMotionValue(0);
@@ -164,7 +221,7 @@ function MagneticCard({
         {item.summary}
       </p>
       <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#202124]">
-        Open details
+        {openLabel}
         <span className="transition-transform group-hover:translate-x-1">
           →
         </span>
@@ -195,6 +252,69 @@ function SkillCloud({ title, skills }: { title: string; skills: string[] }) {
 
 export default function PortfolioExperience({ data }: { data: PortfolioData }) {
   const [selected, setSelected] = useState<PortfolioItem | null>(null);
+  const [lang, setLang] = useState<"en" | "zh">("en");
+
+  const zh = data.zh;
+  const isZh = lang === "zh";
+
+  const t = (en: string, zhText: string | undefined) =>
+    isZh && zhText ? zhText : en;
+
+  const profile = { ...data.profile, ...(isZh ? zh?.profile : {}) };
+  const metrics = isZh && zh?.metrics ? zh.metrics : (data.metrics ?? []);
+
+  const featuredSystems = (data.featuredSystems ?? []).map((sys, i) => ({
+    ...sys,
+    name: t(sys.name, zh?.featuredSystems?.[i]?.name),
+    summary: t(sys.summary, zh?.featuredSystems?.[i]?.summary),
+  }));
+
+  const experiences = data.experiences.map(exp => {
+    const zhExp = zh?.experiences?.find(e => e.id === exp.id);
+    return {
+      ...exp,
+      role: t(exp.role, zhExp?.role),
+      summary: t(exp.summary, zhExp?.summary),
+      details: isZh && zhExp?.details ? zhExp.details : exp.details,
+      impact: t(exp.impact, zhExp?.impact),
+    };
+  });
+
+  const personalLab = data.personalLab
+    ? {
+        ...data.personalLab,
+        name: t(data.personalLab.name, zh?.personalLab?.name),
+        role: t(data.personalLab.role, zh?.personalLab?.role),
+        summary: t(data.personalLab.summary, zh?.personalLab?.summary),
+        details:
+          isZh && zh?.personalLab?.details
+            ? zh.personalLab.details
+            : data.personalLab.details,
+      }
+    : undefined;
+
+  const ui = {
+    backBlog: t("\u2190 Blog", zh?.ui?.backBlog),
+    featuredSystemsLabel: t("Featured Systems", zh?.ui?.featuredSystemsLabel),
+    featuredSystemsHeading: t(
+      "Enterprise scale, product taste.",
+      zh?.ui?.featuredSystemsHeading
+    ),
+    careerLabel: t("Career Timeline", zh?.ui?.careerLabel),
+    careerHeading: t("Impact first. Depth on tap.", zh?.ui?.careerHeading),
+    careerSubtext: t(
+      "Six roles compressed into portfolio cards. Click any card for the resume-level detail: stack, responsibility and impact.",
+      zh?.ui?.careerSubtext
+    ),
+    personalLabLabel: t("Personal Lab", zh?.ui?.personalLabLabel),
+    openDetails: t("Open details", zh?.ui?.openDetails),
+    close: t("Close", zh?.ui?.close),
+    education: t("Education", zh?.ui?.education),
+    coreFrontend: t("Core frontend", zh?.ui?.skillLabels?.coreFrontend),
+    systemsBackend: t("Systems & backend", zh?.ui?.skillLabels?.systemsBackend),
+    workflow: t("Workflow", zh?.ui?.skillLabels?.workflow),
+  };
+
   const heroSkills = [
     ...data.skills.primary,
     ...data.skills.systems.slice(0, 4),
@@ -202,20 +322,22 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f6f3ec] px-4 py-8 font-sans text-[#202124] sm:px-6">
+    <div className="portfolio-page min-h-screen bg-[#f6f3ec] px-4 py-8 font-sans text-[#202124] sm:px-6">
       <div className="mx-auto max-w-7xl">
+        {/* Nav */}
         <motion.nav
-          initial={{ opacity: 0, y: -12 }}
+          initial={{ opacity: 1, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           className="mb-10 flex flex-wrap items-center justify-between gap-4 rounded-full bg-white/70 px-5 py-3 shadow-sm ring-1 ring-black/5 backdrop-blur"
         >
           <a
             href="/"
             className="rounded-full px-3 py-2 text-sm font-semibold no-underline hover:bg-[#f6f3ec]"
           >
-            ← Blog
+            {ui.backBlog}
           </a>
-          <div className="flex gap-2 text-sm text-[#6f6b63]">
+          <div className="flex items-center gap-2 text-sm text-[#6f6b63]">
             <a
               className="rounded-full px-3 py-2 no-underline hover:bg-[#f6f3ec]"
               href={`mailto:${data.profile.email}`}
@@ -228,18 +350,35 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
             >
               Website
             </a>
+            <div className="ml-2 flex rounded-full bg-[#f0ece3] p-0.5">
+              <button
+                type="button"
+                onClick={() => setLang("en")}
+                className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${lang === "en" ? "bg-[#202124] text-white" : "text-[#6f6b63] hover:text-[#202124]"}`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang("zh")}
+                className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${lang === "zh" ? "bg-[#202124] text-white" : "text-[#6f6b63] hover:text-[#202124]"}`}
+              >
+                {"\u4e2d\u6587"}
+              </button>
+            </div>
           </div>
         </motion.nav>
 
-        <section className="grid gap-6 px-0 lg:grid-cols-[1.35fr_0.65fr]">
+        {/* Hero */}
+        <div className="grid gap-6 px-0 lg:grid-cols-[1.35fr_0.65fr]">
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 1, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             className="rounded-[2.5rem] bg-[#fffaf0] p-8 shadow-[0_24px_80px_rgba(72,60,42,0.10)] ring-1 ring-black/5 sm:p-12"
           >
             <p className="mb-5 inline-flex rounded-full bg-[#d8f3dc] px-4 py-2 text-sm font-semibold text-[#335c45]">
-              {data.profile.targetRole}
+              {profile.targetRole}
             </p>
             <h1 className="max-w-4xl text-5xl font-black leading-[0.92] tracking-[-0.08em] sm:text-7xl lg:text-8xl">
               {data.profile.name}
@@ -248,7 +387,7 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
               </span>
             </h1>
             <p className="mt-8 max-w-3xl text-xl leading-9 text-[#4c463d]">
-              {data.profile.tagline}
+              {profile.tagline}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               {heroSkills.map(skill => (
@@ -263,18 +402,18 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
           </motion.div>
 
           <motion.aside
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 1, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.08 }}
+            transition={{ duration: 0.5, delay: 0.08 }}
             className="rounded-[2.5rem] bg-[#202124] p-6 text-white shadow-[0_24px_80px_rgba(72,60,42,0.14)]"
           >
             <div className="rounded-[1.8rem] bg-white/10 p-5 font-mono text-sm leading-7 text-[#d8f3dc]">
               <div className="text-[#ffd180]">rowan@portfolio:~$</div>
               <div>cat mission.txt</div>
-              <div className="mt-4 text-white">{data.profile.summary}</div>
+              <div className="mt-4 text-white">{profile.summary}</div>
             </div>
             <div className="mt-5 grid grid-cols-2 gap-3">
-              {(data.metrics ?? []).map(metric => (
+              {metrics.map(metric => (
                 <div
                   key={metric.value + metric.label}
                   className="rounded-3xl bg-white p-4 text-[#202124]"
@@ -287,31 +426,32 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
                 </div>
               ))}
             </div>
-            {data.profile.education && (
+            {profile.education && (
               <div className="mt-5 rounded-3xl bg-white/10 p-5 text-sm leading-7 text-white/85">
-                <b className="text-white">Education</b>
+                <b className="text-white">{ui.education}</b>
                 <br />
-                {data.profile.education}
+                {profile.education}
               </div>
             )}
           </motion.aside>
-        </section>
+        </div>
 
-        <section className="py-14">
+        {/* Featured Systems */}
+        <div className="py-14">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8a8174]">
-                Featured Systems
+                {ui.featuredSystemsLabel}
               </p>
               <h2 className="mt-2 text-4xl font-black tracking-[-0.06em] sm:text-5xl">
-                Enterprise scale, product taste.
+                {ui.featuredSystemsHeading}
               </h2>
             </div>
           </div>
           <div className="grid gap-5 lg:grid-cols-3">
-            {(data.featuredSystems ?? []).map(system => (
+            {featuredSystems.map((system, i) => (
               <motion.article
-                key={system.name}
+                key={data.featuredSystems?.[i]?.name ?? system.name}
                 whileHover={{ y: -5 }}
                 className="rounded-[2rem] bg-white/70 p-6 shadow-sm ring-1 ring-black/5"
               >
@@ -322,7 +462,7 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
                   {system.summary}
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {system.tags.map(tag => (
+                  {data.featuredSystems?.[i]?.tags.map(tag => (
                     <span
                       key={tag}
                       className="rounded-full bg-[#f6f3ec] px-3 py-1.5 text-xs font-bold text-[#4c463d]"
@@ -334,73 +474,73 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
               </motion.article>
             ))}
           </div>
-        </section>
+        </div>
 
-        <section className="px-0 py-8">
+        {/* Career Timeline */}
+        <div className="px-0 py-8">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8a8174]">
-                Career Timeline
+                {ui.careerLabel}
               </p>
               <h2 className="mt-2 text-4xl font-black tracking-[-0.06em] sm:text-5xl">
-                Impact first. Depth on tap.
+                {ui.careerHeading}
               </h2>
             </div>
-            <p className="max-w-md text-[#6f6b63]">
-              Six roles compressed into portfolio cards. Click any card for the
-              resume-level detail: stack, responsibility and impact.
-            </p>
+            <p className="max-w-md text-[#6f6b63]">{ui.careerSubtext}</p>
           </div>
-
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {data.experiences.map(item => (
+            {experiences.map(item => (
               <MagneticCard
                 key={item.id}
                 item={item}
+                openLabel={ui.openDetails}
                 onOpen={() => setSelected(item)}
               />
             ))}
           </div>
-        </section>
+        </div>
 
-        <section className="grid gap-5 py-14 lg:grid-cols-3">
-          <SkillCloud title="Core frontend" skills={data.skills.primary} />
+        {/* Skills */}
+        <div className="grid gap-5 py-14 lg:grid-cols-3">
+          <SkillCloud title={ui.coreFrontend} skills={data.skills.primary} />
           <SkillCloud
-            title="Systems & backend"
+            title={ui.systemsBackend}
             skills={[...data.skills.systems, ...(data.skills.backend ?? [])]}
           />
           <SkillCloud
-            title="Workflow"
+            title={ui.workflow}
             skills={[
               ...(data.skills.miniPrograms ?? []),
               ...data.skills.workflow,
             ]}
           />
-        </section>
+        </div>
 
-        {data.personalLab && (
-          <section className="pb-16">
+        {/* Personal Lab */}
+        {personalLab && (
+          <div className="pb-16">
             <div className="rounded-[2.5rem] bg-[#d8f3dc] p-8 shadow-[0_24px_80px_rgba(72,60,42,0.10)] ring-1 ring-black/5 sm:p-10">
               <p className="text-sm font-black uppercase tracking-[0.2em] text-[#3f6b4c]">
-                Personal Lab
+                {ui.personalLabLabel}
               </p>
               <div className="mt-4 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
                 <div>
                   <h2 className="text-4xl font-black tracking-[-0.06em] sm:text-5xl">
-                    {data.personalLab.name}
+                    {personalLab.name}
                   </h2>
                   <p className="mt-3 font-bold text-[#335c45]">
-                    {data.personalLab.role}
+                    {personalLab.role}
                   </p>
                   <p className="mt-5 text-lg leading-8 text-[#3f3a33]">
-                    {data.personalLab.summary}
+                    {personalLab.summary}
                   </p>
                 </div>
                 <div>
                   <ul className="grid gap-3">
-                    {data.personalLab.details.map(detail => (
+                    {personalLab.details.map((detail, i) => (
                       <li
-                        key={detail}
+                        key={i}
                         className="rounded-3xl bg-white/60 p-4 leading-7 text-[#3f3a33] ring-1 ring-black/5"
                       >
                         {detail}
@@ -408,7 +548,7 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
                     ))}
                   </ul>
                   <div className="mt-5 flex flex-wrap gap-2">
-                    {data.personalLab.tech.map(tech => (
+                    {data.personalLab?.tech.map(tech => (
                       <span
                         key={tech}
                         className="rounded-full bg-[#202124] px-3 py-1.5 text-xs font-semibold text-white"
@@ -420,10 +560,11 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
                 </div>
               </div>
             </div>
-          </section>
+          </div>
         )}
       </div>
 
+      {/* Detail modal */}
       <AnimatePresence>
         {selected && (
           <motion.div
@@ -447,7 +588,7 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
                   onClick={() => setSelected(null)}
                   className="rounded-full bg-white/70 px-4 py-2 text-sm font-bold text-[#202124] shadow-sm transition hover:bg-white"
                 >
-                  Close
+                  {ui.close}
                 </button>
               </div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#6f6b63]">
@@ -464,9 +605,9 @@ export default function PortfolioExperience({ data }: { data: PortfolioData }) {
                 {selected.impact}
               </p>
               <ul className="mt-6 grid gap-3 md:grid-cols-2">
-                {selected.details.map(detail => (
+                {selected.details.map((detail, i) => (
                   <li
-                    key={detail}
+                    key={i}
                     className={`rounded-3xl border-l-4 ${accentBorderClass[selected.accent]} bg-white/60 p-4 leading-7 text-[#3f3a33] ring-1 ring-black/5`}
                   >
                     {detail}
