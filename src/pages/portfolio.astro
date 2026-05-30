@@ -13,3 +13,13 @@ import resume from "../data/portfolio.resume.json";
 >
   <PortfolioExperience client:load data={resume as PortfolioData} />
 </Layout>
+
+<style is:global>
+  /* Portfolio page: override the blog's global section constraints */
+  .portfolio-page section,
+  .portfolio-page footer {
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+</style>

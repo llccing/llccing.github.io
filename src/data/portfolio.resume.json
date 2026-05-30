@@ -41,11 +41,44 @@
     { "value": "2w", "label": "Sprint cadence in English agile team" }
   ],
   "skills": {
-    "primary": ["Angular", "TypeScript", "Node.js BFF", "Vue.js", "Tailwind CSS", "RxJS"],
-    "systems": ["Enterprise Web Apps", "API composition", "Data filtering", "Document scanning", "Production troubleshooting", "Kibana / Analytics", "Dynamic forms", "Component libraries"],
-    "backend": ["Node.js", "NestJS", "Spring Boot", "TypeORM", "ABP", "Keycloak"],
+    "primary": [
+      "Angular",
+      "TypeScript",
+      "Node.js BFF",
+      "Vue.js",
+      "Tailwind CSS",
+      "RxJS"
+    ],
+    "systems": [
+      "Enterprise Web Apps",
+      "API composition",
+      "Data filtering",
+      "Document scanning",
+      "Production troubleshooting",
+      "Kibana / Analytics",
+      "Dynamic forms",
+      "Component libraries"
+    ],
+    "backend": [
+      "Node.js",
+      "NestJS",
+      "Spring Boot",
+      "TypeORM",
+      "ABP",
+      "Keycloak"
+    ],
     "miniPrograms": ["Uniapp", "MPX", "WeChat Mini Program"],
-    "workflow": ["English Agile collaboration", "Sprint planning / review / retro", "Story grooming", "UAT / regression support", "Code Review", "GitHub Copilot", "Claude", "Figma MCP", "AI-agent code review"]
+    "workflow": [
+      "English Agile collaboration",
+      "Sprint planning / review / retro",
+      "Story grooming",
+      "UAT / regression support",
+      "Code Review",
+      "GitHub Copilot",
+      "Claude",
+      "Figma MCP",
+      "AI-agent code review"
+    ]
   },
   "featuredSystems": [
     {
@@ -84,7 +117,18 @@
         "Support UAT and regression testing while preserving buffer for urgent production or requirement changes.",
         "Use GitHub Copilot, Claude and AI-agent review patterns to accelerate delivery while keeping human review discipline."
       ],
-      "tech": ["Angular", "TypeScript", "Node.js", "BFF", "Scandit", "Kibana", "Analytics", "Agile", "Copilot", "Claude"],
+      "tech": [
+        "Angular",
+        "TypeScript",
+        "Node.js",
+        "BFF",
+        "Scandit",
+        "Kibana",
+        "Analytics",
+        "Agile",
+        "Copilot",
+        "Claude"
+      ],
       "impact": "A heavy enterprise travel workflow presented as clear, resilient customer-facing interactions."
     },
     {
@@ -103,7 +147,15 @@
         "Analyzed requirements and used Figma to design product improvement prototypes.",
         "Researched and planned an Angular upgrade from 13 to 15, including risk assessment, performance and developer-experience improvements."
       ],
-      "tech": ["Angular", "Tailwind CSS", "Spring Boot", "JHipster", "Keycloak", "Figma", "Upgrade planning"],
+      "tech": [
+        "Angular",
+        "Tailwind CSS",
+        "Spring Boot",
+        "JHipster",
+        "Keycloak",
+        "Figma",
+        "Upgrade planning"
+      ],
       "impact": "Product-facing full-stack work: from requirements and prototypes to framework upgrades and backend integration."
     },
     {
@@ -122,7 +174,16 @@
         "Encapsulated business component libraries and frontend layout components based on ABP projects to improve reuse.",
         "Handled effort estimation, task assignment, Code Review and mentoring for junior engineers."
       ],
-      "tech": ["Angular", "NG-ZORRO", "RxJS", "NestJS", "TypeORM", "Uniapp", "ABP", "Code Review"],
+      "tech": [
+        "Angular",
+        "NG-ZORRO",
+        "RxJS",
+        "NestJS",
+        "TypeORM",
+        "Uniapp",
+        "ABP",
+        "Code Review"
+      ],
       "impact": "Combined hands-on delivery with component reuse, estimation and team-level engineering support."
     },
     {
@@ -140,7 +201,14 @@
         "Researched Vue CLI upgrade paths for shared team plugins compatible with @vue/cli 4.",
         "Quickly learned the MPX framework and delivered WeChat mini-program features on schedule."
       ],
-      "tech": ["Vue", "H5", "MPX", "WeChat Mini Program", "Vue CLI", "Design fidelity"],
+      "tech": [
+        "Vue",
+        "H5",
+        "MPX",
+        "WeChat Mini Program",
+        "Vue CLI",
+        "Design fidelity"
+      ],
       "impact": "Fast-moving consumer frontend delivery with high UI fidelity and quick adaptation to new internal frameworks."
     },
     {
@@ -159,7 +227,14 @@
         "Created the idc-cli scaffold for work-order templates to improve development efficiency.",
         "Introduced analytics collection for pages and specified positions, giving PMs data support for feature usage analysis."
       ],
-      "tech": ["Vue.js", "JavaScript", "Enterprise platform", "idc-cli", "Analytics", "Scaffolding"],
+      "tech": [
+        "Vue.js",
+        "JavaScript",
+        "Enterprise platform",
+        "idc-cli",
+        "Analytics",
+        "Scaffolding"
+      ],
       "impact": "A foundational enterprise rewrite that shows scale, ownership and platform thinking early in the career."
     },
     {
@@ -176,7 +251,15 @@
         "Set up project frontend structure with RequireJS, Bootstrap, jQuery, HTML and CSS3.",
         "Introduced Gulp and browser-sync tooling to improve development efficiency."
       ],
-      "tech": ["RequireJS", "Bootstrap", "jQuery", "HTML", "CSS3", "Gulp", "browser-sync"],
+      "tech": [
+        "RequireJS",
+        "Bootstrap",
+        "jQuery",
+        "HTML",
+        "CSS3",
+        "Gulp",
+        "browser-sync"
+      ],
       "impact": "Strong frontend fundamentals formed through hands-on framework setup and workflow automation."
     }
   ],
@@ -190,20 +273,163 @@
       "Potentially combine frontend play patterns, progress tracking, speech/recognition and AI-assisted content generation.",
       "Positioned as a warm personal product that also demonstrates full-stack product ownership."
     ],
-    "tech": ["Product thinking", "Frontend UX", "Learning loops", "AI-assisted content", "Family-first testing"]
+    "tech": [
+      "Product thinking",
+      "Frontend UX",
+      "Learning loops",
+      "AI-assisted content",
+      "Family-first testing"
+    ]
   },
   "projects": [
     {
       "id": "frontend-archive",
       "name": "10-year Frontend Knowledge Base",
       "summary": "A long-running technical blog covering Vue internals, Angular evolution, CSS, JavaScript, Node.js and frontend architecture.",
-      "tech": ["Astro", "Markdown", "Vue", "Angular", "JavaScript", "Architecture"],
+      "tech": [
+        "Astro",
+        "Markdown",
+        "Vue",
+        "Angular",
+        "JavaScript",
+        "Architecture"
+      ],
       "details": [
         "Uses the personal blog as a durable engineering memory across frameworks and years.",
         "Shows breadth from foundational JavaScript/CSS to Angular SSR, hydration and BFF topics."
       ]
     }
   ],
+  "zh": {
+    "profile": {
+      "tagline": "在复杂企业工作流与真实用户产品之间建立连接：现代 Angular、Node.js BFF、生产排障与 AI 辅助交付。",
+      "summary": "10 年 Vue、Angular 及相关前端与后端集成经验。当前在埃森哲以 Angular + Node.js BFF 构建国泰航空在线值机系统，全程英文敏捷协作。",
+      "targetRole": "全栈开发工程师 / Angular + Node.js",
+      "education": "计算机科学与技术学士，黑龙江八一农垦大学 · 2012.09 — 2016.06"
+    },
+    "metrics": [
+      { "value": "10年", "label": "前端 / 全栈交付" },
+      { "value": "80+", "label": "京东 IDC 重建页面数" },
+      { "value": "100k", "label": "Vue 重写迁移行数" },
+      { "value": "2周", "label": "英文敏捷迭代周期" }
+    ],
+    "featuredSystems": [
+      {
+        "name": "国泰航空在线值机",
+        "summary": "以 Angular + Node.js BFF 构建的面向用户旅行工作流，含证件扫描与生产问题分析。"
+      },
+      {
+        "name": "京东 IDC 基础设施平台",
+        "summary": "以 Vue.js 从 0 到 1 重写的 IDC 运维平台，覆盖 80+ 页面，约 10 万行前端代码。"
+      },
+      {
+        "name": "iCluster Web",
+        "summary": "Angular + Tailwind + Spring Boot 产品研发，含设计原型、Keycloak 封装与 Angular 13→15 升级规划。"
+      }
+    ],
+    "experiences": [
+      {
+        "id": "accenture-cathay-checkin",
+        "role": "全栈 / 高级前端工程师",
+        "summary": "以 Angular + Node.js BFF，在英文敏捷团队中构建国泰航空面向用户的在线值机系统。",
+        "details": [
+          "开发面向旅客的在线值机前端模块（现代 Angular 实现）。",
+          "参与 Node.js BFF 的 API 聚合与数据过滤，衔接前端流程与后端服务。",
+          "集成基于 Scandit 的证件扫描功能，支持护照、港澳通行证、中国居留许可及签证识别。",
+          "通过数据分析平台与 Kibana 排查生产问题，将用户行为关联至系统级根因。",
+          "以两周为一个 Sprint 节奏参与计划、评审与回顾会议，加入 Refinement/Story Grooming 明确 Backlog 范围。",
+          "提供 UAT 与回归测试支持，同时为紧急生产问题或需求变更预留缓冲空间。",
+          "借助 GitHub Copilot、Claude 及 AI Agent 代码审查模式提速交付，并保持人工审查规范。"
+        ],
+        "impact": "将繁重的企业旅行工作流呈现为清晰、稳健的面向用户交互体验。"
+      },
+      {
+        "id": "linkstec-icluster",
+        "role": "全栈工程师",
+        "summary": "主导 Angular + Tailwind CSS + Spring Boot 的 iCluster Web 产品研发，含产品原型设计与 Angular 升级工作。",
+        "details": [
+          "主导 iCluster Web 开发，技术栈为 Angular、Tailwind CSS 与 Spring Boot。",
+          "学习 JHipster 工具链，在 Spring Boot 中封装 Keycloak 相关能力，提升可用性。",
+          "分析需求并使用 Figma 设计产品改进原型。",
+          "研究并规划 Angular 从 13 到 15 的升级方案，含风险评估、性能提升与开发体验改进。"
+        ],
+        "impact": "面向产品的全栈工作：从需求与原型，到框架升级与后端集成。"
+      },
+      {
+        "id": "inno-abp-astrazeneca",
+        "role": "全栈工程师",
+        "summary": "构建 Angular/NestJS 业务系统、动态表单、基于 ABP 的组件库及阿斯利康诊所小程序/PC 端功能。",
+        "details": [
+          "基于 Angular、NG-ZORRO、RxJS、NestJS 与 TypeORM 开发动态表单功能。",
+          "使用 Uniapp 及可复用通用组件，为阿斯利康开发诊所项目的小程序与 PC 端功能。",
+          "基于 ABP 项目封装业务组件库与前端布局组件，提升代码复用率。",
+          "负责工期估算、任务分配、代码审查及初级工程师指导。"
+        ],
+        "impact": "将实际交付与组件复用、工期估算、团队工程支持有机结合。"
+      },
+      {
+        "id": "didi-driver-h5",
+        "role": "高级前端工程师",
+        "summary": "交付面向司机的 C 端 H5 及小程序活动页面，高度还原设计稿，快速上手新框架。",
+        "details": [
+          "开发司机日常活动的 C 端 H5 页面，与设计师紧密协作，UI 还原度达 99%。",
+          "研究适配 @vue/cli 4 的团队共享插件的 Vue CLI 升级路径。",
+          "快速掌握 MPX 框架，按期交付微信小程序功能。"
+        ],
+        "impact": "面向消费者的高速前端交付：高度还原设计稿，快速适应新内部框架。"
+      },
+      {
+        "id": "jd-idc-platform",
+        "role": "前端工程师",
+        "summary": "以 Vue.js 从 0 到 1 重写 IDC 基础设施平台：80+ 页面，约 10 万行代码，自建脚手架与数据分析。",
+        "details": [
+          "学习并应用 Vue.js 从 0 到 1 重写 IDC 基础设施平台，覆盖 80+ 页面、约 10 万行代码。",
+          "以高级 Vue 模式开发工单业务模块，解耦代码，支持团队协作。",
+          "创建 idc-cli 脚手架以生成工单模板，提升开发效率。",
+          "引入页面与关键位置的数据埋点，为产品经理提供功能使用分析的数据支撑。"
+        ],
+        "impact": "体现规模、全局意识与平台思维的基础性企业重写项目。"
+      },
+      {
+        "id": "botu-foundation",
+        "role": "前端工程师",
+        "summary": "以 RequireJS、Bootstrap、jQuery、HTML/CSS 及 Gulp/browser-sync 工具链构建前端基础工程。",
+        "details": [
+          "使用 RequireJS、Bootstrap、jQuery、HTML 与 CSS3 搭建项目前端结构。",
+          "引入 Gulp 与 browser-sync 工具链，提升开发效率。"
+        ],
+        "impact": "通过动手实践的框架搭建与工作流自动化，奠定坚实的前端基础。"
+      }
+    ],
+    "personalLab": {
+      "name": "Magic Literacy Garden（魔法识字园）",
+      "role": "个人产品 / 全栈探索",
+      "summary": "一个面向儿童识字与汉字认知的产品构想，以真实的第一位用户——Julianna——为设计原点。",
+      "details": [
+        "探索儿童通过友好、可重复交互学习汉字的产品闭环。",
+        "以 Julianna 为初始用户，让产品根植于真实行为，而非抽象功能。",
+        "可能结合前端互动模式、学习进度追踪、语音/图像识别与 AI 辅助内容生成。",
+        "定位为温暖的个人产品，同时体现完整的全栈产品所有权。"
+      ]
+    },
+    "ui": {
+      "backBlog": "← 博客",
+      "featuredSystemsLabel": "精选系统",
+      "featuredSystemsHeading": "企业级规模，产品级品味。",
+      "careerLabel": "职业历程",
+      "careerHeading": "结果优先，深度随时待命。",
+      "careerSubtext": "六段经历，精炼成作品集卡片。点击任意卡片查看完整技术栈、职责与影响详情。",
+      "personalLabLabel": "个人项目",
+      "openDetails": "查看详情",
+      "close": "关闭",
+      "education": "学历",
+      "skillLabels": {
+        "coreFrontend": "核心前端",
+        "systemsBackend": "系统与后端",
+        "workflow": "工作流"
+      }
+    }
+  },
   "componentPlan": {
     "nextJsTarget": [
       "app/portfolio/page.tsx",
