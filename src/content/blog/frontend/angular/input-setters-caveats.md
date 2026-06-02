@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:32:13+08:00
 title: "[译] 用 input() 信号替换 @Input 设置器"
 slug: input-setters-caveats
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T09:30:00+08:00
 title: "[译] Angular 声明式模板如何实现高性能渲染"
 slug: angular-declarative-templating
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

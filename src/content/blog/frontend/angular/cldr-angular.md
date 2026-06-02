@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T16:30:00+08:00
 title: "[译] CLDR：你的 locale 真相来源"
 slug: cldr-angular
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:27:54+08:00
 title: "[译] 信号和订阅"
 slug: signals-subscriptions
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

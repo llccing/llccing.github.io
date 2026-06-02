@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:28:37+08:00
 title: "[译] Angular v17 中变更检测的状态"
 slug: v17-change-detection
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

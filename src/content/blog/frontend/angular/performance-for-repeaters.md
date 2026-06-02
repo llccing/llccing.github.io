@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:29:54+08:00
 title: "[译] 模板中继器的默认性能"
 slug: performance-for-repeaters
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

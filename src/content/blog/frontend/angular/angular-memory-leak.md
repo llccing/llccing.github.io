@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:20:02+08:00
 title: "[译] 查找、调试并修复 Angular 中的内存泄漏"
 slug: angular-memory-leak
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

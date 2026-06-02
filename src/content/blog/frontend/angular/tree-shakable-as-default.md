@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T16:10:00+08:00
 title: "[译] 默认具备 Tree-shaking 能力"
 slug: tree-shakable-as-default
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

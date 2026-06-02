@@ -3,7 +3,7 @@ pubDatetime: 2026-05-29T19:35:37+08:00
 title: "[译] Angular Input 与 Output 的不对称性"
 slug: angular-input-output-asymmetry
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

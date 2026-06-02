@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:33:31+08:00
 title: "[译] 了解 Angular 中的私有属性降级"
 slug: private-fields-downleveling
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

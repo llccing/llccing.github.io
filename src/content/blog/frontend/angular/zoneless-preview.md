@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:30:47+08:00
 title: "[译] Angular 17.1 预览版中为所有人提供无区域变更检测"
 slug: zoneless-preview
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

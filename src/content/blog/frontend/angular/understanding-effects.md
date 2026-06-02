@@ -3,7 +3,7 @@ pubDatetime: 2026-05-29T20:07:42+08:00
 title: "[译] 理解 effect"
 slug: understanding-effects
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular
