@@ -24,7 +24,7 @@ canonicalURL: https://riegler.fr/blog/2023-09-20-cd-coalescing
 
 这篇文章会聊到 JavaScript 的内部机制，尤其是浏览器的事件循环。
 
-如果你还不熟悉 _microtask_、_macrotask_ 或 _queues_ 这些术语，我推荐你先读一读 Jake Archibald 的那篇精彩文章：[任务、微任务、队列与调度](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)。
+如果你还不熟悉 _microtask_、_macrotask_ 或 _queues_ 这些术语，我推荐你先读一读 Jake Archibald 的那篇精彩文章：[任务、微任务、队列与调度](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)（[中文翻译版](/posts/tasks-microtasks-queues-and-schedules)）。
 
 另外，为了便于说明，从这里开始我提到“入队任务”时，指的都是把函数回调加入微任务或宏任务队列。
 
