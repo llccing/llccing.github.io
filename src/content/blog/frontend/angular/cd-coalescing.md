@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T16:45:00+08:00
 title: "[译] 触发变更检测，但不要太频繁"
 slug: cd-coalescing
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

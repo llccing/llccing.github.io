@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:23:11+08:00
 title: "[译] 延迟加载 Angular 的动画模块"
 slug: animations-async
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:21:35+08:00
 title: "[译] 在 Angular 中延迟加载服务并考虑测试"
 slug: lazy-loading-mockable
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

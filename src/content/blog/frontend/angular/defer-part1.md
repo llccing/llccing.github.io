@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:24:17+08:00
 title: "[译] Understanding Angular's deferrable views - Part. 1"
 slug: defer-part1
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:26:34+08:00
 title: "[译] ESBuild-based builder, to infinity and beyond"
 slug: v17-builders
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

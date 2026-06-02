@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:35:22+08:00
 title: "[译] Resource: async loading with signals"
 slug: resources-as-signals
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular

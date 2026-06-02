@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T14:25:40+08:00
 title: "[译] 了解 Angular 的可延迟视图 - 第 1 部分。 2"
 slug: defer-part2
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - angular
