@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="zh-CN" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://riegler.fr/blog/2023-11-03-performance-for-repeaters"><meta name="generator" content="Astro v4.16.18"><!-- General Meta Tags --><title>[译] 模板中继器的默认性能 | Rowan's Blog</title><meta name="title" content="[译] 模板中继器的默认性能 | Rowan's Blog"><meta name="description" content="这是关于@for"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="[译] 模板中继器的默认性能 | Rowan's Blog"><meta property="og:description" content="这是关于@for"><meta property="og:url" content="https://riegler.fr/blog/2023-11-03-performance-for-repeaters"><meta property="og:image" content="https://rowanliu.com/posts/%E8%AF%91-%E6%A8%A1%E6%9D%BF%E4%B8%AD%E7%BB%A7%E5%99%A8%E7%9A%84%E9%BB%98%E8%AE%A4%E6%80%A7%E8%83%BD.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-05-30T06:29:54.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://riegler.fr/blog/2023-11-03-performance-for-repeaters"><meta property="twitter:title" content="[译] 模板中继器的默认性能 | Rowan's Blog"><meta property="twitter:description" content="这是关于@for"><meta property="twitter:image" content="https://rowanliu.com/posts/%E8%AF%91-%E6%A8%A1%E6%9D%BF%E4%B8%AD%E7%BB%A7%E5%99%A8%E7%9A%84%E9%BB%98%E8%AE%A4%E6%80%A7%E8%83%BD.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.BOEZUx9e.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (min-width:640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.Dyly9mp_.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.filter-bar:where(.astro-eenky23y){--tw-border-opacity:1;border-bottom-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));flex-direction:column;gap:.75rem;margin-bottom:2rem;padding-bottom:1.5rem;display:flex}.filter-row:where(.astro-eenky23y){-moz-column-gap:.75rem;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;display:flex}.filter-label:where(.astro-eenky23y){text-transform:uppercase;letter-spacing:.1em;opacity:.5;flex-shrink:0;font-size:.75rem;font-weight:600;line-height:1rem}.dir-pills:where(.astro-eenky23y){flex-wrap:wrap;gap:.375rem;display:flex}.dir-pill:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));border-radius:9999px;padding:.125rem .75rem;font-size:.875rem;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.dir-pill:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1))}.dir-pill:where(.astro-eenky23y).is-active{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));background-color:rgba(var(--color-accent),.1);--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-weight:500}.tag-select:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));--tw-bg-opacity:1;background-color:rgba(var(--color-fill),var(--tw-bg-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));outline-offset:2px;border-radius:.25rem;outline:2px solid #0000;padding:.25rem .5rem;font-size:.875rem;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.tag-select:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1))}.filter-meta:where(.astro-eenky23y){align-items:center;gap:.5rem;font-size:.875rem;line-height:1.25rem;display:flex}:where(.astro-eenky23y)[data-filter-summary]{opacity:.5}.clear-btn:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));opacity:.6;border-radius:.25rem;padding:.125rem .5rem;font-size:.75rem;line-height:1rem;transition-property:all;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.clear-btn:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));opacity:1}.clear-btn:where(.astro-eenky23y).is-hidden,.post-item.is-hidden{display:none}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (min-width:640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (min-width:640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem;transition:max-width .3s}main:where(.astro-vj4tpspi).comparison-active{max-width:90rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}.toggle-btn:where(.astro-vj4tpspi){cursor:pointer;text-align:center;--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));border-radius:.375rem;flex:1;padding:.375rem .75rem;font-size:.875rem;font-weight:500;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.toggle-btn:where(.astro-vj4tpspi).active{--tw-bg-opacity:1;background-color:rgba(var(--color-accent),var(--tw-bg-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-fill),var(--tw-text-opacity,1))}.toggle-btn:where(.astro-vj4tpspi):not(.active):hover{--tw-bg-opacity:1;background-color:rgba(var(--color-card-muted),var(--tw-bg-opacity,1))}#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr 1fr;gap:2rem;display:grid}@media (max-width:640px){#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr}}#translation-container:where(.astro-vj4tpspi).comparison-mode article:where(.astro-vj4tpspi){max-width:none}</style><script type="module" src="/_astro/hoisted.B8ZB5t_M.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:译-模板中继器的默认性能}@layer astro{::view-transition-old(译-模板中继器的默认性能){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(译-模板中继器的默认性能){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(译-模板中继器的默认性能){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(译-模板中继器的默认性能){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:angular}@layer astro{::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:performance}@layer astro{::view-transition-old(performance){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(performance){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(performance){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(performance){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-4]{view-transition-name:rendering}@layer astro{::view-transition-old(rendering){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(rendering){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(rendering){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(rendering){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex max-w-3xl mx-auto justify-start px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">[译] 模板中继器的默认性能</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-30T06:29:54.000Z">2026年5月30日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">14:29</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>7 min read</span></span></div>  <div class="astro-vj4tpspi flex items-center bg-opacity-60 bg-skin-card gap-1 max-w-3xl mt-4 mx-auto p-1 rounded-lg translation-controls"> <button class="astro-vj4tpspi toggle-btn active" data-view="translated">
+译文
+</button> <button class="astro-vj4tpspi toggle-btn" data-view="original">
+原文
+</button> <button class="astro-vj4tpspi toggle-btn" data-view="comparison">
+对照
+</button> </div> <div id="translation-container" class="astro-vj4tpspi mt-8"> <article id="article-original" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose" hidden=""> <p>One of the major features introduced in Angular v17 is the <a href="https://blog.angular.io/meet-angulars-new-control-flow-a02c6eee7843">new template syntax</a> referred as the ”@-syntax”.</p>
+<p>One of the notable outcomes of this new syntax is the introduction of deferrable views, a powerful feature that allows developers to lazy-load components from the templates. You can learn more about deferrable views in this <a href="https://riegler.fr/blog/2023-10-05-defer-part1">blog post</a>.</p>
+<p>In addition to deferrable views, the Angular team has introduced the <code>@for</code> block, which is designed to replace the <code>ngFor</code> directive. The <code>@for</code> block provides a more structured and explicit way to handle loops and iterate over collections within your Angular templates. This new approach enhances the separation between control flow and declarative HTML in your templates.</p>
+<h2 id="the-new-for-block">The new <code>@for</code> block</h2>
+<p>Here’s an illustrative usage of the new <code>@for</code> block in Angular</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>&lt;ul&gt;</span></span>
+<span class="line"><span>  @for (item of items; track item.id; let e = $even) {</span></span>
+<span class="line"><span>    &lt;li&gt; Item #{{ $index }}: {{ item.name }}&lt;/li&gt;</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>&lt;/ul&gt;</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>A notable departure from traditional structural directives is evident in this example. The new syntax, represented by the <code>@for</code> block, offers a distinct separation between control flow and declarative HTML.</p>
+<p>Within the context of the <code>@for</code> block repeater, you have direct access to several implicit variables that are readily available. Furthermore, it’s worth noting that you can also create aliases for these variables, which proves especially beneficial when dealing with nested <code>@for</code> blocks.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Variable</th><th>meaning</th></tr></thead><tbody><tr><td><code>$count</code></td><td>Number of items in a collection iterated over</td></tr><tr><td><code>$index</code></td><td>Index of the current row</td></tr><tr><td><code>$first</code></td><td>Whether the current row is the first row</td></tr><tr><td><code>$last</code></td><td>Whether the current row is the last row</td></tr><tr><td><code>$even</code></td><td>Whether the current row index is even</td></tr><tr><td><code>$odd</code></td><td>Whether the current row index is odd</td></tr></tbody></table>
+<h2 id="performance-improvements">Performance improvements</h2>
+<p>During each change detection cycle in Angular, when a component contains a repeater (such as an <code>@for</code> block), Angular employs a comparison algorithm to identify differences between the previous and the current iterable set. This algorithm plays a crucial role in optimizing the rendering process by reducing the number of costly changes that would otherwise be applied to the DOM.</p>
+<p>In previous versions of Angular before version 17, this comparison algorithm was recognized as a significant performance bottleneck in various performance benchmarks. It had the potential to negatively impact the efficiency of Angular applications, particularly when dealing with large datasets or frequent updates.</p>
+<p>With the introduction of the new syntax in version 17, the Angular team took the opportunity to revisit and enhance this comparison algorithm. The goal was to make it more efficient and responsive to changes in the iterable data, ultimately improving the overall performance of Angular applications. This optimization is an essential part of the “performance-first” approach adopted in Angular version 17, ensuring that change detection and rendering are as efficient as possible when working with repeaters.</p>
+<p>The following benchmark compares Angular with its previous self and now compared to other famous and performant frameworks.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>v16 <code>ngFor</code> - vs - v17 <code>@for</code></th><th>Angular v17 vs other frameworks</th></tr></thead><tbody><tr><td><a href="/blog-images/performance-for-repeaters/16-17.png">v16 vs v17 diffing performance comparison</a></td><td><a href="/blog-images/performance-for-repeaters/fw-comp.png">Angular compared with other framworks</a></td></tr></tbody></table>
+<h3 id="performance-first">Performance first</h3>
+<p>The comparison algorithm used in Angular relies on the track property to establish a connection between an item in the iterated array and its corresponding DOM element. In previous versions, particularly with the <code>ngFor</code> directive, setting a <code>trackBy</code> function was both optional and somewhat cumbersome. By default, the behavior associated the DOM element to the item’s reference, which led to significant performance challenges, especially when working with immutable datasets. Any change to one or more objects resulted in the comparison algorithm associating the item with a DOM node, necessitating the deletion and recreation of DOM elements.</p>
+<p>With the new <code>@for</code> block in version 17.0, a “performance-first” approach was chosen for the <code>track</code> option, and as a result, this property is now mandatory within the <code>@for</code> block. This means that developers are now responsible for explicitly specifying how the algorithm should compare objects within the array provided to the <code>@for</code> block.</p>
+<p>Developers have several options to choose from when setting the track property within an @for block. The choice of tracking option depends on the specific characteristics of the data and the requirements of the application. Let’s consider the example <code>@for(item of list) { ... }</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>identity</th><th>$index</th><th>ID</th></tr></thead><tbody><tr><td><code>track: item</code></td><td><code>track: $index</code></td><td><code>track: item.id</code></td></tr><tr><td>- Was the default in ngFor <code>trackBy</code> - Good option only if you don’t use immutability</td><td>- When in doubt, its a good default - Will mess things up if items are sorted/moved/replaced</td><td>- The most flexible/reliable one - requires a unique identifier per item</td></tr></tbody></table>
+<p>The identity tracker, which was the default in <code>ngFor</code>, has major performances issues when using immutable datasets. Since references change on each mutations, the framework will have to delete/created the DOM node on every change which is a costly operation. So this one should be avoided in favor of better alternatives (except for JS primites like <code>number</code>,<code>string</code> etc.).</p>
+<p>A good default could be index based tracking. The comparison uses the index to match each item to its DOM element. It works great when item are not moved/reorganized within the array.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>@Component({</span></span>
+<span class="line"><span>  template: `</span></span>
+<span class="line"><span>  &lt;h3&gt;Should change every second but doesn't as often&lt;/h3&gt;</span></span>
+<span class="line"><span>  @for(item of arr; track $index) {</span></span>
+<span class="line"><span>    &lt;div&gt;id: {{item.id}}&lt;/div&gt;</span></span>
+<span class="line"><span>  }`,</span></span>
+<span class="line"><span>})</span></span>
+<span class="line"><span>export class AppComponent {</span></span>
+<span class="line"><span>  arr = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];</span></span>
+<span class="line"><span>  constructor(vcr: ViewContainerRef) {</span></span>
+<span class="line"><span>    setInterval(() =&gt; {</span></span>
+<span class="line"><span>      this.arr = this.arr.sort((a, b) =&gt; 0.5 - Math.random()); // random shuffle</span></span>
+<span class="line"><span>    }, 1000);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>This example (also <a href="https://stackblitz.com/edit/angular-for-track-index-sort?file=src%2Fmain.ts%3AL23">avalable on stackblitz</a>) demo what can go wrong when <code>index$</code> breaks the rendering by wrongly not updating some nodes. replacing <code>$index</code> by <code>item</code> or <code>item.id</code> fixes the issue here.</p>
+<p>So while it works, you see this not THE perfect default value.</p>
+<p>Probably the most recommended solution will be to track a unique identifier. Referring to a unique ID brings flexibility to item tracking. Whatever happens to the object (mutability or immutability). Unfortunately this only works for structures with unique identifiers and if the data structure wasn’t designed with them in mind it might require some refactoring.</p>
+<p>So you see that there isn’t a perfect solution and it’s up to the developer to understand the implication of the chosen track property. But one is sure, by designing it with a “performance-first” approach we make it explicit in the control flow what is going to happen under the hood.</p>
+<h3 id="about-the-migration-schematics">About the migration schematics</h3>
+<p>As we discuss the new <code>@for</code> block, it’s important to note that there are migration schematics available (accessible via <code>ng generate @angular/core:control-flow</code>) that assist in transitioning from directive-based control flow to the new ”@-syntax” control flow. These migration schematics have built-in support for handling the optional <code>trackBy</code> attribute during the migration process.</p>
+<p>Here’s how the migration process is handled:</p>
+<ul>
+<li><strong>No <code>trackBy</code> attribute</strong>: In cases where the original code lacks a <code>trackBy</code> attribute, the migration schematics will automatically set the track property to item, which mirrors the behavior of previous Angular versions. This simplifies the migration process for situations where developers haven’t explicitly defined a <code>trackBy</code> function.</li>
+<li><strong><code>trackBy</code> attribute is present</strong>: When the code contains a <code>trackBy</code> attribute, the migration tool will retain the function and invoke it as specified (<code>track: myTrackByFn($index, item)</code>). This ensures that the tracking logic defined in the <code>trackBy</code> function is preserved in the new <code>@for</code> block, maintaining the desired tracking behavior for the iterable data.</li>
+</ul>
+<p>The effort put into creating these migration tools is truly commendable. They greatly assist developers in smoothly transitioning to the new @-syntax control flow while preserving their existing tracking logic. This reflects the Angular team’s commitment to enhancing the developer experience and simplifying the process of upgrading, and they deserve significant praise for their work in this area! 💯</p>
+<h2 id="providing-feedback">Providing feedback</h2>
+<p>The new control flow syntax is landing in v17 as a developer preview. This stabilisation phase allows the Angular core team to collect valuable feedback and refine the implementation of the new APIs.</p>
+<p>The requirement of the <code>track</code> property has the potential to create some friction among certain developers, as it represents a significant behavior change. If you have insightful feedback or thoughts regarding whether it should be mandatory, optional, or have fallback options, there is an <a href="https://github.com/angular/angular/issues/52050">open issue</a> dedicated to this discussion. Your input and suggestions are welcome and can contribute to the ongoing improvement of this feature.</p> </article> <article id="article-translated" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#新的-for-块" class="astro-vj4tpspi">新的 @for 块</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#性能改进" class="astro-vj4tpspi">性能改进</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#性能第一" class="astro-vj4tpspi">性能第一</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#关于迁移示意图" class="astro-vj4tpspi">关于迁移示意图</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#提供反馈" class="astro-vj4tpspi">提供反馈</a> </li> </ul> </details> <blockquote>
+<p>原文地址: <a href="https://riegler.fr/blog/2023-11-03-performance-for-repeaters">https://riegler.fr/blog/2023-11-03-performance-for-repeaters</a></p>
+</blockquote>
+<p>Angular v17 中引入的主要功能之一是 <a href="https://blog.angular.io/meet-angulars-new-control-flow-a02c6eee7843">new template syntax</a>，称为“@-syntax”。</p>
+<p>这种新语法的显着成果之一是引入了可延迟视图，这是一项强大的功能，允许开发人员从模板延迟加载组件。您可以在此 <a href="https://riegler.fr/blog/2023-10-05-defer-part1">blog post</a> 中了解有关可延迟视图的更多信息。</p>
+<p>除了可延迟视图之外，Angular 团队还引入了 <code>@for</code> 块，旨在取代 <code>ngFor</code> 指令。 <code>@for</code> 块提供了一种更加结构化和明确的方式来处理循环并迭代 Angular 模板中的集合。这种新方法增强了模板中控制流和声明性 HTML 之间的分离。</p>
+<h2 id="新的-for-块">新的 <code>@for</code> 块</h2>
+<p>以下是 Angular 中新 <code>@for</code> 块的示例用法</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>&lt;ul&gt;</span></span>
+<span class="line"><span>  @for (item of items; track item.id; let e = $even) {</span></span>
+<span class="line"><span>    &lt;li&gt; Item #{{ $index }}: {{ item.name }}&lt;/li&gt;</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>&lt;/ul&gt;</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>在这个例子中可以明显看出与传统结构指令的显着背离。由 <code>@for</code> 块表示的新语法在控制流和声明性 HTML 之间提供了明显的分离。</p>
+<p>在 <code>@for</code> 块重复器的上下文中，您可以直接访问几个可用的隐式变量。此外，值得注意的是，您还可以为这些变量创建别名，这在处理嵌套的 <code>@for</code> 块时特别有用。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>变量</th><th>意义</th></tr></thead><tbody><tr><td><code>$count</code></td><td>迭代集合中的项目数</td></tr><tr><td><code>$index</code></td><td>当前行的索引</td></tr><tr><td><code>$first</code></td><td>当前行是否为第一行</td></tr><tr><td><code>$last</code></td><td>当前行是否为最后一行</td></tr><tr><td><code>$even</code></td><td>当前行索引是否为偶数</td></tr><tr><td><code>$odd</code></td><td>当前行索引是否为奇数</td></tr></tbody></table>
+<h2 id="性能改进">性能改进</h2>
+<p>During each change detection cycle in Angular, when a component contains a repeater (such as an <code>@for</code> block), Angular employs a comparison algorithm to identify differences between the previous and the current iterable set. This algorithm plays a crucial role in optimizing the rendering process by reducing the number of costly changes that would otherwise be applied to the DOM.</p>
+<p>在 Angular 17 之前的版本中，这种比较算法在各种性能基准测试中被认为是一个显着的性能瓶颈。它有可能对 Angular 应用程序的效率产生负面影响，特别是在处理大型数据集或频繁更新时。</p>
+<p>随着版本 17 中新语法的引入，Angular 团队借此机会重新审视并增强了这种比较算法。目标是使其更高效、更能响应可迭代数据的变化，最终提高 Angular 应用程序的整体性能。这种优化是 Angular 版本 17 中采用的“性能优先”方法的重要组成部分，确保在使用转发器时更改检测和渲染尽可能高效。</p>
+<p>以下基准测试将 Angular 与其之前的版本以及现在与其他著名的高性能框架进行了比较。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>v16 <code>ngFor</code> - 与 - v17 <code>@for</code></th><th>Angular v17 与其他框架对比</th></tr></thead><tbody><tr><td><a href="/blog-images/performance-for-repeaters/16-17.png">v16 vs v17 diffing performance comparison</a></td><td><a href="/blog-images/performance-for-repeaters/fw-comp.png">Angular compared with other framworks</a></td></tr></tbody></table>
+<h3 id="性能第一">性能第一</h3>
+<p>Angular 中使用的比较算法依赖于 track 属性来在迭代数组中的项目与其对应的 DOM 元素之间建立连接。在以前的版本中，特别是使用 <code>ngFor</code> 指令时，设置 <code>trackBy</code> 函数既是可选的，又有些麻烦。默认情况下，该行为将 DOM 元素关联到项目的引用，这导致了重大的性能挑战，尤其是在使用不可变数据集时。对一个或多个对象的任何更改都会导致比较算法将该项目与 DOM 节点关联起来，从而需要删除和重新创建 DOM 元素。</p>
+<p>使用版本 17.0 中的新 <code>@for</code> 块，为 <code>track</code> 选项选择了“性能优先”方法，因此，该属性现在在 <code>@for</code> 块中是强制的。这意味着开发人员现在负责明确指定算法应如何比较提供给 <code>@for</code> 块的数组中的对象。</p>
+<p>在 @for 块中设置 track 属性时，开发人员有多个选项可供选择。跟踪选项的选择取决于数据的具体特征和应用程序的要求。让我们考虑一下 <code>@for(item of list) { ... }</code> 示例：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>身份</th><th>$索引</th><th>身份证</th></tr></thead><tbody><tr><td><code>track: item</code></td><td><code>track: $index</code></td><td><code>track: item.id</code></td></tr><tr><td>- 是 ngFor <code>trackBy</code> 中的默认值 - 仅当您不使用不变性时才是不错的选择</td><td>- 当有疑问时，这是一个很好的默认值 - 如果项目被排序/移动/替换，将会把事情搞砸</td><td>- 最灵活/最可靠的 - 需要每个项目有一个唯一的标识符</td></tr></tbody></table>
+<p>身份跟踪器是 <code>ngFor</code> 中的默认设置，在使用不可变数据集时存在重大性能问题。由于引用在每次突变时都会发生变化，因此框架必须在每次更改时删除/创建 DOM 节点，这是一项成本高昂的操作。因此，应该避免这种情况，而选择更好的替代方案（除了像 <code>number</code>、<code>string</code> 等 JS 基元）。</p>
+<p>一个好的默认设置可能是基于索引的跟踪。比较使用索引将每个项目与其 DOM 元素进行匹配。当项目在数组内未移动/重新组织时，它非常有效。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>@Component({</span></span>
+<span class="line"><span>  template: `</span></span>
+<span class="line"><span>  &lt;h3&gt;Should change every second but doesn't as often&lt;/h3&gt;</span></span>
+<span class="line"><span>  @for(item of arr; track $index) {</span></span>
+<span class="line"><span>    &lt;div&gt;id: {{item.id}}&lt;/div&gt;</span></span>
+<span class="line"><span>  }`,</span></span>
+<span class="line"><span>})</span></span>
+<span class="line"><span>export class AppComponent {</span></span>
+<span class="line"><span>  arr = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];</span></span>
+<span class="line"><span>  constructor(vcr: ViewContainerRef) {</span></span>
+<span class="line"><span>    setInterval(() =&gt; {</span></span>
+<span class="line"><span>      this.arr = this.arr.sort((a, b) =&gt; 0.5 - Math.random()); // random shuffle</span></span>
+<span class="line"><span>    }, 1000);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>此示例（也是 <a href="https://stackblitz.com/edit/angular-for-track-index-sort?file=src%2Fmain.ts%3AL23">avalable on stackblitz</a>）演示了当 <code>index$</code> 错误地不更新某些节点而中断渲染时可能会出现什么问题。将 <code>$index</code> 替换为 <code>item</code> 或 <code>item.id</code> 可解决此处的问题。</p>
+<p>因此，虽然它有效，但您会发现这不是完美的默认值。</p>
+<p>也许最推荐的解决方案是跟踪唯一标识符。参考唯一的 ID 为项目跟踪带来了灵活性。无论对象发生什么（可变性或不变性）。不幸的是，这仅适用于具有唯一标识符的结构，如果数据结构在设计时没有考虑到它们，则可能需要进行一些重构。</p>
+<p>因此，您会看到，没有完美的解决方案，开发人员需要了解所选轨道属性的含义。但可以肯定的是，通过采用“性能第一”的方法进行设计，我们可以在控制流中明确说明幕后将发生什么。</p>
+<h3 id="关于迁移示意图">关于迁移示意图</h3>
+<p>当我们讨论新的 <code>@for</code> 块时，需要注意的是，有可用的迁移原理图（可通过 <code>ng generate @angular/core:control-flow</code> 访问）帮助从基于指令的控制流过渡到新的“@-syntax”控制流。这些迁移原理图内置支持在迁移过程中处理可选的 <code>trackBy</code> 属性。</p>
+<p>以下是迁移过程的处理方式：</p>
+<ul>
+<li><strong>没有 <code>trackBy</code> 属性</strong>：如果原始代码缺少 <code>trackBy</code> 属性，迁移原理图将自动将 track 属性设置为 item，这反映了以前 Angular 版本的行为。这简化了开发人员未显式定义 <code>trackBy</code> 函数的情况下的迁移过程。</li>
+<li><strong>存在 <code>trackBy</code> 属性</strong>：当代码包含 <code>trackBy</code> 属性时，迁移工具将保留该函数并按指定调用它 (<code>track: myTrackByFn($index, item)</code>)。这确保了 <code>trackBy</code> 函数中定义的跟踪逻辑保留在新的 <code>@for</code> 块中，从而维持可迭代数据所需的跟踪行为。</li>
+</ul>
+<p>创建这些迁移工具所付出的努力确实值得称赞。它们极大地帮助开发人员顺利过渡到新的 @-syntax 控制流程，同时保留现有的跟踪逻辑。这体现了 Angular 团队致力于增强开发人员体验和简化升级过程的承诺，他们在这一领域的工作值得高度赞扬！ 💯</p>
+<h2 id="提供反馈">提供反馈</h2>
+<p>新的控制流语法作为开发者预览版登陆 v17。这个稳定阶段使 Angular 核心团队能够收集有价值的反馈并完善新 API 的实现。</p>
+<p><code>track</code> 属性的要求可能会在某些开发人员之间产生一些摩擦，因为它代表了重大的行为变化。如果您对是否应该强制、可选或有后备选项有深刻的反馈或想法，可以使用 <a href="https://github.com/angular/angular/issues/52050">open issue</a> 专门进行此讨论。欢迎您提出意见和建议，这将有助于此功能的持续改进。</p> </article> </div>  <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/performance/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">performance</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/rendering/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">rendering</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://rowanliu.com/posts/performance-for-repeaters/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://rowanliu.com/posts/performance-for-repeaters/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://rowanliu.com/posts/performance-for-repeaters/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://rowanliu.com/posts/performance-for-repeaters/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://rowanliu.com/posts/performance-for-repeaters/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://rowanliu.com/posts/performance-for-repeaters/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
+</script><astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <a href="/rss.xml" class="astro-sz7xmlte rss-link" aria-label="RSS Feed"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-sz7xmlte rss-icon" viewBox="0 0 24 24" width="16" height="16"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z" fill="currentColor" class="astro-sz7xmlte"></path> </svg>
+RSS
+</a> </div> </div> </footer>     <script>function createProgressBar(){const t=document.createElement("div");t.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const n=document.createElement("div");n.className="progress-bar h-1 w-0 bg-skin-accent",n.id="myBar",t.appendChild(n),document.body.appendChild(t)}createProgressBar();function updateScrollProgress(){const t=document.body.scrollTop||document.documentElement.scrollTop,n=document.documentElement.scrollHeight-document.documentElement.clientHeight,o=t/n*100;if(document){const e=document.getElementById("myBar");e&&(e.style.width=o+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let t=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let n of t){n.classList.add("group");let o=document.createElement("a");o.innerText="#",o.className="heading-link hidden group-hover:inline-block ml-2",o.href="#"+n.id,o.ariaHidden="true",n.appendChild(o)}}addHeadingLinks();function attachCopyButtons(){let t="Copy",n=Array.from(document.querySelectorAll("pre"));for(let e of n){let a=document.createElement("div");a.style.position="relative";let c=document.createElement("button");c.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",c.innerHTML=t,e.setAttribute("tabindex","0"),e.appendChild(c),e?.parentNode?.insertBefore(a,e),a.appendChild(e),c.addEventListener("click",async()=>{await o(e,c)})}async function o(e,a){let i=e.querySelector("code")?.innerText;await navigator.clipboard.writeText(i??""),a.innerText="Copied",setTimeout(()=>{a.innerText=t},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();function initTranslationToggle(){var t=document.querySelector(".translation-controls");if(!t)return;var n=t.querySelectorAll(".toggle-btn"),o=document.getElementById("translation-container"),e=document.getElementById("article-translated"),a=document.getElementById("article-original"),c=document.getElementById("main-content");function i(r){n.forEach(function(s){s.classList.remove("active")});var d=t.querySelector('[data-view="'+r+'"]');d&&d.classList.add("active"),o.classList.remove("comparison-mode"),c.classList.remove("comparison-active"),r==="translated"?(e.hidden=!1,a.hidden=!0):r==="original"?(e.hidden=!0,a.hidden=!1):(e.hidden=!1,a.hidden=!1,o.classList.add("comparison-mode"),c.classList.add("comparison-active"));try{sessionStorage.setItem("translation-view-mode",r)}catch{}}n.forEach(function(r){r.addEventListener("click",function(){i(r.dataset.view)})});try{var l=sessionStorage.getItem("translation-view-mode");l&&l!=="translated"&&i(l)}catch{}}initTranslationToggle();
+</script></body></html>

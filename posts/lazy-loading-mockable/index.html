@@ -1,0 +1,519 @@
+<!DOCTYPE html><html lang="zh-CN" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://riegler.fr/blog/2023-09-30-lazy-loading-mockable"><meta name="generator" content="Astro v4.16.18"><!-- General Meta Tags --><title>[译] 在 Angular 中延迟加载服务并考虑测试 | Rowan's Blog</title><meta name="title" content="[译] 在 Angular 中延迟加载服务并考虑测试 | Rowan's Blog"><meta name="description" content="我们应该能够模拟我们延迟加载的内容"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="[译] 在 Angular 中延迟加载服务并考虑测试 | Rowan's Blog"><meta property="og:description" content="我们应该能够模拟我们延迟加载的内容"><meta property="og:url" content="https://riegler.fr/blog/2023-09-30-lazy-loading-mockable"><meta property="og:image" content="https://rowanliu.com/posts/%E8%AF%91-%E5%9C%A8-angular-%E4%B8%AD%E5%BB%B6%E8%BF%9F%E5%8A%A0%E8%BD%BD%E6%9C%8D%E5%8A%A1%E5%B9%B6%E8%80%83%E8%99%91%E6%B5%8B%E8%AF%95.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-05-30T06:21:35.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://riegler.fr/blog/2023-09-30-lazy-loading-mockable"><meta property="twitter:title" content="[译] 在 Angular 中延迟加载服务并考虑测试 | Rowan's Blog"><meta property="twitter:description" content="我们应该能够模拟我们延迟加载的内容"><meta property="twitter:image" content="https://rowanliu.com/posts/%E8%AF%91-%E5%9C%A8-angular-%E4%B8%AD%E5%BB%B6%E8%BF%9F%E5%8A%A0%E8%BD%BD%E6%9C%8D%E5%8A%A1%E5%B9%B6%E8%80%83%E8%99%91%E6%B5%8B%E8%AF%95.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
+<link rel="stylesheet" href="/_astro/about.BOEZUx9e.css">
+<style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (min-width:640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
+<link rel="stylesheet" href="/_astro/about.Dyly9mp_.css">
+<style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.filter-bar:where(.astro-eenky23y){--tw-border-opacity:1;border-bottom-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));flex-direction:column;gap:.75rem;margin-bottom:2rem;padding-bottom:1.5rem;display:flex}.filter-row:where(.astro-eenky23y){-moz-column-gap:.75rem;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;display:flex}.filter-label:where(.astro-eenky23y){text-transform:uppercase;letter-spacing:.1em;opacity:.5;flex-shrink:0;font-size:.75rem;font-weight:600;line-height:1rem}.dir-pills:where(.astro-eenky23y){flex-wrap:wrap;gap:.375rem;display:flex}.dir-pill:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));border-radius:9999px;padding:.125rem .75rem;font-size:.875rem;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.dir-pill:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1))}.dir-pill:where(.astro-eenky23y).is-active{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));background-color:rgba(var(--color-accent),.1);--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-weight:500}.tag-select:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));--tw-bg-opacity:1;background-color:rgba(var(--color-fill),var(--tw-bg-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));outline-offset:2px;border-radius:.25rem;outline:2px solid #0000;padding:.25rem .5rem;font-size:.875rem;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.tag-select:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1))}.filter-meta:where(.astro-eenky23y){align-items:center;gap:.5rem;font-size:.875rem;line-height:1.25rem;display:flex}:where(.astro-eenky23y)[data-filter-summary]{opacity:.5}.clear-btn:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));opacity:.6;border-radius:.25rem;padding:.125rem .5rem;font-size:.75rem;line-height:1rem;transition-property:all;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.clear-btn:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));opacity:1}.clear-btn:where(.astro-eenky23y).is-hidden,.post-item.is-hidden{display:none}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (min-width:640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (min-width:640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem;transition:max-width .3s}main:where(.astro-vj4tpspi).comparison-active{max-width:90rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}.toggle-btn:where(.astro-vj4tpspi){cursor:pointer;text-align:center;--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));border-radius:.375rem;flex:1;padding:.375rem .75rem;font-size:.875rem;font-weight:500;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.toggle-btn:where(.astro-vj4tpspi).active{--tw-bg-opacity:1;background-color:rgba(var(--color-accent),var(--tw-bg-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-fill),var(--tw-text-opacity,1))}.toggle-btn:where(.astro-vj4tpspi):not(.active):hover{--tw-bg-opacity:1;background-color:rgba(var(--color-card-muted),var(--tw-bg-opacity,1))}#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr 1fr;gap:2rem;display:grid}@media (max-width:640px){#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr}}#translation-container:where(.astro-vj4tpspi).comparison-mode article:where(.astro-vj4tpspi){max-width:none}</style><script type="module" src="/_astro/hoisted.B8ZB5t_M.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:译-在-angular-中延迟加载服务并考虑测试}@layer astro{::view-transition-old(译-在-angular-中延迟加载服务并考虑测试){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(译-在-angular-中延迟加载服务并考虑测试){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(译-在-angular-中延迟加载服务并考虑测试){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(译-在-angular-中延迟加载服务并考虑测试){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:angular}@layer astro{::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:dependency-injection}@layer astro{::view-transition-old(dependency-injection){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(dependency-injection){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(dependency-injection){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(dependency-injection){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-4]{view-transition-name:lazy-loading}@layer astro{::view-transition-old(lazy-loading){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(lazy-loading){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(lazy-loading){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(lazy-loading){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-4],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-4]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags/" class="astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/radio/" class="astro-3ef6ksr2">
+Radio
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex max-w-3xl mx-auto justify-start px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">[译] 在 Angular 中延迟加载服务并考虑测试</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-30T06:21:35.000Z">2026年5月30日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">14:21</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>3 min read</span></span></div>  <div class="astro-vj4tpspi flex items-center bg-opacity-60 bg-skin-card gap-1 max-w-3xl mt-4 mx-auto p-1 rounded-lg translation-controls"> <button class="astro-vj4tpspi toggle-btn active" data-view="translated">
+译文
+</button> <button class="astro-vj4tpspi toggle-btn" data-view="original">
+原文
+</button> <button class="astro-vj4tpspi toggle-btn" data-view="comparison">
+对照
+</button> </div> <div id="translation-container" class="astro-vj4tpspi mt-8"> <article id="article-original" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose" hidden=""> <p>Bundle size is a critical subject when building a SPA. The bigger it is, the longer it will take to start the app.
+Framework and developers have been relying more and more on lazy-loading to delay loading of non necessary code. The most common ones are lazy-loaded routes.</p>
+<p>When it comes to services, we can lazy load it by using a dynamic <code>import()</code>.
+Let’s take as an example a situation where a page displays a heavy WebGL animation that we want to lazy-load.</p>
+<p>We suppose that <code>HomeAnimation</code> is a Angular service with <code>Injectable({providedIn: 'root'})</code>.</p>
+<h4 id="homecomponentts"><strong><code>home.component.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>class HomeComponent {</span></span>
+<span class="line"><span>  injector = inject(Injector);</span></span>
+<span class="line"><span>  ...</span></span>
+<span class="line"><span>  private async loadHomeAnimation() {</span></span>
+<span class="line"><span>    const HomeAnimation = import('./services/home-animation.service').then((c) =&gt; c.HomeAnimation),</span></span>
+<span class="line"><span>    this.injector.get(HomeAnimation);</span></span>
+<span class="line"><span>    this.homeAnimation.init(this.element);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>This is really straightforward but it has a major downside : This doesn’t allow us to use a mock service in unit tests.</p>
+<h2 id="leverage-dependency-injection">Leverage dependency injection</h2>
+<p>DI is a powerful tool, we will leverage it here to create/share instances and to help on testing.</p>
+<p>First let’s start with this helper function.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>export async function injectAsync&lt;T&gt;(</span></span>
+<span class="line"><span>  injector: Injector,</span></span>
+<span class="line"><span>  providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;,</span></span>
+<span class="line"><span>): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>  const injectImpl = injector.get(InjectAsyncImpl);</span></span>
+<span class="line"><span>  return injectImpl.get(providerLoader);</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>The injector will do 2 things here :</p>
+<ul>
+<li>Retrieve a an instance of <code>InjectAsyncImpl</code>, a class providing an implementation of lazy loading</li>
+<li>Create the instance of the service we just loaded (the class must be available to the injector, so you’ll have to add <code>@Injectable({providedIn: 'root'})</code> to the class you want to lazy load)</li>
+</ul>
+<p>The <code>InjectAsyncImpl</code> class can very simple:</p>
+<h4 id="inject-asyncts"><strong><code>inject-async.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>@Injectable({providedIn: 'root'})</span></span>
+<span class="line"><span>class InjectAsyncImpl&lt;T&gt; {</span></span>
+<span class="line"><span>  async get(injector: Injector, providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>    const type = await providerLoader();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    return injector.get(type)</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>With this implementation, we can now override the provider for <code>InjectAsyncImpl</code> in our unit test to return a mock instance of our lazy-loaded service.</p>
+<h4 id="my-testspects"><strong><code>my-test.spec.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>TestBed.configureTestingModule({</span></span>
+<span class="line"><span>  providers: [</span></span>
+<span class="line"><span>    { provide: InjectAsyncImpl, useValue: { get () =&gt; Promise.resolve(MyMockedService) }}</span></span>
+<span class="line"><span>  ]</span></span>
+<span class="line"><span>});</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>Our current implementation works but the DX here is far from great. It’s only easy to mock one lazy-loaded service and we’d have to create a different class/object for every mocked service. So let’s refactor that to improve it.</p>
+<h2 id="improving-dx">Improving DX</h2>
+<p>To simplify the mocking of our lazy-loaded services, we’ll add support for overrides to our implementation.</p>
+<h4 id="inject-asyncts-1"><strong><code>inject-async.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>@Injectable({ providedIn: 'root' })</span></span>
+<span class="line"><span>class InjectAsyncImpl&lt;T&gt; {</span></span>
+<span class="line"><span>  private overrides = new WeakMap(); // no need to cleanup</span></span>
+<span class="line"><span>  override&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>    this.overrides.set(type, mock);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  async get(injector: Injector, providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>    const type = await providerLoader();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    // Check if we have overrides, O(1), low overhead</span></span>
+<span class="line"><span>    if (this.overrides.has(type)) {</span></span>
+<span class="line"><span>      const module = this.overrides.get(type);</span></span>
+<span class="line"><span>      return new module();</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>These overrides will be set by a helper function</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>export function mockAsyncProvider&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>  return [</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>      provide: ENVIRONMENT_INITIALIZER,</span></span>
+<span class="line"><span>      multi: true,</span></span>
+<span class="line"><span>      useValue: () =&gt; {</span></span>
+<span class="line"><span>        inject(InjectAsyncImpl).override(type, mock);</span></span>
+<span class="line"><span>      },</span></span>
+<span class="line"><span>    },</span></span>
+<span class="line"><span>  ];</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p><code>ENVIRONMENT_INITIALIZER</code> is a multi-provider token for initialization functions that will run upon construction of an environment injector. So the <code>override</code> method will be called on setup for every mocked service.</p>
+<p>Now we have a nice &amp; clean testing setup!</p>
+<h4 id="my-testspects-1"><strong><code>my-test.spec.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span> * TestBed.configureTestingModule({</span></span>
+<span class="line"><span> *     providers: [</span></span>
+<span class="line"><span> *       mockAsyncProvider(MyFooService, MyFakeService)</span></span>
+<span class="line"><span> *       mockAsyncProvider(MyBarService, MyBarService)</span></span>
+<span class="line"><span> *   ]</span></span>
+<span class="line"><span> * });</span></span>
+<span class="line"><span></span></span></code></pre>
+<h2 id="improving-angular-integration">Improving Angular integration</h2>
+<p>When providing a service in root, the service will be created by the root injector.
+This has a major downside of never firing <code>DestroyRef.onDestroy</code>.</p>
+<p>From the <a href="https://angular.io/api/core/DestroyRef">official docs</a>:</p>
+<blockquote>
+<p>If DestroyRef is injected in a component or directive, the callbacks run when that component or directive is destroyed. Otherwise the callbacks run when a corresponding injector is destroyed.</p>
+</blockquote>
+<p>So if we want a lazy-loaded service that gets destroyed with the component that created it, we’ll need to change our implementation.</p>
+<p>Our constraints are :</p>
+<ul>
+<li>The service cannot be <code>providedIn: 'root'</code> (we want it to be destroyed with the <code>NodeInjector</code>)</li>
+<li>The service cannot be provided on the component, this would break the lazy loading</li>
+<li>We can’t add a class to an injector, we’ll need to create a new one.</li>
+</ul>
+<p>With this in mind, we’ll add following</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>if (!(injector instanceof EnvironmentInjector)) {</span></span>
+<span class="line"><span>  // We're passing a node injector to the function</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // This is the DestroyRef of the component</span></span>
+<span class="line"><span>  const destroyRef = injector.get(DestroyRef);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // This is the parent injector of the environmentInjector we're creating</span></span>
+<span class="line"><span>  const environmentInjector = injector.get(EnvironmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // Creating an environment injector to destroy it afterwards</span></span>
+<span class="line"><span>  const newInjector = createEnvironmentInjector([type as Provider], environmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // Destroy the injector to trigger DestroyRef.onDestroy on our service</span></span>
+<span class="line"><span>  destroyRef.onDestroy(() =&gt; {</span></span>
+<span class="line"><span>    newInjector.destroy();</span></span>
+<span class="line"><span>  });</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // We want to create the new instance of our service with our new injector</span></span>
+<span class="line"><span>  injector = newInjector;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>return injector.get(module)!;</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>If we go back to our initial example, this how we would use our new helper method to lazy-load the HomeAnimation service.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>export class HomeComponent {</span></span>
+<span class="line"><span>  private readonly injector = inject(Injector); // The Node injector</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  ...</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  private async loadHomeAnimation() {</span></span>
+<span class="line"><span>    this.homeAnimation = await injectAsync(this.injector, () =&gt;</span></span>
+<span class="line"><span>      import('./services/home-animation.service').then((c) =&gt; c.HomeAnimation),</span></span>
+<span class="line"><span>    );</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    this.homeAnimation.init(this.element);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>It is important here that the injector is a <code>NodeInjector</code> and not the <code>EnvironmentInjector</code>.
+The former will be destroyed with the component while the latter will survive the component.</p>
+<h2 id="final-implementation">Final implementation</h2>
+<p>Here is our final implementation of the <code>inject-async.ts</code> helper functions.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import {createEnvironmentInjector, DestroyRef, ENVIRONMENT_INITIALIZER, EnvironmentInjector, inject, Injectable, Injector, Provider, ProviderToken, Type,} from '@angular/core';</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>/**</span></span>
+<span class="line"><span> * inject a service asynchronously</span></span>
+<span class="line"><span> *</span></span>
+<span class="line"><span> * @param: injector. If the injector is a NodeInjector the loaded module will be destroyed alongside its injector</span></span>
+<span class="line"><span> */</span></span>
+<span class="line"><span>export async function injectAsync&lt;T&gt;(</span></span>
+<span class="line"><span>  injector: Injector,</span></span>
+<span class="line"><span>  providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;,</span></span>
+<span class="line"><span>): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>  const injectImpl = injector.get(InjectAsyncImpl);</span></span>
+<span class="line"><span>  return injectImpl.get(injector, providerLoader);</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>@Injectable({providedIn: 'root'})</span></span>
+<span class="line"><span>class InjectAsyncImpl&lt;T&gt; {</span></span>
+<span class="line"><span>  private overrides = new WeakMap(); // no need to cleanup</span></span>
+<span class="line"><span>  override&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>    this.overrides.set(type, mock);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  async get(injector: Injector, providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>    const type = await providerLoader();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    // Check if we have overrides, O(1), low overhead</span></span>
+<span class="line"><span>    if (this.overrides.has(type)) {</span></span>
+<span class="line"><span>      const module = this.overrides.get(type);</span></span>
+<span class="line"><span>      return new module();</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    if (!(injector instanceof EnvironmentInjector)) {</span></span>
+<span class="line"><span>      // We're passing a node injector to the function</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // This is the DestroyRef of the component</span></span>
+<span class="line"><span>      const destroyRef = injector.get(DestroyRef);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // This is the parent injector of the environmentInjector we're creating</span></span>
+<span class="line"><span>      const environmentInjector = injector.get(EnvironmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // Creating an environment injector to destroy it afterwards</span></span>
+<span class="line"><span>      const newInjector = createEnvironmentInjector([type as Provider], environmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // Destroy the injector to trigger DestroyRef.onDestroy on our service</span></span>
+<span class="line"><span>      destroyRef.onDestroy(() =&gt; {</span></span>
+<span class="line"><span>        newInjector.destroy();</span></span>
+<span class="line"><span>      });</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // We want to create the new instance of our service with our new injector</span></span>
+<span class="line"><span>      injector = newInjector;</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    return injector.get(module)!;</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>/**</span></span>
+<span class="line"><span> * Helper function to mock the lazy-loaded module in `injectAsync`</span></span>
+<span class="line"><span> *</span></span>
+<span class="line"><span> * @usage</span></span>
+<span class="line"><span> * TestBed.configureTestingModule({</span></span>
+<span class="line"><span> *     providers: [</span></span>
+<span class="line"><span> *     mockAsyncProvider(SandboxService, fakeSandboxService)</span></span>
+<span class="line"><span> *   ]</span></span>
+<span class="line"><span> * });</span></span>
+<span class="line"><span> */</span></span>
+<span class="line"><span>export function mockAsyncProvider&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>  return [</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>      provide: ENVIRONMENT_INITIALIZER,</span></span>
+<span class="line"><span>      multi: true,</span></span>
+<span class="line"><span>      useValue: () =&gt; {</span></span>
+<span class="line"><span>        inject(InjectAsyncImpl).override(type, mock);</span></span>
+<span class="line"><span>      },</span></span>
+<span class="line"><span>    },</span></span>
+<span class="line"><span>  ];</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre> </article> <article id="article-translated" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#利用依赖注入" class="astro-vj4tpspi">利用依赖注入</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#改善dx" class="astro-vj4tpspi">改善DX</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#improving-angular-integration" class="astro-vj4tpspi">Improving Angular integration</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#最终实施" class="astro-vj4tpspi">最终实施</a> </li> </ul> </details> <blockquote>
+<p>原文地址: <a href="https://riegler.fr/blog/2023-09-30-lazy-loading-mockable">https://riegler.fr/blog/2023-09-30-lazy-loading-mockable</a></p>
+</blockquote>
+<p>构建 SPA 时，捆绑包大小是一个关键主题。它越大，启动应用程序所需的时间就越长。
+框架和开发人员越来越依赖延迟加载来延迟非必要代码的加载。最常见的是延迟加载的路由。</p>
+<p>当涉及到服务时，我们可以通过使用动态 <code>import()</code> 来延迟加载它。
+我们以页面显示我们想要延迟加载的大量 WebGL 动画的情况为例。</p>
+<p>我们假设 <code>HomeAnimation</code> 是 <code>Injectable({providedIn: 'root'})</code> 的 Angular 服务。</p>
+<h4 id="homecomponentts"><strong><code>home.component.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>class HomeComponent {</span></span>
+<span class="line"><span>  injector = inject(Injector);</span></span>
+<span class="line"><span>  ...</span></span>
+<span class="line"><span>  private async loadHomeAnimation() {</span></span>
+<span class="line"><span>    const HomeAnimation = import('./services/home-animation.service').then((c) =&gt; c.HomeAnimation),</span></span>
+<span class="line"><span>    this.injector.get(HomeAnimation);</span></span>
+<span class="line"><span>    this.homeAnimation.init(this.element);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>这非常简单，但有一个主要缺点：这不允许我们在单元测试中使用模拟服务。</p>
+<h2 id="利用依赖注入">利用依赖注入</h2>
+<p>DI 是一个强大的工具，我们将在这里利用它来创建/共享实例并帮助测试。</p>
+<p>首先让我们从这个辅助函数开始。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>export async function injectAsync&lt;T&gt;(</span></span>
+<span class="line"><span>  injector: Injector,</span></span>
+<span class="line"><span>  providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;,</span></span>
+<span class="line"><span>): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>  const injectImpl = injector.get(InjectAsyncImpl);</span></span>
+<span class="line"><span>  return injectImpl.get(providerLoader);</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>注入器将在这里做两件事：</p>
+<ul>
+<li>检索 <code>InjectAsyncImpl</code> 的实例，该类提供延迟加载的实现</li>
+<li>创建我们刚刚加载的服务的实例（该类必须可供注入器使用，因此您必须将 <code>@Injectable({providedIn: 'root'})</code> 添加到要延迟加载的类中）</li>
+</ul>
+<p><code>InjectAsyncImpl</code> 类可以非常简单：</p>
+<h4 id="inject-asyncts"><strong><code>inject-async.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>@Injectable({providedIn: 'root'})</span></span>
+<span class="line"><span>class InjectAsyncImpl&lt;T&gt; {</span></span>
+<span class="line"><span>  async get(injector: Injector, providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>    const type = await providerLoader();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    return injector.get(type)</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>通过此实现，我们现在可以在单元测试中重写 <code>InjectAsyncImpl</code> 的提供程序，以返回延迟加载服务的模拟实例。</p>
+<h4 id="my-testspects"><strong><code>my-test.spec.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>TestBed.configureTestingModule({</span></span>
+<span class="line"><span>  providers: [</span></span>
+<span class="line"><span>    { provide: InjectAsyncImpl, useValue: { get () =&gt; Promise.resolve(MyMockedService) }}</span></span>
+<span class="line"><span>  ]</span></span>
+<span class="line"><span>});</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>我们当前的实现可行，但 DX 还远未达到理想水平。模拟一个延迟加载的服务很容易，我们必须为每个模拟的服务创建一个不同的类/对象。因此，让我们重构它以改进它。</p>
+<h2 id="改善dx">改善DX</h2>
+<p>为了简化对延迟加载服务的模拟，我们将在实现中添加对覆盖的支持。</p>
+<h4 id="inject-asyncts-1"><strong><code>inject-async.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>@Injectable({ providedIn: 'root' })</span></span>
+<span class="line"><span>class InjectAsyncImpl&lt;T&gt; {</span></span>
+<span class="line"><span>  private overrides = new WeakMap(); // no need to cleanup</span></span>
+<span class="line"><span>  override&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>    this.overrides.set(type, mock);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  async get(injector: Injector, providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>    const type = await providerLoader();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    // Check if we have overrides, O(1), low overhead</span></span>
+<span class="line"><span>    if (this.overrides.has(type)) {</span></span>
+<span class="line"><span>      const module = this.overrides.get(type);</span></span>
+<span class="line"><span>      return new module();</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>这些覆盖将由辅助函数设置</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>export function mockAsyncProvider&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>  return [</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>      provide: ENVIRONMENT_INITIALIZER,</span></span>
+<span class="line"><span>      multi: true,</span></span>
+<span class="line"><span>      useValue: () =&gt; {</span></span>
+<span class="line"><span>        inject(InjectAsyncImpl).override(type, mock);</span></span>
+<span class="line"><span>      },</span></span>
+<span class="line"><span>    },</span></span>
+<span class="line"><span>  ];</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p><code>ENVIRONMENT_INITIALIZER</code> 是一个用于初始化函数的多提供商令牌，该函数将在构建环境注入器时运行。因此，在设置每个模拟服务时都会调用 <code>override</code> 方法。</p>
+<p>现在我们有了一个漂亮干净的测试设置！</p>
+<h4 id="my-testspects-1"><strong><code>my-test.spec.ts</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span> * TestBed.configureTestingModule({</span></span>
+<span class="line"><span> *     providers: [</span></span>
+<span class="line"><span> *       mockAsyncProvider(MyFooService, MyFakeService)</span></span>
+<span class="line"><span> *       mockAsyncProvider(MyBarService, MyBarService)</span></span>
+<span class="line"><span> *   ]</span></span>
+<span class="line"><span> * });</span></span>
+<span class="line"><span></span></span></code></pre>
+<h2 id="improving-angular-integration">Improving Angular integration</h2>
+<p>当在根中提供服务时，该服务将由根注入器创建。
+这样做的一个主要缺点是永远不会触发 <code>DestroyRef.onDestroy</code>。</p>
+<p>从 <a href="https://angular.io/api/core/DestroyRef">official docs</a>：</p>
+<blockquote>
+<p>如果 DestroyRef 被注入到组件或指令中，则回调将在该组件或指令被销毁时运行。否则，当相应的注入器被销毁时，回调将运行。</p>
+</blockquote>
+<p>因此，如果我们想要一个延迟加载的服务被创建它的组件破坏，我们需要更改我们的实现。</p>
+<p>我们的限制是：</p>
+<ul>
+<li>该服务不能是 <code>providedIn: 'root'</code>（我们希望它与 <code>NodeInjector</code> 一起被销毁）</li>
+<li>The service cannot be provided on the component, this would break the lazy loading</li>
+<li>我们无法向注入器添加类，我们需要创建一个新类。</li>
+</ul>
+<p>考虑到这一点，我们将添加以下内容</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>if (!(injector instanceof EnvironmentInjector)) {</span></span>
+<span class="line"><span>  // We're passing a node injector to the function</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // This is the DestroyRef of the component</span></span>
+<span class="line"><span>  const destroyRef = injector.get(DestroyRef);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // This is the parent injector of the environmentInjector we're creating</span></span>
+<span class="line"><span>  const environmentInjector = injector.get(EnvironmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // Creating an environment injector to destroy it afterwards</span></span>
+<span class="line"><span>  const newInjector = createEnvironmentInjector([type as Provider], environmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // Destroy the injector to trigger DestroyRef.onDestroy on our service</span></span>
+<span class="line"><span>  destroyRef.onDestroy(() =&gt; {</span></span>
+<span class="line"><span>    newInjector.destroy();</span></span>
+<span class="line"><span>  });</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  // We want to create the new instance of our service with our new injector</span></span>
+<span class="line"><span>  injector = newInjector;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>return injector.get(module)!;</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>如果我们回到最初的示例，这就是我们如何使用新的辅助方法来延迟加载 HomeAnimation 服务。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>export class HomeComponent {</span></span>
+<span class="line"><span>  private readonly injector = inject(Injector); // The Node injector</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  ...</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  private async loadHomeAnimation() {</span></span>
+<span class="line"><span>    this.homeAnimation = await injectAsync(this.injector, () =&gt;</span></span>
+<span class="line"><span>      import('./services/home-animation.service').then((c) =&gt; c.HomeAnimation),</span></span>
+<span class="line"><span>    );</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    this.homeAnimation.init(this.element);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>这里重要的是注入器是 <code>NodeInjector</code> 而不是 <code>EnvironmentInjector</code>。
+前者将随组件一起被破坏，而后者将在组件中幸存下来。</p>
+<h2 id="最终实施">最终实施</h2>
+<p>这是 <code>inject-async.ts</code> 辅助函数的最终实现。</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import {createEnvironmentInjector, DestroyRef, ENVIRONMENT_INITIALIZER, EnvironmentInjector, inject, Injectable, Injector, Provider, ProviderToken, Type,} from '@angular/core';</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>/**</span></span>
+<span class="line"><span> * inject a service asynchronously</span></span>
+<span class="line"><span> *</span></span>
+<span class="line"><span> * @param: injector. If the injector is a NodeInjector the loaded module will be destroyed alongside its injector</span></span>
+<span class="line"><span> */</span></span>
+<span class="line"><span>export async function injectAsync&lt;T&gt;(</span></span>
+<span class="line"><span>  injector: Injector,</span></span>
+<span class="line"><span>  providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;,</span></span>
+<span class="line"><span>): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>  const injectImpl = injector.get(InjectAsyncImpl);</span></span>
+<span class="line"><span>  return injectImpl.get(injector, providerLoader);</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>@Injectable({providedIn: 'root'})</span></span>
+<span class="line"><span>class InjectAsyncImpl&lt;T&gt; {</span></span>
+<span class="line"><span>  private overrides = new WeakMap(); // no need to cleanup</span></span>
+<span class="line"><span>  override&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>    this.overrides.set(type, mock);</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>  async get(injector: Injector, providerLoader: () =&gt; Promise&lt;ProviderToken&lt;T&gt;&gt;): Promise&lt;T&gt; {</span></span>
+<span class="line"><span>    const type = await providerLoader();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    // Check if we have overrides, O(1), low overhead</span></span>
+<span class="line"><span>    if (this.overrides.has(type)) {</span></span>
+<span class="line"><span>      const module = this.overrides.get(type);</span></span>
+<span class="line"><span>      return new module();</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    if (!(injector instanceof EnvironmentInjector)) {</span></span>
+<span class="line"><span>      // We're passing a node injector to the function</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // This is the DestroyRef of the component</span></span>
+<span class="line"><span>      const destroyRef = injector.get(DestroyRef);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // This is the parent injector of the environmentInjector we're creating</span></span>
+<span class="line"><span>      const environmentInjector = injector.get(EnvironmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // Creating an environment injector to destroy it afterwards</span></span>
+<span class="line"><span>      const newInjector = createEnvironmentInjector([type as Provider], environmentInjector);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // Destroy the injector to trigger DestroyRef.onDestroy on our service</span></span>
+<span class="line"><span>      destroyRef.onDestroy(() =&gt; {</span></span>
+<span class="line"><span>        newInjector.destroy();</span></span>
+<span class="line"><span>      });</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      // We want to create the new instance of our service with our new injector</span></span>
+<span class="line"><span>      injector = newInjector;</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    return injector.get(module)!;</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>/**</span></span>
+<span class="line"><span> * Helper function to mock the lazy-loaded module in `injectAsync`</span></span>
+<span class="line"><span> *</span></span>
+<span class="line"><span> * @usage</span></span>
+<span class="line"><span> * TestBed.configureTestingModule({</span></span>
+<span class="line"><span> *     providers: [</span></span>
+<span class="line"><span> *     mockAsyncProvider(SandboxService, fakeSandboxService)</span></span>
+<span class="line"><span> *   ]</span></span>
+<span class="line"><span> * });</span></span>
+<span class="line"><span> */</span></span>
+<span class="line"><span>export function mockAsyncProvider&lt;T&gt;(type: Type&lt;T&gt;, mock: Type&lt;unknown&gt;) {</span></span>
+<span class="line"><span>  return [</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>      provide: ENVIRONMENT_INITIALIZER,</span></span>
+<span class="line"><span>      multi: true,</span></span>
+<span class="line"><span>      useValue: () =&gt; {</span></span>
+<span class="line"><span>        inject(InjectAsyncImpl).override(type, mock);</span></span>
+<span class="line"><span>      },</span></span>
+<span class="line"><span>    },</span></span>
+<span class="line"><span>  ];</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span></code></pre> </article> </div>  <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/dependency-injection/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">dependency-injection</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/lazy-loading/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">lazy-loading</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://rowanliu.com/posts/lazy-loading-mockable/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via WhatsApp</span> </a><a href="https://www.facebook.com/sharer.php?u=https://rowanliu.com/posts/lazy-loading-mockable/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Facebook"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+  </svg> <span class="astro-wkojbtzc sr-only">Share this post on Facebook</span> </a><a href="https://twitter.com/intent/tweet?url=https://rowanliu.com/posts/lazy-loading-mockable/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Tweet this post"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="astro-wkojbtzc sr-only">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://rowanliu.com/posts/lazy-loading-mockable/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via Telegram"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="astro-wkojbtzc sr-only">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://rowanliu.com/posts/lazy-loading-mockable/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post on Pinterest"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&amp;body=https://rowanliu.com/posts/lazy-loading-mockable/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via email"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
+</script><astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to Rowan's Blog</span> </a> </div>  <div class="astro-sz7xmlte copyright-wrapper"> <span class="astro-sz7xmlte">Copyright © 2026</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">All rights reserved.</span> <span class="astro-sz7xmlte separator">&nbsp;|&nbsp;</span> <a href="/rss.xml" class="astro-sz7xmlte rss-link" aria-label="RSS Feed"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-sz7xmlte rss-icon" viewBox="0 0 24 24" width="16" height="16"> <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z" fill="currentColor" class="astro-sz7xmlte"></path> </svg>
+RSS
+</a> </div> </div> </footer>     <script>function createProgressBar(){const t=document.createElement("div");t.className="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";const n=document.createElement("div");n.className="progress-bar h-1 w-0 bg-skin-accent",n.id="myBar",t.appendChild(n),document.body.appendChild(t)}createProgressBar();function updateScrollProgress(){const t=document.body.scrollTop||document.documentElement.scrollTop,n=document.documentElement.scrollHeight-document.documentElement.clientHeight,o=t/n*100;if(document){const e=document.getElementById("myBar");e&&(e.style.width=o+"%")}}document.addEventListener("scroll",updateScrollProgress);function addHeadingLinks(){let t=Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));for(let n of t){n.classList.add("group");let o=document.createElement("a");o.innerText="#",o.className="heading-link hidden group-hover:inline-block ml-2",o.href="#"+n.id,o.ariaHidden="true",n.appendChild(o)}}addHeadingLinks();function attachCopyButtons(){let t="Copy",n=Array.from(document.querySelectorAll("pre"));for(let e of n){let a=document.createElement("div");a.style.position="relative";let c=document.createElement("button");c.className="copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium",c.innerHTML=t,e.setAttribute("tabindex","0"),e.appendChild(c),e?.parentNode?.insertBefore(a,e),a.appendChild(e),c.addEventListener("click",async()=>{await o(e,c)})}async function o(e,a){let i=e.querySelector("code")?.innerText;await navigator.clipboard.writeText(i??""),a.innerText="Copied",setTimeout(()=>{a.innerText=t},700)}}attachCopyButtons();function backToTop(){document.querySelector("#back-to-top")?.addEventListener("click",()=>{document.body.scrollTop=0,document.documentElement.scrollTop=0})}backToTop();function initTranslationToggle(){var t=document.querySelector(".translation-controls");if(!t)return;var n=t.querySelectorAll(".toggle-btn"),o=document.getElementById("translation-container"),e=document.getElementById("article-translated"),a=document.getElementById("article-original"),c=document.getElementById("main-content");function i(r){n.forEach(function(s){s.classList.remove("active")});var d=t.querySelector('[data-view="'+r+'"]');d&&d.classList.add("active"),o.classList.remove("comparison-mode"),c.classList.remove("comparison-active"),r==="translated"?(e.hidden=!1,a.hidden=!0):r==="original"?(e.hidden=!0,a.hidden=!1):(e.hidden=!1,a.hidden=!1,o.classList.add("comparison-mode"),c.classList.add("comparison-active"));try{sessionStorage.setItem("translation-view-mode",r)}catch{}}n.forEach(function(r){r.addEventListener("click",function(){i(r.dataset.view)})});try{var l=sessionStorage.getItem("translation-view-mode");l&&l!=="translated"&&i(l)}catch{}}initTranslationToggle();
+</script></body></html>
