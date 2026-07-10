@@ -11,7 +11,7 @@ Radio
 </a> </li> <li class="astro-3ef6ksr2"> <a href="/about/" class="astro-3ef6ksr2">
 About
 </a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="astro-3ef6ksr2 focus-outline flex group hover:text-skin-accent inline-block p-3 sm:p-1" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-3ef6ksr2 scale-125 sm:scale-100"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="astro-3ef6ksr2 sr-only">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="astro-3ef6ksr2 focus-outline" title="Toggles light &amp; dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="astro-vj4tpspi flex max-w-3xl mx-auto justify-start px-2 w-full"> <button class="astro-vj4tpspi flex focus-outline hover:opacity-75 mb-2 mt-8" onclick='history.length===1?window.location="/":history.back();
-'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">[译] CLDR：你的 locale 真相来源</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-30T08:30:00.000Z">2026年5月30日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">16:30</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>3 min read</span></span></div>  <div class="astro-vj4tpspi flex items-center bg-opacity-60 bg-skin-card gap-1 max-w-3xl mt-4 mx-auto p-1 rounded-lg translation-controls"> <button class="astro-vj4tpspi toggle-btn active" data-view="translated">
+'> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="astro-vj4tpspi post-title" data-astro-transition-scope="astro-ti6a3mbw-1">[译] CLDR：你的 locale 真相来源</h1> <div class="astro-vj4tpspi flex items-center my-2 opacity-80 space-x-2"><svg xmlns="http://www.w3.org/2000/svg" class="inline-block fill-skin-base h-6 min-w-[1.375rem] scale-100 w-6" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time datetime="2026-05-30T08:30:00.000Z">2026年5月30日</time><span aria-hidden="true"> | </span><span class="sr-only">&nbsp;at&nbsp;</span><span class="text-nowrap">16:30</span></span><span class="italic text-base"><span aria-hidden="true"> | </span><span>4 min read</span></span></div>  <div class="astro-vj4tpspi flex items-center bg-opacity-60 bg-skin-card gap-1 max-w-3xl mt-4 mx-auto p-1 rounded-lg translation-controls"> <button class="astro-vj4tpspi toggle-btn active" data-view="translated">
 译文
 </button> <button class="astro-vj4tpspi toggle-btn" data-view="original">
 原文
@@ -22,24 +22,17 @@ About
 <p>Angular eases the work a lot for us by providing the necessary code to setup and handle locales.</p>
 <p>You import the locale and setup the locale provider.</p>
 <h4 id="maints"><strong><code>main.ts</code></strong></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import '@angular/common/locales/global/fr'</span></span>
-<span class="line"><span>;</span></span>
-<span class="line"><span>bootstrapApplication</span></span>
-<span class="line"><span>(App, {providers: [</span></span>
-<span class="line"><span>{provide: LOCALE_ID</span></span>
-<span class="line"><span>, useValue: 'fr'</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>]</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>)</span></span>
-<span class="line"><span>;</span></span>
-<span class="line"><span></span></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#98C379"> "@angular/common/locales/global/fr"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">bootstrapApplication</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">App</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#E06C75">  providers</span><span style="color:#ABB2BF">: [{ </span><span style="color:#E06C75">provide</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">LOCALE_ID</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">useValue</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"fr"</span><span style="color:#ABB2BF"> }],</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
 <p>And the pipes will use that locale for you</p>
 <h4 id="mycomponenthtml"><strong><code>my.component.html</code></strong></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>  {{ date | date: 'dd MMMM yyyy'}} // 16 septembre 2023 (at the time of writing)</span></span>
-<span class="line"><span>  {{ 35.50 | currency }} // 35,50 $US</span></span>
-<span class="line"><span>  {{ 300_000_000 | number }} // 300 000 000</span></span>
-<span class="line"><span></span></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="html"><code><span class="line"><span style="color:#ABB2BF">{{ date | date: "dd MMMM yyyy" }} // 16 septembre 2023 (at the time of writing)</span></span>
+<span class="line"><span style="color:#ABB2BF">{{ 35.50 | currency }} // 35,50 $US {{ 300_000_000 | number }} // 300 000 000</span></span>
+<span class="line"></span></code></pre>
 <p>Et voilà.</p>
 <h2 id="the-cldr">The CLDR</h2>
 <p>But have you ever wondered where this info is comming from ? Enters the CLDR : Common Locale Data Repository.</p>
@@ -50,324 +43,204 @@ About
 <h3 id="numbers">Numbers</h3>
 <p><a href="https://github.com/unicode-org/cldr-json/tree/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main">Here</a> an example with the numbers data. Let’s check the <code>fr</code> locale with the format definition of number in french.</p>
 <h4 id="frnumbersjson"><strong><code>fr/numbers.json</code></strong></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>    "symbols-numberSystem-latn"</span></span>
-<span class="line"><span>: {</span></span>
-<span class="line"><span>        "decimal"</span></span>
-<span class="line"><span>: ","</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>        "group"</span></span>
-<span class="line"><span>: " "</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>        "timeSeparator"</span></span>
-<span class="line"><span>: ":"</span></span>
-<span class="line"><span>        ...</span></span>
-<span class="line"><span>    }</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    ...</span></span>
-<span class="line"><span>    "currencyFormats-numberSystem-latn"</span></span>
-<span class="line"><span>: {</span></span>
-<span class="line"><span>        "standard"</span></span>
-<span class="line"><span>: "#,##0.00 ¤"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>        ...</span></span>
-<span class="line"><span>    }</span></span>
-<span class="line"><span></span></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="jsonc"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "symbols-numberSystem-latn"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "decimal"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">","</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "group"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">" "</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "timeSeparator"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">":"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // ...</span></span>
+<span class="line"><span style="color:#E06C75">  "currencyFormats-numberSystem-latn"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "standard"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"#,##0.00 ¤"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
 <p>We can see that the decimal separator is the a comma, the currency (<code>¤</code>) is after the number etc.
 If you want the meaning of the format, please have a look at the <a href="https://cldr.unicode.org/translation/number-currency-formats/number-and-currency-patterns">online doc of the CLDR</a>.</p>
 <h3 id="dates">Dates</h3>
 <p>Dates are famous data that needs to be formatted correctly for a great i18n. The CLDR defines has a large set of data related to it.</p>
 <p>A short example with the <a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/ko/ca-gregorian.json">korean dates</a></p>
-
-
-
-
-
-
-
-<table><thead><tr><th>Korean</th><th>English</th></tr></thead></table>
-<p>| <strong><code>ko/ca-gregorian.json</code></strong><code>"months" : {     "format" : {         "wide" : {             "1" : "1월" ,             "2" : "2월" ,             "3" : "3월" ,             "4" : "4월" ,             "5" : "5월" ,             "6" : "6월" ,             "7" : "7월" ,             "8" : "8월" ,             "9" : "9월" ,             "10" : "10월" ,             "11" : "11월" ,             "12" : "12월"         } ,     } } , "days" : {     "format" : {         "abbreviated" : {             "sun" : "일" ,             "mon" : "월" ,             "tue" : "화" ,             "wed" : "수" ,             "thu" : "목" ,             "fri" : "금" ,             "sat" : "토"         } ,     } } , ... "dateFormats" : {     "full" : "y년 MMMM d일 EEEE" ,     "long" : "y년 MMMM d일" ,     "medium" : "y. M. d." ,     "short" : "yy. M. d." } ,</code> | <strong><code>en/ca-gregorian.json</code></strong>```
-“months”
-: {
-“format”
-: {
-“wide”
-: {
-“1”
-: “January”
-,
-“2”
-: “February”
-,
-“3”
-: “March”
-,
-“4”
-: “April”
-,
-“5”
-: “May”
-,
-“6”
-: “June”
-,
-“7”
-: “July”
-,
-“8”
-: “August”
-,
-“9”
-: “September”
-,
-“10”
-: “October”
-,
-“11”
-: “November”
-,
-“12”
-: “December”
-}
-,
-}
-}
-,
-“days”
-: {
-“format”
-: {
-“abbreviated”
-: {
-“sun”
-: “Sun”
-,
-“mon”
-: “Mon”
-,
-“tue”
-: “Tue”
-,
-“wed”
-: “Wed”
-,
-“thu”
-: “Thu”
-,
-“fri”
-: “Fri”
-,
-“sat”
-: “Sat”
-}
-,
-}
-}
-,
-…
-“dateFormats”
-: {
-“full”
-: “EEEE, MMMM d, y”
-,
-“long”
-: “MMMM d, y”
-,
-“medium”
-: “MMM d, y”
-,
-“short”
-: “M/d/yy”
-}
-,</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>### Even more</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>It doesn't stop just with format data, there so much more.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>Let's continue with currency data, [here is](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-core/supplemental/currencyData.json#L1093-L1104)</span></span>
-<span class="line"><span>the currency history for each country. If we take the example of Cuba, the US Dollars was a valid currency up until 1959. We have the start of a history lesson here, with 1959 being the start of embargo against Cuba.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>#### **`supplemental/currencyData.json`**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span></span></span></code></pre>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>"CU"</span></span>
-<span class="line"><span></span></span></code></pre>
-<p>: [
-{
-“CUP”
-: {
-“_from”
-: “1859-01-01”
-}
-}
-,
-{
-“USD”
-: {
-“_from”
-: “1899-01-01”
-,
-“_to”
-: “1959-01-01”
-}
-}
-,
-]</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>## Do I have a bug ?</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>So how can I investigate if my display issue is actually a bug or a feature?</span></span>
-<span class="line"><span>I'll illustrate this with issues opened on the Angular repo.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>### What's the spanish value for the USD currency ?</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>Issue [#51671](https://github.com/angular/angular/issues/51671), a user was expecting `$` as the currency symbol when using the italian locale.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>Now that we know the existance of the CLDR, we can check ourselves the info at [the source](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/it/currencies.json#L1112C18-L1112C18).</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>#### **`it/currencies.json`**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span></span></span></code></pre>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>"USD"</span></span>
-<span class="line"><span></span></span></code></pre>
-<p>: {
-“displayName”
-: “dollaro statunitense”
-,
-“displayName-count-one”
-: “dollaro statunitense”
-,
-“displayName-count-other”
-: “dollari statunitensi”
-,
-“symbol”
-: “USD”
-,
-“symbol-alt-narrow”
-: ”$”
-}
-,</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>As you can see, the italian symbol for USD is actually `USD` and not `$`</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>➡️ Result: **✅ Not a bug**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>### Is the spanish short name for a month missing a dot ?</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>Now, let's have a look at the date formating with issue [#51317](https://github.com/angular/angular/issues/51317). The user was reporting a missing dot for month name with the medium `MMM` format.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>This information is located in the [gregorian calendar data](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/es/ca-gregorian.json#L23).</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>| Spanish | French |</span></span>
-<span class="line"><span>| --- | --- |</span></span>
-<span class="line"><span>| **`es/ca-gregorian.json`**```</span></span>
-<span class="line"><span>"abbreviated"</span></span>
-<span class="line"><span>: {</span></span>
-<span class="line"><span>    "1"</span></span>
-<span class="line"><span>: "ene"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "2"</span></span>
-<span class="line"><span>: "feb"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "3"</span></span>
-<span class="line"><span>: "mar"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "4"</span></span>
-<span class="line"><span>: "abr"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "5"</span></span>
-<span class="line"><span>: "may"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "6"</span></span>
-<span class="line"><span>: "jun"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "7"</span></span>
-<span class="line"><span>: "jul"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "8"</span></span>
-<span class="line"><span>: "ago"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "9"</span></span>
-<span class="line"><span>: "sept"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "10"</span></span>
-<span class="line"><span>: "oct"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "11"</span></span>
-<span class="line"><span>: "nov"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "12"</span></span>
-<span class="line"><span>: "dic"</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>``` | **`fr/ca-gregorian.json`**```</span></span>
-<span class="line"><span>    "1"</span></span>
-<span class="line"><span>: "janv."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "2"</span></span>
-<span class="line"><span>: "févr."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "3"</span></span>
-<span class="line"><span>: "mars"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "4"</span></span>
-<span class="line"><span>: "avr."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "5"</span></span>
-<span class="line"><span>: "mai"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "6"</span></span>
-<span class="line"><span>: "juin"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "7"</span></span>
-<span class="line"><span>: "juil."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "8"</span></span>
-<span class="line"><span>: "août"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "9"</span></span>
-<span class="line"><span>: "sept."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "10"</span></span>
-<span class="line"><span>: "oct."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "11"</span></span>
-<span class="line"><span>: "nov."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "12"</span></span>
-<span class="line"><span>: "déc."</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>``` |</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>As we can see, the CLDR uses a point for shorted name in french but not a spanish.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>➡️ Result: **✅ Not a bug**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>### Missing a whitespace on negative currency amount</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>On the last case that will have our interest today, a user reported, on issue [#46038](https://github.com/angular/angular/issues/46038), a missing space between the currency and a negative amount with the `de-CH` locale. He expected `CHF-135.00` to be displayed as `CHF -135.00`.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>Again, let's check the [CLDR number data](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/de-CH/numbers.json#L97-L110) :</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span></span></span></code></pre>
-<p>“currencyFormats-numberSystem-latn”
-: {
-“standard”
-: ”¤ #,##0.00;¤-#,##0.00”
-,
-}</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>The CLDR defines 2 different patterns for currencies in swiss german. As we can see in the negative amount pattern `¤-#,##0.00`, there is no space between the currency symbol (represented by `¤`) and the minus.</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>➡️ Result: **✅ Not a bug**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>## Final note</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>Now that you are CLDR experts, you can look for yourself and check the the CLDR repo. Is what you are seeing expected or not ?</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>If you see any differences between the CLDR and Angular, you can [open an issue](https://github.com/angular/angular/issues/new/choose), the locale data of Angular might need to be updated with the latest CLDR. Or if you are 100% sure to have found a bug in the CLDR, the CLDR accepts change requests, more on that [here](https://github.com/unicode-org/cldr/blob/main/docs/requesting_changes.md).</span></span>
-<span class="line"><span></span></span></code></pre> </article> <article id="article-translated" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#cldr" class="astro-vj4tpspi">CLDR</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#海量且多样的数据" class="astro-vj4tpspi">海量且多样的数据</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#数字" class="astro-vj4tpspi">数字</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#日期" class="astro-vj4tpspi">日期</a> </li> </ul> </details> <blockquote>
+<h4 id="koca-gregorianjson"><strong><code>ko/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="jsonc"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "months"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "wide"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"2월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"3월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"4월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"5월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"6월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"7월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"8월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"9월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"10월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"11월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"12월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#E06C75">  "days"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "sun"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"일"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "mon"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "tue"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"화"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "wed"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"수"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "thu"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"목"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "fri"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"금"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "sat"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"토"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // ...</span></span>
+<span class="line"><span style="color:#E06C75">  "dateFormats"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "full"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"y년 MMMM d일 EEEE"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "long"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"y년 MMMM d일"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "medium"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"y. M. d."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "short"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"yy. M. d."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h4 id="enca-gregorianjson"><strong><code>en/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="jsonc"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "months"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "wide"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"January"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"February"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"March"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"April"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"May"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"June"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"July"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"August"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"September"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"October"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"November"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"December"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#E06C75">  "days"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "sun"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Sun"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "mon"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Mon"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "tue"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Tue"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "wed"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Wed"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "thu"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Thu"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "fri"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Fri"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "sat"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Sat"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // ...</span></span>
+<span class="line"><span style="color:#E06C75">  "dateFormats"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "full"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"EEEE, MMMM d, y"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "long"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"MMMM d, y"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "medium"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"MMM d, y"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "short"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"M/d/yy"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="even-more">Even more</h3>
+<p>It doesn’t stop just with format data, there so much more.</p>
+<p>Let’s continue with currency data, <a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-core/supplemental/currencyData.json#L1093-L1104">here is</a>
+the currency history for each country. If we take the example of Cuba, the US Dollars was a valid currency up until 1959. We have the start of a history lesson here, with 1959 being the start of embargo against Cuba.</p>
+<h4 id="supplementalcurrencydatajson"><strong><code>supplemental/currencyData.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "CU"</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      "CUP"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "_from"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1859-01-01"</span></span>
+<span class="line"><span style="color:#ABB2BF">      }</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      "USD"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "_from"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1899-01-01"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "_to"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1959-01-01"</span></span>
+<span class="line"><span style="color:#ABB2BF">      }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  ]</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h2 id="do-i-have-a-bug">Do I have a bug ?</h2>
+<p>So how can I investigate if my display issue is actually a bug or a feature?
+I’ll illustrate this with issues opened on the Angular repo.</p>
+<h3 id="whats-the-spanish-value-for-the-usd-currency">What’s the spanish value for the USD currency ?</h3>
+<p>Issue <a href="https://github.com/angular/angular/issues/51671">#51671</a>, a user was expecting <code>$</code> as the currency symbol when using the italian locale.</p>
+<p>Now that we know the existance of the CLDR, we can check ourselves the info at <a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/it/currencies.json#L1112C18-L1112C18">the source</a>.</p>
+<h4 id="itcurrenciesjson"><strong><code>it/currencies.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "USD"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "displayName"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dollaro statunitense"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "displayName-count-one"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dollaro statunitense"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "displayName-count-other"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dollari statunitensi"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "symbol"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"USD"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "symbol-alt-narrow"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"$"</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>As you can see, the italian symbol for USD is actually <code>USD</code> and not <code>$</code></p>
+<p>➡️ Result: <strong>✅ Not a bug</strong></p>
+<h3 id="is-the-spanish-short-name-for-a-month-missing-a-dot">Is the spanish short name for a month missing a dot ?</h3>
+<p>Now, let’s have a look at the date formating with issue <a href="https://github.com/angular/angular/issues/51317">#51317</a>. The user was reporting a missing dot for month name with the medium <code>MMM</code> format.</p>
+<p>This information is located in the <a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/es/ca-gregorian.json#L23">gregorian calendar data</a>.</p>
+<h4 id="esca-gregorianjson"><strong><code>es/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"ene"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"feb"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"mar"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"abr"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"may"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"jun"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"jul"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"ago"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"sept"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"oct"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"nov"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dic"</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h4 id="frca-gregorianjson"><strong><code>fr/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"janv."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"févr."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"mars"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"avr."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"mai"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"juin"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"juil."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"août"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"sept."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"oct."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"nov."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"déc."</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>As we can see, the CLDR uses a point for shorted name in french but not a spanish.</p>
+<p>➡️ Result: <strong>✅ Not a bug</strong></p>
+<h3 id="missing-a-whitespace-on-negative-currency-amount">Missing a whitespace on negative currency amount</h3>
+<p>On the last case that will have our interest today, a user reported, on issue <a href="https://github.com/angular/angular/issues/46038">#46038</a>, a missing space between the currency and a negative amount with the <code>de-CH</code> locale. He expected <code>CHF-135.00</code> to be displayed as <code>CHF -135.00</code>.</p>
+<p>Again, let’s check the <a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/de-CH/numbers.json#L97-L110">CLDR number data</a> :</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "currencyFormats-numberSystem-latn"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "standard"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"¤ #,##0.00;¤-#,##0.00"</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>The CLDR defines 2 different patterns for currencies in swiss german. As we can see in the negative amount pattern <code>¤-#,##0.00</code>, there is no space between the currency symbol (represented by <code>¤</code>) and the minus.</p>
+<p>➡️ Result: <strong>✅ Not a bug</strong></p>
+<h2 id="final-note">Final note</h2>
+<p>Now that you are CLDR experts, you can look for yourself and check the the CLDR repo. Is what you are seeing expected or not ?</p>
+<p>If you see any differences between the CLDR and Angular, you can <a href="https://github.com/angular/angular/issues/new/choose">open an issue</a>, the locale data of Angular might need to be updated with the latest CLDR. Or if you are 100% sure to have found a bug in the CLDR, the CLDR accepts change requests, more on that <a href="https://github.com/unicode-org/cldr/blob/main/docs/requesting_changes.md">here</a>.</p> </article> <article id="article-translated" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#cldr" class="astro-vj4tpspi">CLDR</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#海量且多样的数据" class="astro-vj4tpspi">海量且多样的数据</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#数字" class="astro-vj4tpspi">数字</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#日期" class="astro-vj4tpspi">日期</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#还有更多" class="astro-vj4tpspi">还有更多</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#这是-bug-吗" class="astro-vj4tpspi">这是 bug 吗？</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#西班牙语环境下-usd-的值应该是什么" class="astro-vj4tpspi">西班牙语环境下 USD 的值应该是什么？</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#西班牙语月份简称少了一个点号吗" class="astro-vj4tpspi">西班牙语月份简称少了一个点号吗？</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#负数货币金额缺少空格" class="astro-vj4tpspi">负数货币金额缺少空格</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#最后说明" class="astro-vj4tpspi">最后说明</a> </li> </ul> </details> <blockquote>
 <p>原文地址: <a href="https://riegler.fr/blog/2023-09-18-cldr-angular">https://riegler.fr/blog/2023-09-18-cldr-angular</a></p>
 </blockquote>
 <p><img src="/blog-images/cldr-angular/kyle-glenn-nXt5HtLmlgE-unsplash.jpg.webp" alt="Image" loading="lazy" decoding="async" width="864" height="576"></p>
@@ -375,24 +248,17 @@ If you want the meaning of the format, please have a look at the <a href="https:
 <p>Angular 通过提供配置与处理 locale 的必要能力，大大降低了我们的工作量。</p>
 <p>你只需要导入 locale，并配置 locale provider。</p>
 <h4 id="maints"><strong><code>main.ts</code></strong></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import '@angular/common/locales/global/fr'</span></span>
-<span class="line"><span>;</span></span>
-<span class="line"><span>bootstrapApplication</span></span>
-<span class="line"><span>(App, {providers: [</span></span>
-<span class="line"><span>{provide: LOCALE_ID</span></span>
-<span class="line"><span>, useValue: 'fr'</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>]</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>)</span></span>
-<span class="line"><span>;</span></span>
-<span class="line"><span></span></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#98C379"> "@angular/common/locales/global/fr"</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">bootstrapApplication</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75">App</span><span style="color:#ABB2BF">, {</span></span>
+<span class="line"><span style="color:#E06C75">  providers</span><span style="color:#ABB2BF">: [{ </span><span style="color:#E06C75">provide</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">LOCALE_ID</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">useValue</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"fr"</span><span style="color:#ABB2BF"> }],</span></span>
+<span class="line"><span style="color:#ABB2BF">});</span></span>
+<span class="line"></span></code></pre>
 <p>随后这些 pipes 就会自动使用该 locale。</p>
 <h4 id="mycomponenthtml"><strong><code>my.component.html</code></strong></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>  {{ date | date: 'dd MMMM yyyy'}} // 2023 年 9 月 16 日（写作时）</span></span>
-<span class="line"><span>  {{ 35.50 | currency }} // 35,50 $US</span></span>
-<span class="line"><span>  {{ 300_000_000 | number }} // 300 000 000</span></span>
-<span class="line"><span></span></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="html"><code><span class="line"><span style="color:#ABB2BF">{{ date | date: "dd MMMM yyyy" }} // 2023 年 9 月 16 日（写作时） {{ 35.50 |</span></span>
+<span class="line"><span style="color:#ABB2BF">currency }} // 35,50 $US {{ 300_000_000 | number }} // 300 000 000</span></span>
+<span class="line"></span></code></pre>
 <p>就是这么简单。</p>
 <h2 id="cldr">CLDR</h2>
 <p>不过你有没有想过，这些信息到底来自哪里？答案就是 CLDR：Common Locale Data Repository。</p>
@@ -403,324 +269,204 @@ If you want the meaning of the format, please have a look at the <a href="https:
 <h3 id="数字">数字</h3>
 <p><a href="https://github.com/unicode-org/cldr-json/tree/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main">这里</a>有一份数字数据示例。我们看一下 <code>fr</code> locale 中法语数字格式定义。</p>
 <h4 id="frnumbersjson"><strong><code>fr/numbers.json</code></strong></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>    "symbols-numberSystem-latn"</span></span>
-<span class="line"><span>: {</span></span>
-<span class="line"><span>        "decimal"</span></span>
-<span class="line"><span>: ","</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>        "group"</span></span>
-<span class="line"><span>: " "</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>        "timeSeparator"</span></span>
-<span class="line"><span>: ":"</span></span>
-<span class="line"><span>        ...</span></span>
-<span class="line"><span>    }</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    ...</span></span>
-<span class="line"><span>    "currencyFormats-numberSystem-latn"</span></span>
-<span class="line"><span>: {</span></span>
-<span class="line"><span>        "standard"</span></span>
-<span class="line"><span>: "#,##0.00 ¤"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>        ...</span></span>
-<span class="line"><span>    }</span></span>
-<span class="line"><span></span></span></code></pre>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="jsonc"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "symbols-numberSystem-latn"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "decimal"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">","</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "group"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">" "</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "timeSeparator"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">":"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // ...</span></span>
+<span class="line"><span style="color:#E06C75">  "currencyFormats-numberSystem-latn"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "standard"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"#,##0.00 ¤"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
 <p>可以看到，小数分隔符是逗号，货币符号（<code>¤</code>）位于数字后面，等等。
 如果你想了解这些格式的具体含义，可以查看 CLDR 的<a href="https://cldr.unicode.org/translation/number-currency-formats/number-and-currency-patterns">在线文档</a>。</p>
 <h3 id="日期">日期</h3>
 <p>日期是 i18n 中最典型、也最需要正确格式化的数据。CLDR 为此定义了大量相关数据。</p>
 <p>这里给一个<a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/ko/ca-gregorian.json">韩语日期</a>的简短示例。</p>
-
-
-
-
-
-
-
-<table><thead><tr><th>韩文</th><th>英文</th></tr></thead></table>
-<p>| <strong><code>ko/ca-gregorian.json</code></strong><code>"months" : {     "format" : {         "wide" : {             "1" : "1월" ,             "2" : "2월" ,             "3" : "3월" ,             "4" : "4월" ,             "5" : "5월" ,             "6" : "6월" ,             "7" : "7월" ,             "8" : "8월" ,             "9" : "9월" ,             "10" : "10월" ,             "11" : "11월" ,             "12" : "12월"         } ,     } } , "days" : {     "format" : {         "abbreviated" : {             "sun" : "일" ,             "mon" : "월" ,             "tue" : "화" ,             "wed" : "수" ,             "thu" : "목" ,             "fri" : "금" ,             "sat" : "토"         } ,     } } , ... "dateFormats" : {     "full" : "y년 MMMM d일 EEEE" ,     "long" : "y년 MMMM d일" ,     "medium" : "y. M. d." ,     "short" : "yy. M. d." } ,</code> | <strong><code>en/ca-gregorian.json</code></strong>```
-“months”
-: {
-“format”
-: {
-“wide”
-: {
-“1”
-: “January”
-,
-“2”
-: “February”
-,
-“3”
-: “March”
-,
-“4”
-: “April”
-,
-“5”
-: “May”
-,
-“6”
-: “June”
-,
-“7”
-: “July”
-,
-“8”
-: “August”
-,
-“9”
-: “September”
-,
-“10”
-: “October”
-,
-“11”
-: “November”
-,
-“12”
-: “December”
-}
-,
-}
-}
-,
-“days”
-: {
-“format”
-: {
-“abbreviated”
-: {
-“sun”
-: “Sun”
-,
-“mon”
-: “Mon”
-,
-“tue”
-: “Tue”
-,
-“wed”
-: “Wed”
-,
-“thu”
-: “Thu”
-,
-“fri”
-: “Fri”
-,
-“sat”
-: “Sat”
-}
-,
-}
-}
-,
-…
-“dateFormats”
-: {
-“full”
-: “EEEE, MMMM d, y”
-,
-“long”
-: “MMMM d, y”
-,
-“medium”
-: “MMM d, y”
-,
-“short”
-: “M/d/yy”
-}
-,</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>### 还有更多</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>它不仅仅包含格式数据，内容远不止这些。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>继续看货币数据，[这里](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-core/supplemental/currencyData.json#L1093-L1104)</span></span>
-<span class="line"><span>记录了各个国家的货币历史。以古巴为例，美元在 1959 年之前都是有效货币。这里甚至能看到一点历史课内容：1959 年正是对古巴禁运开始的时间点。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>#### **`supplemental/currencyData.json`**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span></span></span></code></pre>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>"CU"</span></span>
-<span class="line"><span></span></span></code></pre>
-<p>: [
-{
-“CUP”
-: {
-“_from”
-: “1859-01-01”
-}
-}
-,
-{
-“USD”
-: {
-“_from”
-: “1899-01-01”
-,
-“_to”
-: “1959-01-01”
-}
-}
-,
-]</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>## 这是 bug 吗？</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>那我该如何判断一个显示问题到底是 bug 还是“本来就该这样”的特性？</span></span>
-<span class="line"><span>我会用 Angular 仓库中的几个 issue 来演示。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>### 西班牙语环境下 USD 的值应该是什么？</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>在 [#51671](https://github.com/angular/angular/issues/51671) 这个 issue 中，用户希望意大利语 locale 下的货币符号显示为 `$`。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>现在我们既然知道了 CLDR 的存在，就可以直接去[源数据](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/it/currencies.json#L1112C18-L1112C18)验证。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>#### **`it/currencies.json`**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span></span></span></code></pre>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>"USD"</span></span>
-<span class="line"><span></span></span></code></pre>
-<p>: {
-“displayName”
-: “dollaro statunitense”
-,
-“displayName-count-one”
-: “dollaro statunitense”
-,
-“displayName-count-other”
-: “dollari statunitensi”
-,
-“symbol”
-: “USD”
-,
-“symbol-alt-narrow”
-: ”$”
-}
-,</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>可以看到，意大利语里 USD 的符号确实是 `USD`，而不是 `$`。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>➡️ 结果：**✅ 不是 bug**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>### 西班牙语月份简称少了一个点号吗？</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>再看日期格式这个例子，在 [#51317](https://github.com/angular/angular/issues/51317) 中，用户反馈使用 `MMM` 中等格式时，月份简称少了点号。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>这项信息位于[gregorian calendar 数据](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/es/ca-gregorian.json#L23)里。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>| 西班牙语 | 法语 |</span></span>
-<span class="line"><span>| --- | --- |</span></span>
-<span class="line"><span>| **`es/ca-gregorian.json`**```</span></span>
-<span class="line"><span>"abbreviated"</span></span>
-<span class="line"><span>: {</span></span>
-<span class="line"><span>    "1"</span></span>
-<span class="line"><span>: "ene"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "2"</span></span>
-<span class="line"><span>: "feb"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "3"</span></span>
-<span class="line"><span>: "mar"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "4"</span></span>
-<span class="line"><span>: "abr"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "5"</span></span>
-<span class="line"><span>: "may"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "6"</span></span>
-<span class="line"><span>: "jun"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "7"</span></span>
-<span class="line"><span>: "jul"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "8"</span></span>
-<span class="line"><span>: "ago"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "9"</span></span>
-<span class="line"><span>: "sept"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "10"</span></span>
-<span class="line"><span>: "oct"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "11"</span></span>
-<span class="line"><span>: "nov"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "12"</span></span>
-<span class="line"><span>: "dic"</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>``` | **`fr/ca-gregorian.json`**```</span></span>
-<span class="line"><span>    "1"</span></span>
-<span class="line"><span>: "janv."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "2"</span></span>
-<span class="line"><span>: "févr."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "3"</span></span>
-<span class="line"><span>: "mars"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "4"</span></span>
-<span class="line"><span>: "avr."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "5"</span></span>
-<span class="line"><span>: "mai"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "6"</span></span>
-<span class="line"><span>: "juin"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "7"</span></span>
-<span class="line"><span>: "juil."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "8"</span></span>
-<span class="line"><span>: "août"</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "9"</span></span>
-<span class="line"><span>: "sept."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "10"</span></span>
-<span class="line"><span>: "oct."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "11"</span></span>
-<span class="line"><span>: "nov."</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>    "12"</span></span>
-<span class="line"><span>: "déc."</span></span>
-<span class="line"><span>}</span></span>
-<span class="line"><span>,</span></span>
-<span class="line"><span>``` |</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>可以看到，CLDR 在法语简称中使用点号，但在西班牙语中没有。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>➡️ 结果：**✅ 不是 bug**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>### 负数货币金额缺少空格</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>最后一个例子是 [#46038](https://github.com/angular/angular/issues/46038)。用户反馈 `de-CH` locale 下，货币与负号之间缺少空格。他期望 `CHF-135.00` 显示为 `CHF -135.00`。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>同样，我们来看 [CLDR 数字数据](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/de-CH/numbers.json#L97-L110)：</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span></span></span></code></pre>
-<p>“currencyFormats-numberSystem-latn”
-: {
-“standard”
-: ”¤ #,##0.00;¤-#,##0.00”
-,
-}</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
-<span class="line"><span>CLDR 为瑞士德语货币定义了 2 种模式。可以看到负数模式 `¤-#,##0.00` 中，货币符号（`¤`）与负号之间本来就没有空格。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>➡️ 结果：**✅ 不是 bug**</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>## 最后说明</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>现在你已经是 CLDR 专家了，可以自己去查看 CLDR 仓库，判断你看到的行为是否符合预期。</span></span>
-<span class="line"><span></span></span>
-<span class="line"><span>如果你发现 CLDR 与 Angular 之间存在差异，可以去 [open an issue](https://github.com/angular/angular/issues/new/choose)，Angular 的 locale 数据可能需要同步到最新 CLDR。或者如果你 100% 确认是 CLDR 本身的数据问题，也可以向 CLDR 提交变更请求，详见[这里](https://github.com/unicode-org/cldr/blob/main/docs/requesting_changes.md)。</span></span>
-<span class="line"><span></span></span></code></pre> </article> </div>  <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+<h4 id="koca-gregorianjson"><strong><code>ko/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="jsonc"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "months"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "wide"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"2월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"3월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"4월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"5월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"6월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"7월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"8월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"9월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"10월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"11월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"12월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#E06C75">  "days"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "sun"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"일"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "mon"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"월"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "tue"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"화"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "wed"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"수"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "thu"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"목"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "fri"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"금"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "sat"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"토"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // ...</span></span>
+<span class="line"><span style="color:#E06C75">  "dateFormats"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "full"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"y년 MMMM d일 EEEE"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "long"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"y년 MMMM d일"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "medium"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"y. M. d."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "short"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"yy. M. d."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h4 id="enca-gregorianjson"><strong><code>en/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="jsonc"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "months"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "wide"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"January"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"February"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"March"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"April"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"May"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"June"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"July"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"August"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"September"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"October"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"November"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"December"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#E06C75">  "days"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "format"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">      "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "sun"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Sun"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "mon"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Mon"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "tue"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Tue"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "wed"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Wed"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "thu"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Thu"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "fri"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Fri"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "sat"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"Sat"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">      },</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // ...</span></span>
+<span class="line"><span style="color:#E06C75">  "dateFormats"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "full"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"EEEE, MMMM d, y"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "long"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"MMMM d, y"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "medium"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"MMM d, y"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "short"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"M/d/yy"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#ABB2BF">  },</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h3 id="还有更多">还有更多</h3>
+<p>它不仅仅包含格式数据，内容远不止这些。</p>
+<p>继续看货币数据，<a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-core/supplemental/currencyData.json#L1093-L1104">这里</a>
+记录了各个国家的货币历史。以古巴为例，美元在 1959 年之前都是有效货币。这里甚至能看到一点历史课内容：1959 年正是对古巴禁运开始的时间点。</p>
+<h4 id="supplementalcurrencydatajson"><strong><code>supplemental/currencyData.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "CU"</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      "CUP"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "_from"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1859-01-01"</span></span>
+<span class="line"><span style="color:#ABB2BF">      }</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      "USD"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">        "_from"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1899-01-01"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">        "_to"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"1959-01-01"</span></span>
+<span class="line"><span style="color:#ABB2BF">      }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  ]</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h2 id="这是-bug-吗">这是 bug 吗？</h2>
+<p>那我该如何判断一个显示问题到底是 bug 还是“本来就该这样”的特性？
+我会用 Angular 仓库中的几个 issue 来演示。</p>
+<h3 id="西班牙语环境下-usd-的值应该是什么">西班牙语环境下 USD 的值应该是什么？</h3>
+<p>在 <a href="https://github.com/angular/angular/issues/51671">#51671</a> 这个 issue 中，用户希望意大利语 locale 下的货币符号显示为 <code>$</code>。</p>
+<p>现在我们既然知道了 CLDR 的存在，就可以直接去<a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/it/currencies.json#L1112C18-L1112C18">源数据</a>验证。</p>
+<h4 id="itcurrenciesjson"><strong><code>it/currencies.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "USD"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "displayName"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dollaro statunitense"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "displayName-count-one"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dollaro statunitense"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "displayName-count-other"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dollari statunitensi"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "symbol"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"USD"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "symbol-alt-narrow"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"$"</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>可以看到，意大利语里 USD 的符号确实是 <code>USD</code>，而不是 <code>$</code>。</p>
+<p>➡️ 结果：<strong>✅ 不是 bug</strong></p>
+<h3 id="西班牙语月份简称少了一个点号吗">西班牙语月份简称少了一个点号吗？</h3>
+<p>再看日期格式这个例子，在 <a href="https://github.com/angular/angular/issues/51317">#51317</a> 中，用户反馈使用 <code>MMM</code> 中等格式时，月份简称少了点号。</p>
+<p>这项信息位于<a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/es/ca-gregorian.json#L23">gregorian calendar 数据</a>里。</p>
+<h4 id="esca-gregorianjson"><strong><code>es/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"ene"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"feb"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"mar"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"abr"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"may"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"jun"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"jul"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"ago"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"sept"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"oct"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"nov"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"dic"</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<h4 id="frca-gregorianjson"><strong><code>fr/ca-gregorian.json</code></strong></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "abbreviated"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "1"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"janv."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "2"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"févr."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "3"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"mars"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "4"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"avr."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "5"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"mai"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "6"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"juin"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "7"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"juil."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "8"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"août"</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "9"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"sept."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "10"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"oct."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "11"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"nov."</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">    "12"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"déc."</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>可以看到，CLDR 在法语简称中使用点号，但在西班牙语中没有。</p>
+<p>➡️ 结果：<strong>✅ 不是 bug</strong></p>
+<h3 id="负数货币金额缺少空格">负数货币金额缺少空格</h3>
+<p>最后一个例子是 <a href="https://github.com/angular/angular/issues/46038">#46038</a>。用户反馈 <code>de-CH</code> locale 下，货币与负号之间缺少空格。他期望 <code>CHF-135.00</code> 显示为 <code>CHF -135.00</code>。</p>
+<p>同样，我们来看 <a href="https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/de-CH/numbers.json#L97-L110">CLDR 数字数据</a>：</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  "currencyFormats-numberSystem-latn"</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">    "standard"</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">"¤ #,##0.00;¤-#,##0.00"</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
+<p>CLDR 为瑞士德语货币定义了 2 种模式。可以看到负数模式 <code>¤-#,##0.00</code> 中，货币符号（<code>¤</code>）与负号之间本来就没有空格。</p>
+<p>➡️ 结果：<strong>✅ 不是 bug</strong></p>
+<h2 id="最后说明">最后说明</h2>
+<p>现在你已经是 CLDR 专家了，可以自己去查看 CLDR 仓库，判断你看到的行为是否符合预期。</p>
+<p>如果你发现 CLDR 与 Angular 之间存在差异，可以去 <a href="https://github.com/angular/angular/issues/new/choose">open an issue</a>，Angular 的 locale 数据可能需要同步到最新 CLDR。或者如果你 100% 确认是 CLDR 本身的数据问题，也可以向 CLDR 提交变更请求，详见<a href="https://github.com/unicode-org/cldr/blob/main/docs/requesting_changes.md">这里</a>。</p> </article> </div>  <ul class="astro-vj4tpspi my-8"> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
 &nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/i18n/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
 &nbsp;<span class="astro-blwjyjpt">i18n</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/cldr/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
 &nbsp;<span class="astro-blwjyjpt">cldr</span> </a> </li> <li class="astro-blwjyjpt inline-block my-1 underline-offset-4"> <a href="/tags/localization/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-5"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
