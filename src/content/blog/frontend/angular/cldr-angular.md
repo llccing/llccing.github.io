@@ -26,28 +26,21 @@ Angular 通过提供配置与处理 locale 的必要能力，大大降低了我�
 
 #### **`main.ts`**
 
-```
-import '@angular/common/locales/global/fr'
-;
-bootstrapApplication
-(App, {providers: [
-{provide: LOCALE_ID
-, useValue: 'fr'
-}
-]
-}
-)
-;
+```ts
+import "@angular/common/locales/global/fr";
+
+bootstrapApplication(App, {
+  providers: [{ provide: LOCALE_ID, useValue: "fr" }],
+});
 ```
 
 随后这些 pipes 就会自动使用该 locale。
 
 #### **`my.component.html`**
 
-```
-  {{ date | date: 'dd MMMM yyyy'}} // 2023 年 9 月 16 日（写作时）
-  {{ 35.50 | currency }} // 35,50 $US
-  {{ 300_000_000 | number }} // 300 000 000
+```html
+{{ date | date: "dd MMMM yyyy" }} // 2023 年 9 月 16 日（写作时） {{ 35.50 |
+currency }} // 35,50 $US {{ 300_000_000 | number }} // 300 000 000
 ```
 
 就是这么简单。
@@ -70,28 +63,20 @@ CLDR（[wiki](https://en.wikipedia.org/wiki/Common_Locale_Data_Repository)）是
 
 #### **`fr/numbers.json`**
 
-```
-    "symbols-numberSystem-latn"
-: {
-        "decimal"
-: ","
-,
-        "group"
-: " "
-,
-        "timeSeparator"
-: ":"
-        ...
-    }
-,
-    ...
-    "currencyFormats-numberSystem-latn"
-: {
-        "standard"
-: "#,##0.00 ¤"
-,
-        ...
-    }
+```jsonc
+{
+  "symbols-numberSystem-latn": {
+    "decimal": ",",
+    "group": " ",
+    "timeSeparator": ":",
+    // ...
+  },
+  // ...
+  "currencyFormats-numberSystem-latn": {
+    "standard": "#,##0.00 ¤",
+    // ...
+  },
+}
 ```
 
 可以看到，小数分隔符是逗号，货币符号（`¤`）位于数字后面，等等。
@@ -103,197 +88,95 @@ CLDR（[wiki](https://en.wikipedia.org/wiki/Common_Locale_Data_Repository)）是
 
 这里给一个[韩语日期](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/ko/ca-gregorian.json)的简短示例。
 
-| 韩文 | 英文 |
-| ---- | ---- |
+#### **`ko/ca-gregorian.json`**
 
-| **`ko/ca-gregorian.json`**`"months"
-: {
-    "format"
-: {
-        "wide"
-: {
-            "1"
-: "1월"
-,
-            "2"
-: "2월"
-,
-            "3"
-: "3월"
-,
-            "4"
-: "4월"
-,
-            "5"
-: "5월"
-,
-            "6"
-: "6월"
-,
-            "7"
-: "7월"
-,
-            "8"
-: "8월"
-,
-            "9"
-: "9월"
-,
-            "10"
-: "10월"
-,
-            "11"
-: "11월"
-,
-            "12"
-: "12월"
-        }
-,
-    }
+```jsonc
+{
+  "months": {
+    "format": {
+      "wide": {
+        "1": "1월",
+        "2": "2월",
+        "3": "3월",
+        "4": "4월",
+        "5": "5월",
+        "6": "6월",
+        "7": "7월",
+        "8": "8월",
+        "9": "9월",
+        "10": "10월",
+        "11": "11월",
+        "12": "12월",
+      },
+    },
+  },
+  "days": {
+    "format": {
+      "abbreviated": {
+        "sun": "일",
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토",
+      },
+    },
+  },
+  // ...
+  "dateFormats": {
+    "full": "y년 MMMM d일 EEEE",
+    "long": "y년 MMMM d일",
+    "medium": "y. M. d.",
+    "short": "yy. M. d.",
+  },
 }
-,
-"days"
-: {
-    "format"
-: {
-        "abbreviated"
-: {
-            "sun"
-: "일"
-,
-            "mon"
-: "월"
-,
-            "tue"
-: "화"
-,
-            "wed"
-: "수"
-,
-            "thu"
-: "목"
-,
-            "fri"
-: "금"
-,
-            "sat"
-: "토"
-        }
-,
-    }
-}
-,
-...
-"dateFormats"
-: {
-    "full"
-: "y년 MMMM d일 EEEE"
-,
-    "long"
-: "y년 MMMM d일"
-,
-    "medium"
-: "y. M. d."
-,
-    "short"
-: "yy. M. d."
-}
-,` | **`en/ca-gregorian.json`**```
-"months"
-: {
-"format"
-: {
-"wide"
-: {
-"1"
-: "January"
-,
-"2"
-: "February"
-,
-"3"
-: "March"
-,
-"4"
-: "April"
-,
-"5"
-: "May"
-,
-"6"
-: "June"
-,
-"7"
-: "July"
-,
-"8"
-: "August"
-,
-"9"
-: "September"
-,
-"10"
-: "October"
-,
-"11"
-: "November"
-,
-"12"
-: "December"
-}
-,
-}
-}
-,
-"days"
-: {
-"format"
-: {
-"abbreviated"
-: {
-"sun"
-: "Sun"
-,
-"mon"
-: "Mon"
-,
-"tue"
-: "Tue"
-,
-"wed"
-: "Wed"
-,
-"thu"
-: "Thu"
-,
-"fri"
-: "Fri"
-,
-"sat"
-: "Sat"
-}
-,
-}
-}
-,
-...
-"dateFormats"
-: {
-"full"
-: "EEEE, MMMM d, y"
-,
-"long"
-: "MMMM d, y"
-,
-"medium"
-: "MMM d, y"
-,
-"short"
-: "M/d/yy"
-}
-,
+```
 
-```|
+#### **`en/ca-gregorian.json`**
+
+```jsonc
+{
+  "months": {
+    "format": {
+      "wide": {
+        "1": "January",
+        "2": "February",
+        "3": "March",
+        "4": "April",
+        "5": "May",
+        "6": "June",
+        "7": "July",
+        "8": "August",
+        "9": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December",
+      },
+    },
+  },
+  "days": {
+    "format": {
+      "abbreviated": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+      },
+    },
+  },
+  // ...
+  "dateFormats": {
+    "full": "EEEE, MMMM d, y",
+    "long": "MMMM d, y",
+    "medium": "MMM d, y",
+    "short": "M/d/yy",
+  },
+}
+```
 
 ### 还有更多
 
@@ -304,32 +187,22 @@ CLDR（[wiki](https://en.wikipedia.org/wiki/Common_Locale_Data_Repository)）是
 
 #### **`supplemental/currencyData.json`**
 
-```
-
-    "CU"
-
-: [
+```json
 {
-"CUP"
-: {
-"_from"
-: "1859-01-01"
+  "CU": [
+    {
+      "CUP": {
+        "_from": "1859-01-01"
+      }
+    },
+    {
+      "USD": {
+        "_from": "1899-01-01",
+        "_to": "1959-01-01"
+      }
+    }
+  ]
 }
-}
-,
-{
-"USD"
-: {
-"_from"
-: "1899-01-01"
-,
-"_to"
-: "1959-01-01"
-}
-}
-,
-]
-
 ```
 
 ## 这是 bug 吗？
@@ -345,29 +218,17 @@ CLDR（[wiki](https://en.wikipedia.org/wiki/Common_Locale_Data_Repository)）是
 
 #### **`it/currencies.json`**
 
-```
-
-    "USD"
-
-: {
-"displayName"
-: "dollaro statunitense"
-,
-"displayName-count-one"
-: "dollaro statunitense"
-,
-"displayName-count-other"
-: "dollari statunitensi"
-,
-"symbol"
-: "USD"
-,
-"symbol-alt-narrow"
-: "$"
+```json
+{
+  "USD": {
+    "displayName": "dollaro statunitense",
+    "displayName-count-one": "dollaro statunitense",
+    "displayName-count-other": "dollari statunitensi",
+    "symbol": "USD",
+    "symbol-alt-narrow": "$"
+  }
 }
-,
-
-````
+```
 
 可以看到，意大利语里 USD 的符号确实是 `USD`，而不是 `$`。
 
@@ -379,87 +240,47 @@ CLDR（[wiki](https://en.wikipedia.org/wiki/Common_Locale_Data_Repository)）是
 
 这项信息位于[gregorian calendar 数据](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/es/ca-gregorian.json#L23)里。
 
-| 西班牙语 | 法语 |
-| --- | --- |
-| **`es/ca-gregorian.json`**```
-"abbreviated"
-: {
-    "1"
-: "ene"
-,
-    "2"
-: "feb"
-,
-    "3"
-: "mar"
-,
-    "4"
-: "abr"
-,
-    "5"
-: "may"
-,
-    "6"
-: "jun"
-,
-    "7"
-: "jul"
-,
-    "8"
-: "ago"
-,
-    "9"
-: "sept"
-,
-    "10"
-: "oct"
-,
-    "11"
-: "nov"
-,
-    "12"
-: "dic"
+#### **`es/ca-gregorian.json`**
+
+```json
+{
+  "abbreviated": {
+    "1": "ene",
+    "2": "feb",
+    "3": "mar",
+    "4": "abr",
+    "5": "may",
+    "6": "jun",
+    "7": "jul",
+    "8": "ago",
+    "9": "sept",
+    "10": "oct",
+    "11": "nov",
+    "12": "dic"
+  }
 }
-,
-``` | **`fr/ca-gregorian.json`**```
-    "1"
-: "janv."
-,
-    "2"
-: "févr."
-,
-    "3"
-: "mars"
-,
-    "4"
-: "avr."
-,
-    "5"
-: "mai"
-,
-    "6"
-: "juin"
-,
-    "7"
-: "juil."
-,
-    "8"
-: "août"
-,
-    "9"
-: "sept."
-,
-    "10"
-: "oct."
-,
-    "11"
-: "nov."
-,
-    "12"
-: "déc."
+```
+
+#### **`fr/ca-gregorian.json`**
+
+```json
+{
+  "abbreviated": {
+    "1": "janv.",
+    "2": "févr.",
+    "3": "mars",
+    "4": "avr.",
+    "5": "mai",
+    "6": "juin",
+    "7": "juil.",
+    "8": "août",
+    "9": "sept.",
+    "10": "oct.",
+    "11": "nov.",
+    "12": "déc."
+  }
 }
-,
-``` |
+```
 
 可以看到，CLDR 在法语简称中使用点号，但在西班牙语中没有。
 
@@ -471,15 +292,12 @@ CLDR（[wiki](https://en.wikipedia.org/wiki/Common_Locale_Data_Repository)）是
 
 同样，我们来看 [CLDR 数字数据](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/de-CH/numbers.json#L97-L110)：
 
-````
-
-"currencyFormats-numberSystem-latn"
-: {
-"standard"
-: "¤ #,##0.00;¤-#,##0.00"
-,
+```json
+{
+  "currencyFormats-numberSystem-latn": {
+    "standard": "¤ #,##0.00;¤-#,##0.00"
+  }
 }
-
 ```
 
 CLDR 为瑞士德语货币定义了 2 种模式。可以看到负数模式 `¤-#,##0.00` 中，货币符号（`¤`）与负号之间本来就没有空格。
@@ -491,4 +309,3 @@ CLDR 为瑞士德语货币定义了 2 种模式。可以看到负数模式 `¤-#
 现在你已经是 CLDR 专家了，可以自己去查看 CLDR 仓库，判断你看到的行为是否符合预期。
 
 如果你发现 CLDR 与 Angular 之间存在差异，可以去 [open an issue](https://github.com/angular/angular/issues/new/choose)，Angular 的 locale 数据可能需要同步到最新 CLDR。或者如果你 100% 确认是 CLDR 本身的数据问题，也可以向 CLDR 提交变更请求，详见[这里](https://github.com/unicode-org/cldr/blob/main/docs/requesting_changes.md)。
-```

@@ -13,28 +13,21 @@ You import the locale and setup the locale provider.
 
 #### **`main.ts`**
 
-```
-import '@angular/common/locales/global/fr'
-;
-bootstrapApplication
-(App, {providers: [
-{provide: LOCALE_ID
-, useValue: 'fr'
-}
-]
-}
-)
-;
+```ts
+import "@angular/common/locales/global/fr";
+
+bootstrapApplication(App, {
+  providers: [{ provide: LOCALE_ID, useValue: "fr" }],
+});
 ```
 
 And the pipes will use that locale for you
 
 #### **`my.component.html`**
 
-```
-  {{ date | date: 'dd MMMM yyyy'}} // 16 septembre 2023 (at the time of writing)
-  {{ 35.50 | currency }} // 35,50 $US
-  {{ 300_000_000 | number }} // 300 000 000
+```html
+{{ date | date: "dd MMMM yyyy" }} // 16 septembre 2023 (at the time of writing)
+{{ 35.50 | currency }} // 35,50 $US {{ 300_000_000 | number }} // 300 000 000
 ```
 
 Et voilà.
@@ -57,28 +50,20 @@ As of the v44 of the CLDR, you can see that the repo has support for over 600 lo
 
 #### **`fr/numbers.json`**
 
-```
-    "symbols-numberSystem-latn"
-: {
-        "decimal"
-: ","
-,
-        "group"
-: " "
-,
-        "timeSeparator"
-: ":"
-        ...
-    }
-,
-    ...
-    "currencyFormats-numberSystem-latn"
-: {
-        "standard"
-: "#,##0.00 ¤"
-,
-        ...
-    }
+```jsonc
+{
+  "symbols-numberSystem-latn": {
+    "decimal": ",",
+    "group": " ",
+    "timeSeparator": ":",
+    // ...
+  },
+  // ...
+  "currencyFormats-numberSystem-latn": {
+    "standard": "#,##0.00 ¤",
+    // ...
+  },
+}
 ```
 
 We can see that the decimal separator is the a comma, the currency (`¤`) is after the number etc.
@@ -90,197 +75,95 @@ Dates are famous data that needs to be formatted correctly for a great i18n. The
 
 A short example with the [korean dates](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/ko/ca-gregorian.json)
 
-| Korean | English |
-| ------ | ------- |
+#### **`ko/ca-gregorian.json`**
 
-| **`ko/ca-gregorian.json`**`"months"
-: {
-    "format"
-: {
-        "wide"
-: {
-            "1"
-: "1월"
-,
-            "2"
-: "2월"
-,
-            "3"
-: "3월"
-,
-            "4"
-: "4월"
-,
-            "5"
-: "5월"
-,
-            "6"
-: "6월"
-,
-            "7"
-: "7월"
-,
-            "8"
-: "8월"
-,
-            "9"
-: "9월"
-,
-            "10"
-: "10월"
-,
-            "11"
-: "11월"
-,
-            "12"
-: "12월"
-        }
-,
-    }
+```jsonc
+{
+  "months": {
+    "format": {
+      "wide": {
+        "1": "1월",
+        "2": "2월",
+        "3": "3월",
+        "4": "4월",
+        "5": "5월",
+        "6": "6월",
+        "7": "7월",
+        "8": "8월",
+        "9": "9월",
+        "10": "10월",
+        "11": "11월",
+        "12": "12월",
+      },
+    },
+  },
+  "days": {
+    "format": {
+      "abbreviated": {
+        "sun": "일",
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토",
+      },
+    },
+  },
+  // ...
+  "dateFormats": {
+    "full": "y년 MMMM d일 EEEE",
+    "long": "y년 MMMM d일",
+    "medium": "y. M. d.",
+    "short": "yy. M. d.",
+  },
 }
-,
-"days"
-: {
-    "format"
-: {
-        "abbreviated"
-: {
-            "sun"
-: "일"
-,
-            "mon"
-: "월"
-,
-            "tue"
-: "화"
-,
-            "wed"
-: "수"
-,
-            "thu"
-: "목"
-,
-            "fri"
-: "금"
-,
-            "sat"
-: "토"
-        }
-,
-    }
-}
-,
-...
-"dateFormats"
-: {
-    "full"
-: "y년 MMMM d일 EEEE"
-,
-    "long"
-: "y년 MMMM d일"
-,
-    "medium"
-: "y. M. d."
-,
-    "short"
-: "yy. M. d."
-}
-,` | **`en/ca-gregorian.json`**```
-"months"
-: {
-"format"
-: {
-"wide"
-: {
-"1"
-: "January"
-,
-"2"
-: "February"
-,
-"3"
-: "March"
-,
-"4"
-: "April"
-,
-"5"
-: "May"
-,
-"6"
-: "June"
-,
-"7"
-: "July"
-,
-"8"
-: "August"
-,
-"9"
-: "September"
-,
-"10"
-: "October"
-,
-"11"
-: "November"
-,
-"12"
-: "December"
-}
-,
-}
-}
-,
-"days"
-: {
-"format"
-: {
-"abbreviated"
-: {
-"sun"
-: "Sun"
-,
-"mon"
-: "Mon"
-,
-"tue"
-: "Tue"
-,
-"wed"
-: "Wed"
-,
-"thu"
-: "Thu"
-,
-"fri"
-: "Fri"
-,
-"sat"
-: "Sat"
-}
-,
-}
-}
-,
-...
-"dateFormats"
-: {
-"full"
-: "EEEE, MMMM d, y"
-,
-"long"
-: "MMMM d, y"
-,
-"medium"
-: "MMM d, y"
-,
-"short"
-: "M/d/yy"
-}
-,
+```
 
-```|
+#### **`en/ca-gregorian.json`**
+
+```jsonc
+{
+  "months": {
+    "format": {
+      "wide": {
+        "1": "January",
+        "2": "February",
+        "3": "March",
+        "4": "April",
+        "5": "May",
+        "6": "June",
+        "7": "July",
+        "8": "August",
+        "9": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December",
+      },
+    },
+  },
+  "days": {
+    "format": {
+      "abbreviated": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+      },
+    },
+  },
+  // ...
+  "dateFormats": {
+    "full": "EEEE, MMMM d, y",
+    "long": "MMMM d, y",
+    "medium": "MMM d, y",
+    "short": "M/d/yy",
+  },
+}
+```
 
 ### Even more
 
@@ -291,32 +174,22 @@ the currency history for each country. If we take the example of Cuba, the US Do
 
 #### **`supplemental/currencyData.json`**
 
-```
-
-    "CU"
-
-: [
+```json
 {
-"CUP"
-: {
-"_from"
-: "1859-01-01"
+  "CU": [
+    {
+      "CUP": {
+        "_from": "1859-01-01"
+      }
+    },
+    {
+      "USD": {
+        "_from": "1899-01-01",
+        "_to": "1959-01-01"
+      }
+    }
+  ]
 }
-}
-,
-{
-"USD"
-: {
-"_from"
-: "1899-01-01"
-,
-"_to"
-: "1959-01-01"
-}
-}
-,
-]
-
 ```
 
 ## Do I have a bug ?
@@ -332,29 +205,17 @@ Now that we know the existance of the CLDR, we can check ourselves the info at [
 
 #### **`it/currencies.json`**
 
-```
-
-    "USD"
-
-: {
-"displayName"
-: "dollaro statunitense"
-,
-"displayName-count-one"
-: "dollaro statunitense"
-,
-"displayName-count-other"
-: "dollari statunitensi"
-,
-"symbol"
-: "USD"
-,
-"symbol-alt-narrow"
-: "$"
+```json
+{
+  "USD": {
+    "displayName": "dollaro statunitense",
+    "displayName-count-one": "dollaro statunitense",
+    "displayName-count-other": "dollari statunitensi",
+    "symbol": "USD",
+    "symbol-alt-narrow": "$"
+  }
 }
-,
-
-````
+```
 
 As you can see, the italian symbol for USD is actually `USD` and not `$`
 
@@ -366,87 +227,47 @@ Now, let's have a look at the date formating with issue [#51317](https://github.
 
 This information is located in the [gregorian calendar data](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-dates-full/main/es/ca-gregorian.json#L23).
 
-| Spanish | French |
-| --- | --- |
-| **`es/ca-gregorian.json`**```
-"abbreviated"
-: {
-    "1"
-: "ene"
-,
-    "2"
-: "feb"
-,
-    "3"
-: "mar"
-,
-    "4"
-: "abr"
-,
-    "5"
-: "may"
-,
-    "6"
-: "jun"
-,
-    "7"
-: "jul"
-,
-    "8"
-: "ago"
-,
-    "9"
-: "sept"
-,
-    "10"
-: "oct"
-,
-    "11"
-: "nov"
-,
-    "12"
-: "dic"
+#### **`es/ca-gregorian.json`**
+
+```json
+{
+  "abbreviated": {
+    "1": "ene",
+    "2": "feb",
+    "3": "mar",
+    "4": "abr",
+    "5": "may",
+    "6": "jun",
+    "7": "jul",
+    "8": "ago",
+    "9": "sept",
+    "10": "oct",
+    "11": "nov",
+    "12": "dic"
+  }
 }
-,
-``` | **`fr/ca-gregorian.json`**```
-    "1"
-: "janv."
-,
-    "2"
-: "févr."
-,
-    "3"
-: "mars"
-,
-    "4"
-: "avr."
-,
-    "5"
-: "mai"
-,
-    "6"
-: "juin"
-,
-    "7"
-: "juil."
-,
-    "8"
-: "août"
-,
-    "9"
-: "sept."
-,
-    "10"
-: "oct."
-,
-    "11"
-: "nov."
-,
-    "12"
-: "déc."
+```
+
+#### **`fr/ca-gregorian.json`**
+
+```json
+{
+  "abbreviated": {
+    "1": "janv.",
+    "2": "févr.",
+    "3": "mars",
+    "4": "avr.",
+    "5": "mai",
+    "6": "juin",
+    "7": "juil.",
+    "8": "août",
+    "9": "sept.",
+    "10": "oct.",
+    "11": "nov.",
+    "12": "déc."
+  }
 }
-,
-``` |
+```
 
 As we can see, the CLDR uses a point for shorted name in french but not a spanish.
 
@@ -458,15 +279,12 @@ On the last case that will have our interest today, a user reported, on issue [#
 
 Again, let's check the [CLDR number data](https://github.com/unicode-org/cldr-json/blob/f93780d69dbd62550cd0a3eb64aa3c73b2c45e91/cldr-json/cldr-numbers-full/main/de-CH/numbers.json#L97-L110) :
 
-````
-
-"currencyFormats-numberSystem-latn"
-: {
-"standard"
-: "¤ #,##0.00;¤-#,##0.00"
-,
+```json
+{
+  "currencyFormats-numberSystem-latn": {
+    "standard": "¤ #,##0.00;¤-#,##0.00"
+  }
 }
-
 ```
 
 The CLDR defines 2 different patterns for currencies in swiss german. As we can see in the negative amount pattern `¤-#,##0.00`, there is no space between the currency symbol (represented by `¤`) and the minus.
@@ -478,4 +296,3 @@ The CLDR defines 2 different patterns for currencies in swiss german. As we can 
 Now that you are CLDR experts, you can look for yourself and check the the CLDR repo. Is what you are seeing expected or not ?
 
 If you see any differences between the CLDR and Angular, you can [open an issue](https://github.com/angular/angular/issues/new/choose), the locale data of Angular might need to be updated with the latest CLDR. Or if you are 100% sure to have found a bug in the CLDR, the CLDR accepts change requests, more on that [here](https://github.com/unicode-org/cldr/blob/main/docs/requesting_changes.md).
-```
