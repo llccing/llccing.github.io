@@ -11,12 +11,12 @@ title: "About"
 
 展望未来，我希望能够一直写代码到老，保持对编程的热爱和激情。
 
-详细的工作经历请 >>> <a href="/assets/resume.pdf" target="_blank">查看PDF简历</a> <<<。
+详细的工作经历请 >>> <a href="/assets/resume.pdf" target="_blank">查看中文 PDF 简历</a> / <a href="/assets/resume-en.pdf" target="_blank">View English PDF Resume</a> <<<。
 
 想看更现代、带交互动画的在线版本，可以访问 >>> <a href="/portfolio/">Animated Portfolio</a> <<<。
 
-
 ## History Blogs
+
 - <a href="https://rowanliu.com/FrontEnd" target="_blank"><strong>知识点总结</strong></a>
 - <a href="https://juejin.cn/user/3227821867281079" target="_blank"><strong>掘金</strong></a>
 - <a href="https://www.yuque.com/uov16w" target="_blank"><strong>语雀</strong></a>
