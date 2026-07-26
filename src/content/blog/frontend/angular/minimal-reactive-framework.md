@@ -3,7 +3,7 @@ pubDatetime: 2026-05-30T10:00:00Z
 title: "[译] 用约 200 行 JavaScript 构建响应式框架"
 slug: minimal-reactive-framework
 featured: false
-draft: true
+draft: false
 isTranslation: true
 tags:
   - javascript
