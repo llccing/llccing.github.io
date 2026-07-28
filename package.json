@@ -16,7 +16,8 @@
     "check:content": "node scripts/check-content.mjs",
     "cz": "cz",
     "prepare": "husky install",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "daily-post": "node scripts/daily-commit-helper.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.7.0",
@@ -24,14 +25,15 @@
     "@giscus/react": "^3.1.0",
     "@resvg/resvg-js": "^2.6.0",
     "astro": "^4.2.1",
+    "framer-motion": "^11.18.2",
     "fuse.js": "^7.0.0",
     "github-slugger": "^2.0.0",
     "howler": "^2.2.4",
+    "openai": "^6.49.0",
     "remark-collapse": "^0.1.2",
     "remark-toc": "^9.0.0",
     "satori": "^0.10.11",
     "sharp": "^0.33.4",
-    "framer-motion": "^11.18.2",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.4.5"
   },

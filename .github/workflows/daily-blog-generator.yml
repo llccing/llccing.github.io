@@ -1,0 +1,79 @@
+name: Daily Blog Post Generator
+
+on:
+  schedule:
+    # Runs every day at 2 AM UTC (10 AM Beijing Time)
+    # Adjust based on your preferred publishing time
+    - cron: '0 2 * * *'
+  
+  # Allow manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Blog post topic'
+        required: false
+        default: 'Technology Trends'
+      content_type:
+        description: 'Content type'
+        required: true
+        type: choice
+        options:
+          - technical-note
+          - daily-english-reading
+        default: 'technical-note'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-commit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BLOG_PAT }}
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Generate blog post
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          TOPIC: ${{ github.event.inputs.topic || 'Daily Tech Insights' }}
+          CONTENT_TYPE: ${{ github.event.inputs.content_type || 'technical-note' }}
+        run: |
+          node scripts/generate-daily-post.js
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Commit and push changes
+        run: |
+          git add src/content/blog/*.md
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: add daily blog post [skip ci]"
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
+      
+      - name: Trigger deployment
+        if: success()
+        run: echo "Deployment will be triggered automatically by the deploy workflow"
