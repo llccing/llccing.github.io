@@ -2,7 +2,7 @@ import type { Site, SocialObjects } from "./types";
 
 export const SITE: Site = {
   website: "https://rowanliu.com",
-  base: '/',  // This line ensures correct asset paths
+  base: "/", // This line ensures correct asset paths
   author: "Rowan Liu",
   desc: "日常碎碎念的地方，记录工作生活过程中的各种有意义的事情。",
   title: "Rowan's Blog",
@@ -16,6 +16,29 @@ export const LOCALE = {
   lang: "zh-CN", // html lang code. Set this empty and default will be "en"
   langTag: ["zh-CN"], // BCP 47 Language Tags. Set this empty [] to use the environment default
 } as const;
+
+/**
+ * Domains covered by the generated daily digest.
+ *
+ * Single source of truth for the site side: the content schema and every digest
+ * page read the vocabulary from here. `scripts/digest/sources.mjs` keeps its own
+ * copy because Node cannot import this TypeScript module; the two must stay in
+ * sync.
+ *
+ * Angular is deliberately separate from `web`: it is the blog's deepest topic,
+ * and folding it into a general frontend bucket would bury its signal under
+ * React and Vue release churn.
+ */
+export const DIGEST_DOMAINS = ["angular", "web", "ai", "fullstack"] as const;
+
+export type DigestDomain = (typeof DIGEST_DOMAINS)[number];
+
+export const DIGEST_DOMAIN_LABELS: Record<DigestDomain, string> = {
+  angular: "Angular",
+  web: "Web / 框架",
+  ai: "AI",
+  fullstack: "全栈 / 运行时",
+};
 
 export const LOGO_IMAGE = {
   enable: false,

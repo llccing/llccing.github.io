@@ -1,0 +1,103 @@
+---
+import { type CollectionEntry } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { SITE, DIGEST_DOMAIN_LABELS } from "@config";
+import { getSortedDigests, digestDate, digestPath } from "@utils/getDigests";
+
+export async function getStaticPaths() {
+  const entries = await getSortedDigests();
+  // Newest first, so index+1 is the previous (older) day.
+  return entries.map((entry, index) => ({
+    params: { slug: entry.slug },
+    props: {
+      entry,
+      newer: entries[index - 1],
+      older: entries[index + 1],
+    },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"digest">;
+  newer?: CollectionEntry<"digest">;
+  older?: CollectionEntry<"digest">;
+}
+
+const { entry, newer, older } = Astro.props;
+const { Content } = await entry.render();
+const date = digestDate(entry);
+---
+
+<Layout
+  title={`技术简报 ${date} | ${SITE.title}`}
+  description={entry.data.description ??
+    `${date} 技术动态，共 ${entry.data.itemCount} 条`}
+>
+  <Header activeNav="digest" />
+
+  <div class="mx-auto flex w-full max-w-3xl justify-start px-4">
+    <a href="/digest/" class="focus-outline mb-2 mt-8 flex hover:opacity-75">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        ><path
+          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
+        ></path>
+      </svg><span>返回简报</span>
+    </a>
+  </div>
+
+  <main id="main-content" class="mx-auto w-full max-w-3xl px-4 pb-12">
+    <h1 class="text-2xl font-semibold sm:text-3xl">技术简报 {date}</h1>
+
+    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+      <span class="opacity-80">{entry.data.itemCount} 条</span>
+      {
+        entry.data.domains.map(domain => (
+          <a href={`/digest/domain/${domain}/`} class="digest-domain-tag">
+            {DIGEST_DOMAIN_LABELS[domain]}
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="mt-3 text-sm italic opacity-70">
+      由 {entry.data.generatedBy} 根据下列来源自动生成{
+        entry.data.reviewed ? "，已人工校对" : "，未经人工校对"
+      }。
+    </p>
+
+    <article class="prose mt-8 max-w-3xl">
+      <Content />
+    </article>
+
+    <nav
+      class="mt-12 flex justify-between gap-4 border-t border-skin-line pt-6"
+    >
+      {
+        older ? (
+          <a href={digestPath(older)} class="hover:text-skin-accent">
+            ← {digestDate(older)}
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        newer && (
+          <a href={digestPath(newer)} class="hover:text-skin-accent">
+            {digestDate(newer)} →
+          </a>
+        )
+      }
+    </nav>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .digest-domain-tag {
+    @apply rounded bg-skin-card px-2 py-0.5 text-xs hover:text-skin-accent;
+  }
+</style>

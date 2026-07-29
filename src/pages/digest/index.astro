@@ -1,0 +1,161 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import Main from "@layouts/Main.astro";
+import DigestSourceList from "@components/DigestSourceList.astro";
+import {
+  getSortedDigests,
+  digestDate,
+  digestPath,
+  withinDays,
+  currentMonth,
+  collectSources,
+  sourcesByDomain,
+  domainCounts,
+  groupByMonth,
+} from "@utils/getDigests";
+import { SITE, DIGEST_DOMAIN_LABELS } from "@config";
+
+const entries = await getSortedDigests();
+
+const latest = entries.at(0);
+const week = withinDays(entries, 7);
+const month = currentMonth(entries);
+
+const latestGroups = latest ? sourcesByDomain(latest.data.sources) : [];
+const weekSources = collectSources(week);
+const weekCounts = domainCounts(weekSources);
+const monthSources = collectSources(month);
+const archive = groupByMonth(entries);
+---
+
+<Layout
+  title={`Digest | ${SITE.title}`}
+  description="每日技术动态简报，按领域汇总并附原文链接。"
+>
+  <Header activeNav="digest" />
+  <Main
+    pageTitle="Digest"
+    pageDesc="每日抓取四个领域的官方发布与技术博客，由模型归纳，所有引用均为原文链接。"
+  >
+    {
+      entries.length === 0 ? (
+        <p class="empty">
+          还没有简报。运行 <code>pnpm digest</code> 生成第一条。
+        </p>
+      ) : (
+        <>
+          <section>
+            <div class="section-head">
+              <h2>最新 · {digestDate(latest!)}</h2>
+              <a href={digestPath(latest!)}>查看全文 →</a>
+            </div>
+            <p class="counts">
+              {latest!.data.itemCount} 条 · 由 {latest!.data.generatedBy} 生成
+            </p>
+            {latestGroups.map(group => (
+              <div class="domain-block">
+                <h3>
+                  {group.label}
+                  <span class="badge">{group.sources.length}</span>
+                </h3>
+                <DigestSourceList sources={group.sources} />
+              </div>
+            ))}
+          </section>
+
+          <section>
+            <h2>本周</h2>
+            <p class="counts">
+              {week.length} 天 · {weekSources.length} 条引用
+            </p>
+            <ul class="strip">
+              {weekCounts.map(({ domain, label, count }) => (
+                <li class={count === 0 ? "muted" : ""}>
+                  <a href={`/digest/domain/${domain}/`}>
+                    {label} <span class="badge">{count}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section>
+            <h2>本月</h2>
+            <p class="counts">
+              {month.length} 天 · {monthSources.length} 条引用
+            </p>
+          </section>
+
+          <section>
+            <h2>归档</h2>
+            {archive.map(({ month: label, entries: monthEntries }) => (
+              <div class="archive-month">
+                <h3>{label}</h3>
+                <ul class="days">
+                  {monthEntries.map(entry => (
+                    <li>
+                      <a href={digestPath(entry)}>
+                        {digestDate(entry).slice(8)}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
+        </>
+      )
+    }
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  section {
+    @apply mb-10;
+  }
+  .section-head {
+    @apply flex flex-wrap items-baseline justify-between gap-2;
+  }
+  .section-head a {
+    @apply text-sm underline decoration-dashed underline-offset-4 hover:text-skin-accent;
+  }
+  h2 {
+    @apply text-xl font-semibold;
+  }
+  h3 {
+    @apply mt-4 flex items-center gap-2 text-lg font-medium;
+  }
+  .counts {
+    @apply !my-1 text-sm not-italic opacity-70;
+  }
+  .badge {
+    @apply rounded bg-skin-card px-1.5 py-0.5 text-xs font-normal opacity-80;
+  }
+  .strip {
+    @apply mt-2 flex flex-wrap gap-2;
+  }
+  .strip li a {
+    @apply flex items-center gap-1.5 rounded border border-skin-line px-3 py-1.5 text-sm hover:border-skin-accent hover:text-skin-accent;
+  }
+  .strip li.muted {
+    @apply opacity-40;
+  }
+  .domain-block {
+    @apply mt-3;
+  }
+  .archive-month {
+    @apply mt-3;
+  }
+  .days {
+    @apply mt-1 flex flex-wrap gap-1.5;
+  }
+  .days a {
+    @apply inline-block rounded border border-skin-line px-2 py-1 font-mono text-xs hover:border-skin-accent hover:text-skin-accent;
+  }
+  .empty code {
+    @apply rounded bg-skin-card px-1.5 py-0.5 text-sm;
+  }
+</style>

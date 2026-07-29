@@ -1,0 +1,50 @@
+---
+import type { DigestSource } from "@utils/getDigests";
+
+export interface Props {
+  sources: DigestSource[];
+  /** Show the numbering the digest body cites, e.g. "[3]". */
+  numbered?: boolean;
+}
+
+const { sources, numbered = false } = Astro.props;
+
+function shortDate(value: Date | undefined) {
+  return value ? value.toISOString().slice(0, 10) : "";
+}
+---
+
+<ul class="source-list">
+  {
+    sources.map((source, i) => (
+      <li>
+        {numbered && <span class="index">[{i + 1}]</span>}
+        <a href={source.url} target="_blank" rel="noopener noreferrer">
+          {source.title}
+        </a>
+        <span class="meta">
+          {source.label}
+          {source.publishedAt && ` · ${shortDate(source.publishedAt)}`}
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .source-list {
+    @apply my-2 space-y-2;
+  }
+  .source-list li {
+    @apply flex flex-col text-sm sm:flex-row sm:items-baseline sm:gap-2;
+  }
+  .index {
+    @apply shrink-0 font-mono text-xs opacity-60;
+  }
+  .source-list a {
+    @apply underline decoration-dashed underline-offset-4 hover:text-skin-accent;
+  }
+  .meta {
+    @apply shrink-0 text-xs opacity-60;
+  }
+</style>

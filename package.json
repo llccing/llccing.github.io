@@ -17,7 +17,9 @@
     "cz": "cz",
     "prepare": "husky install",
     "lint": "eslint .",
-    "daily-post": "node scripts/daily-commit-helper.js"
+    "digest": "node scripts/digest/generate.mjs",
+    "digest:dry": "node scripts/digest/generate.mjs --dry-run",
+    "digest:offline": "node scripts/digest/generate.mjs --offline"
   },
   "dependencies": {
     "@astrojs/check": "^0.7.0",
@@ -25,6 +27,7 @@
     "@giscus/react": "^3.1.0",
     "@resvg/resvg-js": "^2.6.0",
     "astro": "^4.2.1",
+    "fast-xml-parser": "^4.5.1",
     "framer-motion": "^11.18.2",
     "fuse.js": "^7.0.0",
     "github-slugger": "^2.0.0",

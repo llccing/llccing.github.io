@@ -1,0 +1,84 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import Main from "@layouts/Main.astro";
+import DigestSourceList from "@components/DigestSourceList.astro";
+import { SITE, DIGEST_DOMAINS, DIGEST_DOMAIN_LABELS } from "@config";
+import type { DigestDomain } from "@config";
+import {
+  getSortedDigests,
+  entriesForDomain,
+  digestDate,
+  digestPath,
+} from "@utils/getDigests";
+
+export async function getStaticPaths() {
+  const entries = await getSortedDigests();
+  // Every domain gets a page even with no entries yet, so navigation from a
+  // digest badge never lands on a 404.
+  return DIGEST_DOMAINS.map(domain => ({
+    params: { domain },
+    props: { domain, groups: entriesForDomain(entries, domain) },
+  }));
+}
+
+interface Props {
+  domain: DigestDomain;
+  groups: ReturnType<typeof entriesForDomain>;
+}
+
+const { domain, groups } = Astro.props;
+const label = DIGEST_DOMAIN_LABELS[domain];
+const total = groups.reduce((sum, g) => sum + g.sources.length, 0);
+---
+
+<Layout
+  title={`${label} 简报 | ${SITE.title}`}
+  description={`${label} 领域的技术动态时间线，共 ${total} 条`}
+>
+  <Header activeNav="digest" />
+  <Main
+    pageTitle={`${label} · 简报时间线`}
+    pageDesc={`按日期倒序，共 ${total} 条动态。`}
+  >
+    <div class="mb-8 flex flex-wrap gap-2">
+      {
+        DIGEST_DOMAINS.map(d => (
+          <a
+            href={`/digest/domain/${d}/`}
+            class={`rounded px-3 py-1 text-sm ${
+              d === domain
+                ? "bg-skin-accent text-skin-inverted"
+                : "bg-skin-card hover:text-skin-accent"
+            }`}
+          >
+            {DIGEST_DOMAIN_LABELS[d]}
+          </a>
+        ))
+      }
+    </div>
+
+    {
+      groups.length === 0 ? (
+        <p class="opacity-70">该领域还没有收录动态。</p>
+      ) : (
+        groups.map(({ entry, sources }) => (
+          <section class="mb-8">
+            <h2 class="text-lg font-semibold">
+              <a href={digestPath(entry)} class="hover:text-skin-accent">
+                {digestDate(entry)}
+              </a>
+            </h2>
+            <DigestSourceList sources={sources} />
+          </section>
+        ))
+      )
+    }
+
+    <p class="mt-12 border-t border-skin-line pt-6 text-sm">
+      <a href="/digest/" class="hover:text-skin-accent">← 返回简报总览</a>
+    </p>
+  </Main>
+  <Footer />
+</Layout>
