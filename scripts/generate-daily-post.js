@@ -72,8 +72,10 @@ function generateFromTemplate(contentType, topic, date) {
       path.join(TEMPLATES_DIR, 'technical-note-template.md'),
       'utf-8'
     );
+    // The template already appends "T09:00:00+08:00" after {{DATE}}, so inject
+    // the plain date here to avoid a duplicated time suffix in pubDatetime.
     content = template
-      .replace(/\{\{DATE\}\}/g, formatDateTime(date))
+      .replace(/\{\{DATE\}\}/g, today)
       .replace(/\[Title: Concise and Descriptive\]/g, topic)
       .replace(/\[Brief summary in 1-2 sentences, max 160 characters\]/g, 
         `Daily technical note about ${topic}`);
@@ -90,10 +92,45 @@ function generateFromTemplate(contentType, topic, date) {
   return filename;
 }
 
+// Some OpenAI-compatible proxies are configured as a bare host. The SDK
+// appends "/chat/completions" straight onto baseURL, so a bare host resolves
+// to https://host/chat/completions and 404s. Add the /v1 prefix when the
+// configured URL carries no path of its own.
+function normalizeBaseURL(raw) {
+  try {
+    const url = new URL(raw);
+    if (url.pathname === '/' || url.pathname === '') {
+      url.pathname = '/v1';
+    }
+    return url.toString().replace(/\/$/, '');
+  } catch (err) {
+    return raw;
+  }
+}
+
+// Surface the provider's actual response in CI logs. Without this an API
+// failure only shows up as a template-based post with no explanation.
+function logApiError(err, label) {
+  console.error(`AI request failed (${label}): ${err && err.message}`);
+  if (err && err.status) console.error(`  status: ${err.status}`);
+  const code = err && (err.code || (err.error && err.error.code));
+  if (code) console.error(`  code: ${code}`);
+  const body = err && err.error;
+  if (body) {
+    try {
+      console.error(`  body: ${JSON.stringify(body).slice(0, 500)}`);
+    } catch (jsonErr) {
+      // non-serializable error payload, message above is enough
+    }
+  }
+}
+
 // AI-based generation (requires AI_API_KEY)
 async function generateWithAI(contentType, topic, date) {
   const apiKey = process.env.AI_API_KEY;
-  const baseURL = process.env.AI_BASE_URL || 'https://api.openai.com/v1';
+  const baseURL = normalizeBaseURL(
+    process.env.AI_BASE_URL || 'https://api.openai.com/v1'
+  );
   const model = process.env.AI_MODEL || 'gpt-4';
 
   if (!apiKey) {
@@ -122,24 +159,77 @@ async function generateWithAI(contentType, topic, date) {
 
     console.log(`Using model: ${model} via ${baseURL}`);
 
-    const response = await openai.chat.completions.create({
-      model,
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a professional blog writer specializing in technology and education.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000
-    });
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a professional blog writer specializing in technology and education.'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ];
 
-    const generatedContent = response.choices[0].message.content;
-    
+    // Reasoning models (grok-4.x, o1, etc.) spend a large budget on hidden
+    // reasoning tokens before emitting any visible content, so the cap needs
+    // room for reasoning *and* the article. They also disagree on which
+    // parameters they accept: newer ones require max_completion_tokens and
+    // reject a custom temperature, older ones only know max_tokens. Try the
+    // modern shape first and fall back rather than failing the whole run.
+    const attempts = [
+      { label: 'max_completion_tokens+temperature', max_completion_tokens: 8000, temperature: 0.7 },
+      { label: 'max_completion_tokens', max_completion_tokens: 8000 },
+      { label: 'max_tokens', max_tokens: 8000 }
+    ];
+
+    let response = null;
+    let lastError = null;
+
+    for (const attempt of attempts) {
+      const { label, ...params } = attempt;
+      try {
+        response = await openai.chat.completions.create({
+          model,
+          messages,
+          ...params
+        });
+        console.log(`Request succeeded using: ${label}`);
+        break;
+      } catch (err) {
+        lastError = err;
+        logApiError(err, label);
+        // Only a rejected-parameter error is worth retrying with a different
+        // parameter shape. Auth failures, wrong endpoints and unknown models
+        // fail identically on every attempt, so stop and report those.
+        if (err && err.status && err.status !== 400) {
+          break;
+        }
+      }
+    }
+
+    if (!response) {
+      throw lastError || new Error('All request attempts failed');
+    }
+
+    const choice = response.choices && response.choices[0];
+    const generatedContent = choice && choice.message && choice.message.content;
+
+    // Log diagnostics so failures are visible in CI logs instead of silently
+    // producing an empty post.
+    console.log(`finish_reason: ${choice ? choice.finish_reason : 'n/a'}`);
+    if (response.usage) {
+      console.log(`usage: ${JSON.stringify(response.usage)}`);
+    }
+
+    if (!generatedContent || !generatedContent.trim()) {
+      console.error(
+        'AI returned empty content (finish_reason=' +
+          (choice ? choice.finish_reason : 'n/a') +
+          '). Falling back to template-based generation.'
+      );
+      return generateFromTemplate(contentType, topic, date);
+    }
+
     // Add frontmatter
     const frontmatter = contentType === 'daily-english-reading'
       ? `---
@@ -167,7 +257,7 @@ draft: false
     return filename;
 
   } catch (error) {
-    console.error('AI generation failed:', error.message);
+    logApiError(error, 'generation');
     console.log('Falling back to template-based generation');
     return generateFromTemplate(contentType, topic, date);
   }
