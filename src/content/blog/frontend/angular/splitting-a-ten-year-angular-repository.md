@@ -21,7 +21,10 @@ description: 一个运行十年的 Angular 项目已经按业务划分目录，�
 
 <!-- PODCAST_AUDIO_START -->
 
-> 音频版正在制作中。完成上传后，这里会提供完整的双人技术对谈播放器。
+<audio controls preload="metadata" style="width: 100%" aria-label="十年 Angular 仓库拆分双人技术对谈">
+  <source src="https://podcast-audio-worker.lcf33123.workers.dev/audio/podcasts/angular-repo-split.mp3" type="audio/mpeg" />
+  你的浏览器不支持音频播放。
+</audio>
 
 <!-- PODCAST_AUDIO_END -->
 
