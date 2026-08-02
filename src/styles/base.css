@@ -96,6 +96,14 @@
     background-color: rgb(var(--color-accent) / 0.09);
     box-shadow: -3px 0 0 rgb(var(--color-accent));
   }
+  @media (max-width: 640px) {
+    .prose table {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  }
   .prose summary {
     @apply focus-outline;
   }
