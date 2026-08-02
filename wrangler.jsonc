@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "rowan-blog-comments",
+  "main": "workers/comments-api/src/index.ts",
+  "compatibility_date": "2026-08-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "vars": {
+    "GITHUB_OWNER": "llccing",
+    "GITHUB_REPO": "llccing.github.io",
+    "GITHUB_REPO_ID": "R_kgDOL98uEQ",
+    "GITHUB_CATEGORY_ID": "DIC_kwDOL98uEc4C7B0s",
+    "OWNER_LOGIN": "llccing",
+    "SITE_URL": "https://rowanliu.com",
+    "ALLOWED_ORIGINS": "https://rowanliu.com,http://localhost:4321,http://127.0.0.1:4321"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

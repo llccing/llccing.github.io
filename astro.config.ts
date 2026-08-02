@@ -5,6 +5,7 @@ import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import sitemap from "@astrojs/sitemap";
 import { remarkReadingTime } from "./src/utils/remark-reading-time";
+import { rehypeCommentAnchors } from "./src/utils/rehype-comment-anchors";
 import { SITE } from "./src/config";
 
 // Set timezone to Asia/Shanghai (UTC+8) for all date processing
@@ -21,6 +22,7 @@ export default defineConfig({
     sitemap(),
   ],
   markdown: {
+    rehypePlugins: [rehypeCommentAnchors],
     remarkPlugins: [
       remarkReadingTime,
       remarkToc,

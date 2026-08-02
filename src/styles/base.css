@@ -83,6 +83,19 @@
   .prose details {
     @apply inline-block cursor-pointer select-none text-skin-base;
   }
+  .prose [data-comment-block-id] {
+    scroll-margin-top: 5rem;
+    transition:
+      background-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+  .prose [data-comment-block-id].inline-comment-owner-block {
+    cursor: text;
+  }
+  .prose [data-comment-block-id].inline-comment-active {
+    background-color: rgb(var(--color-accent) / 0.09);
+    box-shadow: -3px 0 0 rgb(var(--color-accent));
+  }
   .prose summary {
     @apply focus-outline;
   }

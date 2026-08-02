@@ -8,6 +8,7 @@ import { type CollectionEntry, getEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
 import Comments from "@components/Comments";
+import InlineComments from "@components/InlineComments";
 import { SITE } from "@config";
 
 export interface Props {
@@ -30,6 +31,9 @@ const {
 const { Content, headings, remarkPluginFrontmatter } = await post.render();
 const minutesRead = remarkPluginFrontmatter?.minutesRead;
 const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+const commentsApiUrl = import.meta.env.PUBLIC_COMMENTS_API_URL;
+const inlineCommentsEnabled =
+  import.meta.env.PUBLIC_INLINE_COMMENTS === "true" && Boolean(commentsApiUrl);
 
 // Translation support
 const isTranslation =
@@ -153,6 +157,17 @@ const layoutProps = {
           )}
           <Content />
         </article>
+      )
+    }
+
+    {
+      inlineCommentsEnabled && (
+        <InlineComments
+          apiUrl={commentsApiUrl}
+          articlePath={Astro.url.pathname}
+          articleTitle={title}
+          client:only="react"
+        />
       )
     }
 
@@ -362,7 +377,9 @@ const layoutProps = {
 
       try {
         sessionStorage.setItem("translation-view-mode", view);
-      } catch (e) {}
+      } catch (e) {
+        // Storage can be unavailable in private browsing modes.
+      }
     }
 
     buttons.forEach(function (btn) {
@@ -375,7 +392,9 @@ const layoutProps = {
     try {
       var saved = sessionStorage.getItem("translation-view-mode");
       if (saved && saved !== "translated") switchView(saved);
-    } catch (e) {}
+    } catch (e) {
+      // Keep the default view when storage is unavailable.
+    }
   }
   initTranslationToggle();
 </script>

@@ -1,0 +1,44 @@
+name: Answer inline annotation with AI
+
+on:
+  discussion_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  discussions: write
+
+concurrency:
+  group: annotation-ai-${{ github.event.comment.node_id }}
+  cancel-in-progress: false
+
+jobs:
+  answer:
+    if: >-
+      github.event.comment.user.login == 'llccing' &&
+      contains(github.event.comment.body, '@ai')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Answer annotation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.AI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          OPENAI_MODEL: ${{ secrets.AI_MODEL }}
+        run: pnpm exec tsx scripts/comments/respond-to-ai.ts
