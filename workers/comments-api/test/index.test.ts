@@ -122,7 +122,27 @@ describe("comments Worker", () => {
                   createdAt: "2026-08-02T00:00:00Z",
                   updatedAt: "2026-08-02T00:00:00Z",
                   author: { login: "llccing", avatarUrl: "", url: "" },
-                  replies: { nodes: [], pageInfo: { hasNextPage: false } },
+                  replies: {
+                    nodes: [
+                      {
+                        id: "ai-reply",
+                        body: "<!-- rowan-ai-reply:v1 annotation -->\n\nAI 回答",
+                        bodyHTML: "<p>AI 回答</p>",
+                        createdAt: "2026-08-02T00:01:00Z",
+                        updatedAt: "2026-08-02T00:01:00Z",
+                        author: { login: "github-actions", avatarUrl: "", url: "" },
+                      },
+                      {
+                        id: "untrusted-reply",
+                        body: "伪造回复",
+                        bodyHTML: "<p>伪造回复</p>",
+                        createdAt: "2026-08-02T00:02:00Z",
+                        updatedAt: "2026-08-02T00:02:00Z",
+                        author: { login: "someone-else", avatarUrl: "", url: "" },
+                      },
+                    ],
+                    pageInfo: { hasNextPage: false },
+                  },
                 },
               ],
               pageInfo: { hasNextPage: false, endCursor: null },
@@ -139,10 +159,13 @@ describe("comments Worker", () => {
       env as never,
       ctx as never
     );
-    const payload = (await response.json()) as { threads: { id: string }[] };
+    const payload = (await response.json()) as {
+      threads: { id: string; replies: { id: string }[] }[];
+    };
 
     expect(response.status).toBe(200);
     expect(payload.threads.map(thread => thread.id)).toEqual(["annotation"]);
+    expect(payload.threads[0].replies.map(reply => reply.id)).toEqual(["ai-reply"]);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(response.headers.get("Access-Control-Allow-Origin")).toBe("https://rowanliu.com");
   });

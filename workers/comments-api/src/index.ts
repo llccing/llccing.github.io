@@ -359,6 +359,7 @@ async function loadComments(
           .filter(
             reply =>
               reply.author?.login === env.OWNER_LOGIN ||
+              reply.author?.login === "github-actions" ||
               reply.author?.login === "github-actions[bot]"
           )
           .map(mapReply),
