@@ -19,6 +19,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "check:worker": "tsc --noEmit -p workers/comments-api/tsconfig.json && wrangler deploy --dry-run",
+    "comments:export": "node scripts/comments/export-annotations.mjs",
     "digest": "node scripts/digest/generate.mjs",
     "digest:dry": "node scripts/digest/generate.mjs --dry-run",
     "digest:offline": "node scripts/digest/generate.mjs --offline"
