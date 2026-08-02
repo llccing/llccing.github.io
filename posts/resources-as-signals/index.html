@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh-CN" class="scroll-smooth"><head><meta charset="UTF-8"><style>:where(img){height:auto}</style><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/assets/rowanliu-logo.png"><link rel="canonical" href="https://riegler.fr/blog/2024-10-18-resources-as-signals"><meta name="generator" content="Astro v4.16.18"><!-- General Meta Tags --><title>[译] Resource: async loading with signals | Rowan's Blog</title><meta name="title" content="[译] Resource: async loading with signals | Rowan's Blog"><meta name="description" content="谁说你需要效果？"><meta name="author" content="Rowan Liu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="[译] Resource: async loading with signals | Rowan's Blog"><meta property="og:description" content="谁说你需要效果？"><meta property="og:url" content="https://riegler.fr/blog/2024-10-18-resources-as-signals"><meta property="og:image" content="https://rowanliu.com/posts/%E8%AF%91-resource-async-loading-with-signals.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2026-05-30T06:35:22.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://riegler.fr/blog/2024-10-18-resources-as-signals"><meta property="twitter:title" content="[译] Resource: async loading with signals | Rowan's Blog"><meta property="twitter:description" content="谁说你需要效果？"><meta property="twitter:image" content="https://rowanliu.com/posts/%E8%AF%91-resource-async-loading-with-signals.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><meta name="theme-color" content=""><!-- Google Analytics (gtag) --><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){width:100%;max-width:48rem;margin:2rem auto .25rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}</style>
-<link rel="stylesheet" href="/_astro/about.QzML0WrB.css">
+<link rel="stylesheet" href="/_astro/about.rC69PSJu.css">
 <style>#main-content:where(.astro-hsp6otuf){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:1rem;padding-left:1rem;padding-right:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;font-weight:600;line-height:2rem}@media (min-width:640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-top:.5rem;margin-bottom:1.5rem;font-style:italic}a:where(.astro-blwjyjpt){text-decoration-line:underline;text-decoration-style:dashed;position:relative}a:where(.astro-blwjyjpt):hover{--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));top:-.125rem}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){--tw-scale-x:.95;--tw-scale-y:.95;width:1.5rem;height:1.5rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));opacity:.8;margin-right:-1.25rem}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}</style>
 <link rel="stylesheet" href="/_astro/about.Dyly9mp_.css">
 <style>.pagination-wrapper:where(.astro-d776pwuy){justify-content:center;margin-top:auto;margin-bottom:2rem;display:flex}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*){animation:none!important}::view-transition-old(*){animation:none!important}::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}.filter-bar:where(.astro-eenky23y){--tw-border-opacity:1;border-bottom-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));flex-direction:column;gap:.75rem;margin-bottom:2rem;padding-bottom:1.5rem;display:flex}.filter-row:where(.astro-eenky23y){-moz-column-gap:.75rem;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;display:flex}.filter-label:where(.astro-eenky23y){text-transform:uppercase;letter-spacing:.1em;opacity:.5;flex-shrink:0;font-size:.75rem;font-weight:600;line-height:1rem}.dir-pills:where(.astro-eenky23y){flex-wrap:wrap;gap:.375rem;display:flex}.dir-pill:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));border-radius:9999px;padding:.125rem .75rem;font-size:.875rem;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.dir-pill:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1))}.dir-pill:where(.astro-eenky23y).is-active{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));background-color:rgba(var(--color-accent),.1);--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-weight:500}.tag-select:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));--tw-bg-opacity:1;background-color:rgba(var(--color-fill),var(--tw-bg-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));outline-offset:2px;border-radius:.25rem;outline:2px solid #0000;padding:.25rem .5rem;font-size:.875rem;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.tag-select:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1))}.filter-meta:where(.astro-eenky23y){align-items:center;gap:.5rem;font-size:.875rem;line-height:1.25rem;display:flex}:where(.astro-eenky23y)[data-filter-summary]{opacity:.5}.clear-btn:where(.astro-eenky23y){cursor:pointer;--tw-border-opacity:1;border-width:1px;border-color:rgba(var(--color-border),var(--tw-border-opacity,1));opacity:.6;border-radius:.25rem;padding:.125rem .5rem;font-size:.75rem;line-height:1rem;transition-property:all;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.clear-btn:where(.astro-eenky23y):hover{--tw-border-opacity:1;border-color:rgba(var(--color-accent),var(--tw-border-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));opacity:1}.clear-btn:where(.astro-eenky23y).is-hidden,.post-item.is-hidden{display:none}.social-icons:where(.astro-wkojbtzc){flex-flow:column wrap;justify-content:center;align-items:center;gap:.25rem;display:flex}@media (min-width:640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x:.9;--tw-scale-y:.9;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate:6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y))rotate(var(--tw-rotate))skew(var(--tw-skew-x))skewY(var(--tw-skew-y))scaleX(var(--tw-scale-x))scaleY(var(--tw-scale-y))}@media (min-width:640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){width:100%;max-width:48rem;margin-left:auto;margin-right:auto;padding-bottom:3rem;padding-left:1rem;padding-right:1rem;transition:max-width .3s}main:where(.astro-vj4tpspi).comparison-active{max-width:90rem}.post-title:where(.astro-vj4tpspi){--tw-text-opacity:1;color:rgba(var(--color-accent),var(--tw-text-opacity,1));font-size:1.5rem;font-weight:600;line-height:2rem}.toggle-btn:where(.astro-vj4tpspi){cursor:pointer;text-align:center;--tw-text-opacity:1;color:rgba(var(--color-text-base),var(--tw-text-opacity,1));border-radius:.375rem;flex:1;padding:.375rem .75rem;font-size:.875rem;font-weight:500;line-height:1.25rem;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-duration:.15s;transition-timing-function:cubic-bezier(.4,0,.2,1)}.toggle-btn:where(.astro-vj4tpspi).active{--tw-bg-opacity:1;background-color:rgba(var(--color-accent),var(--tw-bg-opacity,1));--tw-text-opacity:1;color:rgba(var(--color-fill),var(--tw-text-opacity,1))}.toggle-btn:where(.astro-vj4tpspi):not(.active):hover{--tw-bg-opacity:1;background-color:rgba(var(--color-card-muted),var(--tw-bg-opacity,1))}#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr 1fr;gap:2rem;display:grid}@media (max-width:640px){#translation-container:where(.astro-vj4tpspi).comparison-mode{grid-template-columns:1fr}}#translation-container:where(.astro-vj4tpspi).comparison-mode article:where(.astro-vj4tpspi){max-width:none}</style><script type="module" src="/_astro/hoisted.B8ZB5t_M.js"></script><style>[data-astro-transition-scope=astro-ti6a3mbw-1]{view-transition-name:译-resource-async-loading-with-signals}@layer astro{::view-transition-old(译-resource-async-loading-with-signals){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(译-resource-async-loading-with-signals){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(译-resource-async-loading-with-signals){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(译-resource-async-loading-with-signals){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-ti6a3mbw-1],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-ti6a3mbw-1]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-2]{view-transition-name:angular}@layer astro{::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(angular){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(angular){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-2],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-2]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style><style>[data-astro-transition-scope=astro-36ssibgs-3]{view-transition-name:signals}@layer astro{::view-transition-old(signals){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}::view-transition-new(signals){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-old(signals){animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back]::view-transition-new(signals){animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}}[data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=old] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=old][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeOut;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}[data-astro-transition=back][data-astro-transition-fallback=new] [data-astro-transition-scope=astro-36ssibgs-3],[data-astro-transition=back][data-astro-transition-fallback=new][data-astro-transition-scope=astro-36ssibgs-3]{animation-name:astroFadeIn;animation-duration:.18s;animation-timing-function:cubic-bezier(.76,0,.24,1);animation-fill-mode:both}</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="astro-3ef6ksr2 nav-container"> <div class="astro-3ef6ksr2 top-nav-wrap"> <a href="/" class="astro-3ef6ksr2 logo whitespace-nowrap"> Rowan's Blog </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="astro-3ef6ksr2 focus-outline hamburger-menu" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="astro-3ef6ksr2 menu-icon"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="astro-3ef6ksr2 close"></line> <line x1="6" y1="6" x2="18" y2="18" class="astro-3ef6ksr2 close"></line> </svg> </button> <ul id="menu-items" class="astro-3ef6ksr2 display-none sm:flex"> <li class="astro-3ef6ksr2"> <a href="/posts/" class="astro-3ef6ksr2">
@@ -19,17 +19,17 @@ About
 原文
 </button> <button class="astro-vj4tpspi toggle-btn" data-view="comparison">
 对照
-</button> </div> <div id="translation-container" class="astro-vj4tpspi mt-8"> <article id="article-original" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose" hidden=""> <p>Defining APIs and patterns around them is a task that requires time, feedback loops and taking a step back.
+</button> </div> <div id="translation-container" class="astro-vj4tpspi mt-8"> <article id="article-original" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose" hidden=""> <p data-comment-block-id="cb-article-1b9f6777d49b" data-comment-heading-id="article">Defining APIs and patterns around them is a task that requires time, feedback loops and taking a step back.
 As the Signal APIs mature in Angular (most of them are being promoted to stable in v19, exception of <code>effect</code>), it
 becomes time to have a look at more advanced patterns.</p>
-<p>The usage of <code>effect</code> has been a debated topic, Alex Rickabaugh, the framework lead of the Angular Team has been pretty vocal on <a href="https://www.youtube.com/watch?v=aKxcIQMWSNU">recommending to use them as less as possible</a>.
+<p data-comment-block-id="cb-article-e88bb995a30f" data-comment-heading-id="article">The usage of <code>effect</code> has been a debated topic, Alex Rickabaugh, the framework lead of the Angular Team has been pretty vocal on <a href="https://www.youtube.com/watch?v=aKxcIQMWSNU">recommending to use them as less as possible</a>.
 There are alternatives, often abstractions on top of if which express more the intention of the developers.</p>
-<h2 id="introducing-the-resource-api">Introducing the <code>resource</code> API.</h2>
-<p>The <code>resource</code> API is one of those APIs that is intended to abstract the usage of <code>effect</code> and provide a more declarative signal-based API
+<h2 data-comment-block-id="cb-introducing-the-resource-api-d1a4ef0161e8" data-comment-heading-id="introducing-the-resource-api" id="introducing-the-resource-api">Introducing the <code>resource</code> API.</h2>
+<p data-comment-block-id="cb-introducing-the-resource-api-a85e58563099" data-comment-heading-id="introducing-the-resource-api">The <code>resource</code> API is one of those APIs that is intended to abstract the usage of <code>effect</code> and provide a more declarative signal-based API
 for asynchronous loading of data.</p>
-<p>As a bare minimum <code>resource</code> requires a <code>loader</code> that returns async data and returns an <code>WritableResource</code> wrapper object.
+<p data-comment-block-id="cb-introducing-the-resource-api-3ce0486fc85e" data-comment-heading-id="introducing-the-resource-api">As a bare minimum <code>resource</code> requires a <code>loader</code> that returns async data and returns an <code>WritableResource</code> wrapper object.
 The <code>loader</code> function is invoked eagerly (as part of an <code>effect</code>).</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-introducing-the-resource-api-7c21858667f4" data-comment-heading-id="introducing-the-resource-api"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>@Component({</span></span>
 <span class="line"><span>  template: `</span></span>
@@ -44,27 +44,27 @@ The <code>loader</code> function is invoked eagerly (as part of an <code>effect<
 <span class="line"><span>  });</span></span>
 <span class="line"><span>}</span></span>
 <span class="line"><span></span></span></code></pre>
-<p>This example will display nothing (<code>undefined</code>) until the data is loaded and <code>My data is loaded</code> once the promise is resolved.</p>
-<h2 id="the-loading-status-as-a-key-information">The loading status as a key information</h2>
-<p>When we are loading data asynchronously, it is important to keep track of our loading status.
+<p data-comment-block-id="cb-introducing-the-resource-api-535546cc1853" data-comment-heading-id="introducing-the-resource-api">This example will display nothing (<code>undefined</code>) until the data is loaded and <code>My data is loaded</code> once the promise is resolved.</p>
+<h2 data-comment-block-id="cb-the-loading-status-as-a-key-information-30476c8f9567" data-comment-heading-id="the-loading-status-as-a-key-information" id="the-loading-status-as-a-key-information">The loading status as a key information</h2>
+<p data-comment-block-id="cb-the-loading-status-as-a-key-information-cbc6d9232bfe" data-comment-heading-id="the-loading-status-as-a-key-information">When we are loading data asynchronously, it is important to keep track of our loading status.
 Is it loading ? Is it done ? Did I get an error ?</p>
-<p>Famously, having a <code>isLoading</code> boolean is considered an anti-pattern as it lacks a lot of information around it.</p>
-<p>A <code>WritableResource</code> holds 3 key information.</p>
+<p data-comment-block-id="cb-the-loading-status-as-a-key-information-8047adb1ab4f" data-comment-heading-id="the-loading-status-as-a-key-information">Famously, having a <code>isLoading</code> boolean is considered an anti-pattern as it lacks a lot of information around it.</p>
+<p data-comment-block-id="cb-the-loading-status-as-a-key-information-6549879708f6" data-comment-heading-id="the-loading-status-as-a-key-information">A <code>WritableResource</code> holds 3 key information.</p>
 <ul>
-<li><code>value</code>, a signal wrapped value for the loaded</li>
-<li><code>status</code>, a signal wrapped value of the loading status (<code>'idle' | 'error' | 'loading' | 'refreshing' | 'resolved' | 'local'</code>)</li>
-<li><code>error</code>, a signal wrapped object for the details of the error, loading resulted in an error.</li>
+<li data-comment-block-id="cb-the-loading-status-as-a-key-information-4c12442a27f4" data-comment-heading-id="the-loading-status-as-a-key-information"><code>value</code>, a signal wrapped value for the loaded</li>
+<li data-comment-block-id="cb-the-loading-status-as-a-key-information-70260bfd54c4" data-comment-heading-id="the-loading-status-as-a-key-information"><code>status</code>, a signal wrapped value of the loading status (<code>'idle' | 'error' | 'loading' | 'refreshing' | 'resolved' | 'local'</code>)</li>
+<li data-comment-block-id="cb-the-loading-status-as-a-key-information-cf47088ec115" data-comment-heading-id="the-loading-status-as-a-key-information"><code>error</code>, a signal wrapped object for the details of the error, loading resulted in an error.</li>
 </ul>
-<p>If we capture this in an <code>effect</code> we would observe following:</p>
-<h4 id="capturing-resource-changes"><code>Capturing resource changes</code></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>effect(() =&gt; {</span></span>
+<p data-comment-block-id="cb-the-loading-status-as-a-key-information-f66d9d51aa7f" data-comment-heading-id="the-loading-status-as-a-key-information">If we capture this in an <code>effect</code> we would observe following:</p>
+<h4 data-comment-block-id="cb-capturing-resource-changes-d3b4eeba5122" data-comment-heading-id="capturing-resource-changes" id="capturing-resource-changes"><code>Capturing resource changes</code></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-capturing-resource-changes-57b3e9c86b9e" data-comment-heading-id="capturing-resource-changes"><code><span class="line"><span>effect(() =&gt; {</span></span>
 <span class="line"><span>  console.log('value: ', this.myResource.value());</span></span>
 <span class="line"><span>  console.log('status: ', this.myResource.status(), myResource.status());</span></span>
 <span class="line"><span>  console.log('error: ', this.myResource.error());</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h4 id="output"><code>Output</code></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>value: undefined</span></span>
+<h4 data-comment-block-id="cb-output-38523a7faeb5" data-comment-heading-id="output" id="output"><code>Output</code></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-output-a6c7f6b74860" data-comment-heading-id="output"><code><span class="line"><span>value: undefined</span></span>
 <span class="line"><span>status: 0 Idle</span></span>
 <span class="line"><span>error: undefined</span></span>
 <span class="line"><span></span></span>
@@ -72,30 +72,30 @@ Is it loading ? Is it done ? Did I get an error ?</p>
 <span class="line"><span>status: 3 Resolved</span></span>
 <span class="line"><span>error: undefined</span></span>
 <span class="line"><span></span></span></code></pre>
-<h2 id="fetching-data">Fetching data</h2>
-<p>You’ll probably reach out to <code>resource</code> for fetching async data over HTTP, but it could be any other async API that is promised based.
+<h2 data-comment-block-id="cb-fetching-data-5b01941911f7" data-comment-heading-id="fetching-data" id="fetching-data">Fetching data</h2>
+<p data-comment-block-id="cb-fetching-data-841d022cca8f" data-comment-heading-id="fetching-data">You’ll probably reach out to <code>resource</code> for fetching async data over HTTP, but it could be any other async API that is promised based.
 Let’s take an example using <code>fetch</code>.</p>
-<h3 id="basic-fetch-resource-example"><code>Basic fetch resource example</code></h3>
-<p><code>fetch</code> returns a promise which is passed to <code>resource</code> as the loader. The <code>fetch</code> request emitted instantly (as part of an <code>effect()</code>) without
+<h3 data-comment-block-id="cb-basic-fetch-resource-example-7ef827f9f2ee" data-comment-heading-id="basic-fetch-resource-example" id="basic-fetch-resource-example"><code>Basic fetch resource example</code></h3>
+<p data-comment-block-id="cb-basic-fetch-resource-example-b5b8183ee4d1" data-comment-heading-id="basic-fetch-resource-example"><code>fetch</code> returns a promise which is passed to <code>resource</code> as the loader. The <code>fetch</code> request emitted instantly (as part of an <code>effect()</code>) without
 any template or additional <code>effect</code> consuming the <code>WritableResource</code>.</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({loader: () =&gt; fetch(`https://dummyjson.com/posts/1`)});</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-basic-fetch-resource-example-745cddcd9da6" data-comment-heading-id="basic-fetch-resource-example"><code><span class="line"><span>postResource = resource({loader: () =&gt; fetch(`https://dummyjson.com/posts/1`)});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h2 id="reacting-to-signal-changes">Reacting to signal changes</h2>
-<p>One of the missing building pieces has been about reacting to signal changes and reloading data as a consequence.
+<h2 data-comment-block-id="cb-reacting-to-signal-changes-dc981588c3e3" data-comment-heading-id="reacting-to-signal-changes" id="reacting-to-signal-changes">Reacting to signal changes</h2>
+<p data-comment-block-id="cb-reacting-to-signal-changes-cd2cfb1a143a" data-comment-heading-id="reacting-to-signal-changes">One of the missing building pieces has been about reacting to signal changes and reloading data as a consequence.
 The <code>resource</code> API addresses this requirement by declaring dependencies as part of a <code>request</code>.</p>
-<h3 id="listening-to-a-signal-change">Listening to a signal change</h3>
-<p>The dependencies are declared as part of the <code>request</code> callback.</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<h3 data-comment-block-id="cb-listening-to-a-signal-change-1f7064865059" data-comment-heading-id="listening-to-a-signal-change" id="listening-to-a-signal-change">Listening to a signal change</h3>
+<p data-comment-block-id="cb-listening-to-a-signal-change-21e19a768d4e" data-comment-heading-id="listening-to-a-signal-change">The dependencies are declared as part of the <code>request</code> callback.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-listening-to-a-signal-change-d48a3b207484" data-comment-heading-id="listening-to-a-signal-change"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: this.postId, // this could be one of your signal inputs</span></span>
 <span class="line"><span>  loader: ({request: postId}) =&gt; return fetch(`https://dummyjson.com/posts/${postId}`),</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<p>Signals read as part of the loader callback will not trigger further loading upon changes
+<p data-comment-block-id="cb-listening-to-a-signal-change-5ad3973a85cd" data-comment-heading-id="listening-to-a-signal-change">Signals read as part of the loader callback will not trigger further loading upon changes
 (The <code>loader</code>’s execution is <code>untracked</code>).</p>
-<p>If you’re asking yourself why the loader function isn’t tracked, it’s because the async part of the loader function wouldn’t be tracked.
+<p data-comment-block-id="cb-listening-to-a-signal-change-387a18f7be62" data-comment-heading-id="listening-to-a-signal-change">If you’re asking yourself why the loader function isn’t tracked, it’s because the async part of the loader function wouldn’t be tracked.
 So to make it more clear reactivity-wise, the reactive part (the <code>request</code>) was separated for the loading part (the <code>loader</code>).</p>
-<h4 id="if-the-loader-was-a-reactive-context"><code>If the loader was a reactive context</code></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<h4 data-comment-block-id="cb-if-the-loader-was-a-reactive-context-ab4fa75be8ac" data-comment-heading-id="if-the-loader-was-a-reactive-context" id="if-the-loader-was-a-reactive-context"><code>If the loader was a reactive context</code></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-if-the-loader-was-a-reactive-context-8a0aa3d3fa62" data-comment-heading-id="if-the-loader-was-a-reactive-context"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; this.postId(),</span></span>
 <span class="line"><span>  loader: async ({request}) =&gt; {</span></span>
 <span class="line"><span>    // signals can be tracked</span></span>
@@ -105,30 +105,30 @@ So to make it more clear reactivity-wise, the reactive part (the <code>request</
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h3 id="listening-to-multiple-signal-changes">Listening to multiple signal changes</h3>
-<p>A more realistic use case would be to listen to multiple signal at once and react to the change
+<h3 data-comment-block-id="cb-listening-to-multiple-signal-changes-dbbbd8d51645" data-comment-heading-id="listening-to-multiple-signal-changes" id="listening-to-multiple-signal-changes">Listening to multiple signal changes</h3>
+<p data-comment-block-id="cb-listening-to-multiple-signal-changes-6cfdf8c93704" data-comment-heading-id="listening-to-multiple-signal-changes">A more realistic use case would be to listen to multiple signal at once and react to the change
 of each of them.</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-listening-to-multiple-signal-changes-780201a684df" data-comment-heading-id="listening-to-multiple-signal-changes"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; ({limit: this.limit(), filter: this.filter(), select: this.select()}),</span></span>
 <span class="line"><span>  loader: ({request: {limit, filter, select}}) =&gt; {</span></span>
 <span class="line"><span>    return fetch(`https://dummyjson.com/posts/search?q=${filter}&amp;limit=${limit}&amp;select=${select}`);</span></span>
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h3 id="skipping-requests">Skipping requests</h3>
-<p>The loader is conditionnaly firing depending on the request itself. If it returns <code>undefined</code>, the loader won’t fire.
+<h3 data-comment-block-id="cb-skipping-requests-b11b3499f0d5" data-comment-heading-id="skipping-requests" id="skipping-requests">Skipping requests</h3>
+<p data-comment-block-id="cb-skipping-requests-f95af5814d86" data-comment-heading-id="skipping-requests">The loader is conditionnaly firing depending on the request itself. If it returns <code>undefined</code>, the loader won’t fire.
 This way you can skip some request (the status remains <code>idle</code> until the first request fires).</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-skipping-requests-cca7fca8a887" data-comment-heading-id="skipping-requests"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; (this.postId() &gt; 5 ? this.postId() : undefined),</span></span>
 <span class="line"><span>  loader: ({request}) =&gt; {</span></span>
 <span class="line"><span>    return fetch(`https://dummyjson.com/posts/${request}`).then((res) =&gt; res.json());</span></span>
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h3 id="complete-fetch-resource-example">Complete fetch resource example</h3>
-<p>More realisticaly, we’ll parse the response as JSON and might want to plug-in the <code>abortSignal</code>.
+<h3 data-comment-block-id="cb-complete-fetch-resource-example-3a2a79df08da" data-comment-heading-id="complete-fetch-resource-example" id="complete-fetch-resource-example">Complete fetch resource example</h3>
+<p data-comment-block-id="cb-complete-fetch-resource-example-955be4c3d998" data-comment-heading-id="complete-fetch-resource-example">More realisticaly, we’ll parse the response as JSON and might want to plug-in the <code>abortSignal</code>.
 The <code>abortSignal</code> will be used to cancel the pending request when one of the signals receives a new value.</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-complete-fetch-resource-example-a04b2fd00955" data-comment-heading-id="complete-fetch-resource-example"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; ({limit: this.limit(), filter: this.filter(), select: this.select()}),</span></span>
 <span class="line"><span>  loader: ({request: {limit, filter, select}, abortSignal}) =&gt; {</span></span>
 <span class="line"><span>    return fetch(`https://dummyjson.com/posts/search?q=${filter}&amp;limit=${limit}&amp;select=${select}`, {</span></span>
@@ -137,13 +137,13 @@ The <code>abortSignal</code> will be used to cancel the pending request when one
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h2 id="refreshing-the-data">Refreshing the data</h2>
-<p>In the case that your resource data gets invalidated on the server, imagine deleting a post for example, you’d like to refresh your local data
+<h2 data-comment-block-id="cb-refreshing-the-data-12f63e17e4cc" data-comment-heading-id="refreshing-the-data" id="refreshing-the-data">Refreshing the data</h2>
+<p data-comment-block-id="cb-refreshing-the-data-7f0e161384c8" data-comment-heading-id="refreshing-the-data">In the case that your resource data gets invalidated on the server, imagine deleting a post for example, you’d like to refresh your local data
 to get the latest state from the server. For this you’ll reach out to the <code>reload()</code> method.</p>
-<p>If your resource isn’t already loading (<code>status() === 'loading'</code>), <code>reload()</code> will set your resource status
+<p data-comment-block-id="cb-refreshing-the-data-a41a2781dfc3" data-comment-heading-id="refreshing-the-data">If your resource isn’t already loading (<code>status() === 'loading'</code>), <code>reload()</code> will set your resource status
 to <code>'reloading'</code>, and send a new request.
 In the meantime, your resource will keep its previous value until the new one is received.</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-refreshing-the-data-0577b0981c54" data-comment-heading-id="refreshing-the-data"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>@Component()</span></span>
 <span class="line"><span>export class MyComponent {</span></span>
@@ -161,20 +161,20 @@ In the meantime, your resource will keep its previous value until the new one is
 <span class="line"><span>  }</span></span>
 <span class="line"><span>}</span></span>
 <span class="line"><span></span></span></code></pre>
-<p>If you want to cancel any pending request, <code>reload()</code> it not tool you’re looking for.
+<p data-comment-block-id="cb-refreshing-the-data-ef6a553e8574" data-comment-heading-id="refreshing-the-data">If you want to cancel any pending request, <code>reload()</code> it not tool you’re looking for.
 <code>resource</code> will cancel any request on dependency changes. Those are expressed as signals in the <code>request</code> property.</p>
-<h2 id="resource-as-a-writable-local-state">Resource as a writable local state</h2>
-<p>When using the <code>resource</code> API, you’ll create an use a <code>WritableResource</code>. This <code>WritableResource</code> represent a local state
+<h2 data-comment-block-id="cb-resource-as-a-writable-local-state-a7ab06d920df" data-comment-heading-id="resource-as-a-writable-local-state" id="resource-as-a-writable-local-state">Resource as a writable local state</h2>
+<p data-comment-block-id="cb-resource-as-a-writable-local-state-4de8b4dd5ac3" data-comment-heading-id="resource-as-a-writable-local-state">When using the <code>resource</code> API, you’ll create an use a <code>WritableResource</code>. This <code>WritableResource</code> represent a local state
 of a resource on your server.</p>
-<p>This state is also writable locally, <code>WritableResource.set()</code> will allow you to programmatically set the local value.
+<p data-comment-block-id="cb-resource-as-a-writable-local-state-78d5898341a9" data-comment-heading-id="resource-as-a-writable-local-state">This state is also writable locally, <code>WritableResource.set()</code> will allow you to programmatically set the local value.
 Overwriting the value of a resource sets it to the <code>status</code> signa to <code>'local'</code>.</p>
-<p>If you want to expose this resource as readonly, <code>WritableResource.asReadonly()</code> will return a readonly <code>Ressource</code> that can be shared with other parts of your application which risking exposing the writable behavior.</p>
-<h2 id="rxjs-as-a-first-class-citizen-rxresource">RxJS as a first-class citizen: <code>rxResource</code></h2>
-<p>It has already been mentioned by the Angular team multiple times, RxJS is a first class citizen and
+<p data-comment-block-id="cb-resource-as-a-writable-local-state-52870c263cca" data-comment-heading-id="resource-as-a-writable-local-state">If you want to expose this resource as readonly, <code>WritableResource.asReadonly()</code> will return a readonly <code>Ressource</code> that can be shared with other parts of your application which risking exposing the writable behavior.</p>
+<h2 data-comment-block-id="cb-rxjs-as-a-first-class-citizen-rxresource-abc15cae9b6b" data-comment-heading-id="rxjs-as-a-first-class-citizen-rxresource" id="rxjs-as-a-first-class-citizen-rxresource">RxJS as a first-class citizen: <code>rxResource</code></h2>
+<p data-comment-block-id="cb-rxjs-as-a-first-class-citizen-rxresource-65e11363b483" data-comment-heading-id="rxjs-as-a-first-class-citizen-rxresource">It has already been mentioned by the Angular team multiple times, RxJS is a first class citizen and
 while Angular shouldn’t require you to learn/use RxJS, using RxJS with Angular should feel like a natural, polished experience.</p>
-<p>As of now, we only discussed <code>resource</code> as a Promise-based API. v19 will also introduce its <code>Observable</code> based counterpart: <code>rxResource</code> from the <code>@angular/core/rxjs-interop</code> module.</p>
-<h3 id="observable-based-example">Observable based example</h3>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>effect(() =&gt; {</span></span>
+<p data-comment-block-id="cb-rxjs-as-a-first-class-citizen-rxresource-6bcf6dd51218" data-comment-heading-id="rxjs-as-a-first-class-citizen-rxresource">As of now, we only discussed <code>resource</code> as a Promise-based API. v19 will also introduce its <code>Observable</code> based counterpart: <code>rxResource</code> from the <code>@angular/core/rxjs-interop</code> module.</p>
+<h3 data-comment-block-id="cb-observable-based-example-2c225efb888c" data-comment-heading-id="observable-based-example" id="observable-based-example">Observable based example</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-observable-based-example-a7c4603e271b" data-comment-heading-id="observable-based-example"><code><span class="line"><span>effect(() =&gt; {</span></span>
 <span class="line"><span>  console.log('value: ', this.myResource.value());</span></span>
 <span class="line"><span>  console.log('status: ', this.myResource.status(), myResource.status());</span></span>
 <span class="line"><span>  console.log('error: ', this.myResource.error());</span></span>
@@ -192,12 +192,12 @@ while Angular shouldn’t require you to learn/use RxJS, using RxJS with Angular
 <span class="line"><span>#### `not a pulling example`</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span></span></span></code></pre>
-<p>effect(() =&gt; {
+<p data-comment-block-id="cb-observable-based-example-939b30c85b52" data-comment-heading-id="observable-based-example">effect(() =&gt; {
 console.log(‘value: ’, this.myResource.value());
 console.log(‘status: ’, this.myResource.status(), myResource.status());
 console.log(‘error: ’, this.myResource.error());
 });</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-observable-based-example-49390073ef5d" data-comment-heading-id="observable-based-example"><code><span class="line"><span></span></span>
 <span class="line"><span>This example will not implement a signal-based pulling. As mentionned before, only the first value will be passed to the resource.</span></span>
 <span class="line"><span>A new request will only be emitted when the `postId` signal is emitted.</span></span>
 <span class="line"><span></span></span>
@@ -207,20 +207,20 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>This means that they might not become stable at all or have significant changes before becoming stable.</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>Feel free to report [any feedback](https://github.com/angular/angular/issues/new) to the team.</span></span>
-<span class="line"><span></span></span></code></pre> </article> <article id="article-translated" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#介绍-resource-api" class="astro-vj4tpspi">介绍 resource API。</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#加载状态作为关键信息" class="astro-vj4tpspi">加载状态作为关键信息</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#获取数据" class="astro-vj4tpspi">获取数据</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#basic-fetch-resource-example" class="astro-vj4tpspi">Basic fetch resource example</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#对信号变化做出反应" class="astro-vj4tpspi">对信号变化做出反应</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#聆听信号变化" class="astro-vj4tpspi">聆听信号变化</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#聆听多个信号变化" class="astro-vj4tpspi">聆听多个信号变化</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#跳过请求" class="astro-vj4tpspi">跳过请求</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#完整的获取资源示例" class="astro-vj4tpspi">完整的获取资源示例</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#刷新数据" class="astro-vj4tpspi">刷新数据</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#作为可写本地状态的资源" class="astro-vj4tpspi">作为可写本地状态的资源</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#rxjs-作为一等公民rxresource" class="astro-vj4tpspi">RxJS 作为一等公民：rxResource</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#基于可观察的示例" class="astro-vj4tpspi">基于可观察的示例</a> </li> </ul> </details> <blockquote>
-<p>原文地址: <a href="https://riegler.fr/blog/2024-10-18-resources-as-signals">https://riegler.fr/blog/2024-10-18-resources-as-signals</a></p>
+<span class="line"><span></span></span></code></pre> </article> <article id="article-translated" role="article" class="astro-vj4tpspi max-w-3xl mx-auto prose"> <details class="astro-vj4tpspi toc" open=""> <summary class="astro-vj4tpspi cursor-pointer font-bold">目录</summary> <ul class="astro-vj4tpspi mt-2"> <li style="margin-left:0" class="astro-vj4tpspi"> <a href="#介绍-resource-api" class="astro-vj4tpspi">介绍 resource API。</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#加载状态作为关键信息" class="astro-vj4tpspi">加载状态作为关键信息</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#获取数据" class="astro-vj4tpspi">获取数据</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#basic-fetch-resource-example" class="astro-vj4tpspi">Basic fetch resource example</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#对信号变化做出反应" class="astro-vj4tpspi">对信号变化做出反应</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#聆听信号变化" class="astro-vj4tpspi">聆听信号变化</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#聆听多个信号变化" class="astro-vj4tpspi">聆听多个信号变化</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#跳过请求" class="astro-vj4tpspi">跳过请求</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#完整的获取资源示例" class="astro-vj4tpspi">完整的获取资源示例</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#刷新数据" class="astro-vj4tpspi">刷新数据</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#作为可写本地状态的资源" class="astro-vj4tpspi">作为可写本地状态的资源</a> </li><li style="margin-left:0" class="astro-vj4tpspi"> <a href="#rxjs-作为一等公民rxresource" class="astro-vj4tpspi">RxJS 作为一等公民：rxResource</a> </li><li style="margin-left:1rem" class="astro-vj4tpspi"> <a href="#基于可观察的示例" class="astro-vj4tpspi">基于可观察的示例</a> </li> </ul> </details> <blockquote data-comment-block-id="cb-article-2f9f29bd9453" data-comment-heading-id="article">
+<p data-comment-block-id="cb-article-b4a1957d32bc" data-comment-heading-id="article">原文地址: <a href="https://riegler.fr/blog/2024-10-18-resources-as-signals">https://riegler.fr/blog/2024-10-18-resources-as-signals</a></p>
 </blockquote>
-<p>定义 API 和围绕它们的模式是一项需要时间、反馈循环和后退一步的任务。
+<p data-comment-block-id="cb-article-239a23374550" data-comment-heading-id="article">定义 API 和围绕它们的模式是一项需要时间、反馈循环和后退一步的任务。
 随着 Signal API 在 Angular 中的成熟（其中大多数在 v19 中升级为稳定版本，<code>effect</code> 除外），
 是时候看看更高级的模式了。</p>
-<p><code>effect</code> 的使用一直是一个有争议的话题，Angular 团队的框架负责人 Alex Rickabaugh 在 <a href="https://www.youtube.com/watch?v=aKxcIQMWSNU">recommending to use them as less as possible</a> 上直言不讳。
+<p data-comment-block-id="cb-article-870c68adc819" data-comment-heading-id="article"><code>effect</code> 的使用一直是一个有争议的话题，Angular 团队的框架负责人 Alex Rickabaugh 在 <a href="https://www.youtube.com/watch?v=aKxcIQMWSNU">recommending to use them as less as possible</a> 上直言不讳。
 还有其他选择，通常是在 if 之上的抽象，可以更多地表达开发人员的意图。</p>
-<h2 id="介绍-resource-api">介绍 <code>resource</code> API。</h2>
-<p><code>resource</code> API 是旨在抽象 <code>effect</code> 用法并提供更具声明性的基于信号的 API 的 API 之一
+<h2 data-comment-block-id="cb-介绍-resource-api-c4aa69b92fb3" data-comment-heading-id="介绍-resource-api" id="介绍-resource-api">介绍 <code>resource</code> API。</h2>
+<p data-comment-block-id="cb-介绍-resource-api-6da1db513d61" data-comment-heading-id="介绍-resource-api"><code>resource</code> API 是旨在抽象 <code>effect</code> 用法并提供更具声明性的基于信号的 API 的 API 之一
 用于异步加载数据。</p>
-<p><code>resource</code> 至少需要一个返回异步数据并返回 <code>WritableResource</code> 包装对象的 <code>loader</code>。
+<p data-comment-block-id="cb-介绍-resource-api-5bd63b4e931c" data-comment-heading-id="介绍-resource-api"><code>resource</code> 至少需要一个返回异步数据并返回 <code>WritableResource</code> 包装对象的 <code>loader</code>。
 <code>loader</code> 函数被急切地调用（作为 <code>effect</code> 的一部分）。</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-介绍-resource-api-7c21858667f4" data-comment-heading-id="介绍-resource-api"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>@Component({</span></span>
 <span class="line"><span>  template: `</span></span>
@@ -235,27 +235,27 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>  });</span></span>
 <span class="line"><span>}</span></span>
 <span class="line"><span></span></span></code></pre>
-<p>此示例将在数据加载之前不显示任何内容 (<code>undefined</code>)，并在承诺解决后显示 <code>My data is loaded</code>。</p>
-<h2 id="加载状态作为关键信息">加载状态作为关键信息</h2>
-<p>当我们异步加载数据时，跟踪加载状态非常重要。
+<p data-comment-block-id="cb-介绍-resource-api-bf722995653f" data-comment-heading-id="介绍-resource-api">此示例将在数据加载之前不显示任何内容 (<code>undefined</code>)，并在承诺解决后显示 <code>My data is loaded</code>。</p>
+<h2 data-comment-block-id="cb-加载状态作为关键信息-a40dfb528b25" data-comment-heading-id="加载状态作为关键信息" id="加载状态作为关键信息">加载状态作为关键信息</h2>
+<p data-comment-block-id="cb-加载状态作为关键信息-f39da7480611" data-comment-heading-id="加载状态作为关键信息">当我们异步加载数据时，跟踪加载状态非常重要。
 正在加载吗？完成了吗？我收到错误了吗？</p>
-<p>众所周知，<code>isLoading</code> 布尔值被认为是一种反模式，因为它缺乏大量相关信息。</p>
-<p>一个<code>WritableResource</code>包含3个关键信息。</p>
+<p data-comment-block-id="cb-加载状态作为关键信息-56cbc69741f5" data-comment-heading-id="加载状态作为关键信息">众所周知，<code>isLoading</code> 布尔值被认为是一种反模式，因为它缺乏大量相关信息。</p>
+<p data-comment-block-id="cb-加载状态作为关键信息-d22a5dcc5f94" data-comment-heading-id="加载状态作为关键信息">一个<code>WritableResource</code>包含3个关键信息。</p>
 <ul>
-<li><code>value</code>，加载的信号包装值</li>
-<li><code>status</code>，加载状态的信号包裹值（<code>'idle' | 'error' | 'loading' | 'refreshing' | 'resolved' | 'local'</code>）</li>
-<li><code>error</code>，一个信号包装对象，用于显示错误的详细信息，加载导致错误。</li>
+<li data-comment-block-id="cb-加载状态作为关键信息-c5ca6951a433" data-comment-heading-id="加载状态作为关键信息"><code>value</code>，加载的信号包装值</li>
+<li data-comment-block-id="cb-加载状态作为关键信息-07f978a76638" data-comment-heading-id="加载状态作为关键信息"><code>status</code>，加载状态的信号包裹值（<code>'idle' | 'error' | 'loading' | 'refreshing' | 'resolved' | 'local'</code>）</li>
+<li data-comment-block-id="cb-加载状态作为关键信息-9ee6fc434f28" data-comment-heading-id="加载状态作为关键信息"><code>error</code>，一个信号包装对象，用于显示错误的详细信息，加载导致错误。</li>
 </ul>
-<p>如果我们在 <code>effect</code> 中捕获这一点，我们将观察到以下内容：</p>
-<h4 id="capturing-resource-changes"><code>Capturing resource changes</code></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>effect(() =&gt; {</span></span>
+<p data-comment-block-id="cb-加载状态作为关键信息-2a3152627ff1" data-comment-heading-id="加载状态作为关键信息">如果我们在 <code>effect</code> 中捕获这一点，我们将观察到以下内容：</p>
+<h4 data-comment-block-id="cb-capturing-resource-changes-d3b4eeba5122" data-comment-heading-id="capturing-resource-changes" id="capturing-resource-changes"><code>Capturing resource changes</code></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-capturing-resource-changes-57b3e9c86b9e" data-comment-heading-id="capturing-resource-changes"><code><span class="line"><span>effect(() =&gt; {</span></span>
 <span class="line"><span>  console.log('value: ', this.myResource.value());</span></span>
 <span class="line"><span>  console.log('status: ', this.myResource.status(), myResource.status());</span></span>
 <span class="line"><span>  console.log('error: ', this.myResource.error());</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h4 id="output"><code>Output</code></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>value: undefined</span></span>
+<h4 data-comment-block-id="cb-output-38523a7faeb5" data-comment-heading-id="output" id="output"><code>Output</code></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-output-a6c7f6b74860" data-comment-heading-id="output"><code><span class="line"><span>value: undefined</span></span>
 <span class="line"><span>status: 0 Idle</span></span>
 <span class="line"><span>error: undefined</span></span>
 <span class="line"><span></span></span>
@@ -263,30 +263,30 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>status: 3 Resolved</span></span>
 <span class="line"><span>error: undefined</span></span>
 <span class="line"><span></span></span></code></pre>
-<h2 id="获取数据">获取数据</h2>
-<p>您可能会使用 <code>resource</code> 通过 HTTP 获取异步数据，但它也可以是基于承诺的任何其他异步 API。
+<h2 data-comment-block-id="cb-获取数据-8a5d9c5000e2" data-comment-heading-id="获取数据" id="获取数据">获取数据</h2>
+<p data-comment-block-id="cb-获取数据-133bcc2c3742" data-comment-heading-id="获取数据">您可能会使用 <code>resource</code> 通过 HTTP 获取异步数据，但它也可以是基于承诺的任何其他异步 API。
 我们以使用 <code>fetch</code> 为例。</p>
-<h3 id="basic-fetch-resource-example"><code>Basic fetch resource example</code></h3>
-<p><code>fetch</code> 返回一个承诺，该承诺被传递给作为加载器的 <code>resource</code>。 <code>fetch</code> 请求立即发出（作为 <code>effect()</code> 的一部分），无需
+<h3 data-comment-block-id="cb-basic-fetch-resource-example-7ef827f9f2ee" data-comment-heading-id="basic-fetch-resource-example" id="basic-fetch-resource-example"><code>Basic fetch resource example</code></h3>
+<p data-comment-block-id="cb-basic-fetch-resource-example-210da954da8d" data-comment-heading-id="basic-fetch-resource-example"><code>fetch</code> 返回一个承诺，该承诺被传递给作为加载器的 <code>resource</code>。 <code>fetch</code> 请求立即发出（作为 <code>effect()</code> 的一部分），无需
 任何使用 <code>WritableResource</code> 的模板或附加 <code>effect</code>。</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({loader: () =&gt; fetch(`https://dummyjson.com/posts/1`)});</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-basic-fetch-resource-example-745cddcd9da6" data-comment-heading-id="basic-fetch-resource-example"><code><span class="line"><span>postResource = resource({loader: () =&gt; fetch(`https://dummyjson.com/posts/1`)});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h2 id="对信号变化做出反应">对信号变化做出反应</h2>
-<p>缺失的组成部分之一是对信号变化做出反应并因此重新加载数据。
+<h2 data-comment-block-id="cb-对信号变化做出反应-b5238a24bdff" data-comment-heading-id="对信号变化做出反应" id="对信号变化做出反应">对信号变化做出反应</h2>
+<p data-comment-block-id="cb-对信号变化做出反应-576f1b928371" data-comment-heading-id="对信号变化做出反应">缺失的组成部分之一是对信号变化做出反应并因此重新加载数据。
 <code>resource</code> API 通过将依赖项声明为 <code>request</code> 的一部分来满足此要求。</p>
-<h3 id="聆听信号变化">聆听信号变化</h3>
-<p>The dependencies are declared as part of the <code>request</code> callback.</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<h3 data-comment-block-id="cb-聆听信号变化-b61975bbc8c8" data-comment-heading-id="聆听信号变化" id="聆听信号变化">聆听信号变化</h3>
+<p data-comment-block-id="cb-聆听信号变化-21e19a768d4e" data-comment-heading-id="聆听信号变化">The dependencies are declared as part of the <code>request</code> callback.</p>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-聆听信号变化-d48a3b207484" data-comment-heading-id="聆听信号变化"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: this.postId, // this could be one of your signal inputs</span></span>
 <span class="line"><span>  loader: ({request: postId}) =&gt; return fetch(`https://dummyjson.com/posts/${postId}`),</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<p>作为加载器回调的一部分读取的信号不会在更改时触发进一步加载
+<p data-comment-block-id="cb-聆听信号变化-16f9d7c40ce2" data-comment-heading-id="聆听信号变化">作为加载器回调的一部分读取的信号不会在更改时触发进一步加载
 （<code>loader</code> 的执行是<code>untracked</code>）。</p>
-<p>如果您问自己为什么不跟踪加载程序函数，那是因为加载程序函数的异步部分不会被跟踪。
+<p data-comment-block-id="cb-聆听信号变化-1c44522fedbc" data-comment-heading-id="聆听信号变化">如果您问自己为什么不跟踪加载程序函数，那是因为加载程序函数的异步部分不会被跟踪。
 因此，为了使其反应性更加清晰，反应部分 (<code>request</code>) 被分离为加载部分 (<code>loader</code>)。</p>
-<h4 id="if-the-loader-was-a-reactive-context"><code>If the loader was a reactive context</code></h4>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<h4 data-comment-block-id="cb-if-the-loader-was-a-reactive-context-ab4fa75be8ac" data-comment-heading-id="if-the-loader-was-a-reactive-context" id="if-the-loader-was-a-reactive-context"><code>If the loader was a reactive context</code></h4>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-if-the-loader-was-a-reactive-context-8a0aa3d3fa62" data-comment-heading-id="if-the-loader-was-a-reactive-context"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; this.postId(),</span></span>
 <span class="line"><span>  loader: async ({request}) =&gt; {</span></span>
 <span class="line"><span>    // signals can be tracked</span></span>
@@ -296,30 +296,30 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h3 id="聆听多个信号变化">聆听多个信号变化</h3>
-<p>更现实的用例是一次监听多个信号并对变化做出反应
+<h3 data-comment-block-id="cb-聆听多个信号变化-018a1de4e6d3" data-comment-heading-id="聆听多个信号变化" id="聆听多个信号变化">聆听多个信号变化</h3>
+<p data-comment-block-id="cb-聆听多个信号变化-7c2b4f97efec" data-comment-heading-id="聆听多个信号变化">更现实的用例是一次监听多个信号并对变化做出反应
 他们每个人的。</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-聆听多个信号变化-780201a684df" data-comment-heading-id="聆听多个信号变化"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; ({limit: this.limit(), filter: this.filter(), select: this.select()}),</span></span>
 <span class="line"><span>  loader: ({request: {limit, filter, select}}) =&gt; {</span></span>
 <span class="line"><span>    return fetch(`https://dummyjson.com/posts/search?q=${filter}&amp;limit=${limit}&amp;select=${select}`);</span></span>
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h3 id="跳过请求">跳过请求</h3>
-<p>加载程序根据请求本身有条件地触发。如果它返回 <code>undefined</code>，加载程序将不会启动。
+<h3 data-comment-block-id="cb-跳过请求-951b82800dc4" data-comment-heading-id="跳过请求" id="跳过请求">跳过请求</h3>
+<p data-comment-block-id="cb-跳过请求-0a4327faa3a2" data-comment-heading-id="跳过请求">加载程序根据请求本身有条件地触发。如果它返回 <code>undefined</code>，加载程序将不会启动。
 这样您就可以跳过某些请求（状态保持为 <code>idle</code>，直到第一个请求触发）。</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-跳过请求-cca7fca8a887" data-comment-heading-id="跳过请求"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; (this.postId() &gt; 5 ? this.postId() : undefined),</span></span>
 <span class="line"><span>  loader: ({request}) =&gt; {</span></span>
 <span class="line"><span>    return fetch(`https://dummyjson.com/posts/${request}`).then((res) =&gt; res.json());</span></span>
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h3 id="完整的获取资源示例">完整的获取资源示例</h3>
-<p>更现实的是，我们会将响应解析为 JSON，并可能想要插入 <code>abortSignal</code>。
+<h3 data-comment-block-id="cb-完整的获取资源示例-22f91533d7f2" data-comment-heading-id="完整的获取资源示例" id="完整的获取资源示例">完整的获取资源示例</h3>
+<p data-comment-block-id="cb-完整的获取资源示例-1f527060e758" data-comment-heading-id="完整的获取资源示例">更现实的是，我们会将响应解析为 JSON，并可能想要插入 <code>abortSignal</code>。
 当其中一个信号接收到新值时，<code>abortSignal</code> 将用于取消待处理的请求。</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>postResource = resource({</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-完整的获取资源示例-a04b2fd00955" data-comment-heading-id="完整的获取资源示例"><code><span class="line"><span>postResource = resource({</span></span>
 <span class="line"><span>  request: () =&gt; ({limit: this.limit(), filter: this.filter(), select: this.select()}),</span></span>
 <span class="line"><span>  loader: ({request: {limit, filter, select}, abortSignal}) =&gt; {</span></span>
 <span class="line"><span>    return fetch(`https://dummyjson.com/posts/search?q=${filter}&amp;limit=${limit}&amp;select=${select}`, {</span></span>
@@ -328,13 +328,13 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>  },</span></span>
 <span class="line"><span>});</span></span>
 <span class="line"><span></span></span></code></pre>
-<h2 id="刷新数据">刷新数据</h2>
-<p>如果您的资源数据在服务器上失效，想象一下删除帖子，例如您想刷新本地数据
+<h2 data-comment-block-id="cb-刷新数据-e95351561e44" data-comment-heading-id="刷新数据" id="刷新数据">刷新数据</h2>
+<p data-comment-block-id="cb-刷新数据-3f036cc33605" data-comment-heading-id="刷新数据">如果您的资源数据在服务器上失效，想象一下删除帖子，例如您想刷新本地数据
 从服务器获取最新状态。为此，您将使用 <code>reload()</code> 方法。</p>
-<p>如果您的资源尚未加载 (<code>status() === 'loading'</code>)，<code>reload()</code> 将设置您的资源状态
+<p data-comment-block-id="cb-刷新数据-349ebd1ceda4" data-comment-heading-id="刷新数据">如果您的资源尚未加载 (<code>status() === 'loading'</code>)，<code>reload()</code> 将设置您的资源状态
 到 <code>'reloading'</code>，并发送新请求。
 与此同时，您的资源将保留其先前的值，直到收到新的值。</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-刷新数据-0577b0981c54" data-comment-heading-id="刷新数据"><code><span class="line"><span>import {resource} from '@angular/core';</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>@Component()</span></span>
 <span class="line"><span>export class MyComponent {</span></span>
@@ -352,20 +352,20 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>  }</span></span>
 <span class="line"><span>}</span></span>
 <span class="line"><span></span></span></code></pre>
-<p>如果您想取消任何待处理的请求，<code>reload()</code> 它不是您正在寻找的工具。
+<p data-comment-block-id="cb-刷新数据-f8e88fc78ee2" data-comment-heading-id="刷新数据">如果您想取消任何待处理的请求，<code>reload()</code> 它不是您正在寻找的工具。
 <code>resource</code> will cancel any request on dependency changes.这些在 <code>request</code> 属性中表示为信号。</p>
-<h2 id="作为可写本地状态的资源">作为可写本地状态的资源</h2>
-<p>使用 <code>resource</code> API 时，您将创建一个 <code>WritableResource</code>。这个<code>WritableResource</code>代表一个本地状态
+<h2 data-comment-block-id="cb-作为可写本地状态的资源-358d88f3eda9" data-comment-heading-id="作为可写本地状态的资源" id="作为可写本地状态的资源">作为可写本地状态的资源</h2>
+<p data-comment-block-id="cb-作为可写本地状态的资源-69a54b01bd09" data-comment-heading-id="作为可写本地状态的资源">使用 <code>resource</code> API 时，您将创建一个 <code>WritableResource</code>。这个<code>WritableResource</code>代表一个本地状态
 您的服务器上的资源。</p>
-<p>该状态也是本地可写的，<code>WritableResource.set()</code> 将允许您以编程方式设置本地值。
+<p data-comment-block-id="cb-作为可写本地状态的资源-ae96dc9bd664" data-comment-heading-id="作为可写本地状态的资源">该状态也是本地可写的，<code>WritableResource.set()</code> 将允许您以编程方式设置本地值。
 覆盖资源的值会将其设置为 <code>status</code> 符号到 <code>'local'</code>。</p>
-<p>如果您想将此资源公开为只读，则 <code>WritableResource.asReadonly()</code> 将返回一个只读 <code>Ressource</code>，该资源可以与应用程序的其他部分共享，从而冒暴露可写行为的风险。</p>
-<h2 id="rxjs-作为一等公民rxresource">RxJS 作为一等公民：<code>rxResource</code></h2>
-<p>Angular 团队已经多次提到过，RxJS 是一等公民，
+<p data-comment-block-id="cb-作为可写本地状态的资源-704971520936" data-comment-heading-id="作为可写本地状态的资源">如果您想将此资源公开为只读，则 <code>WritableResource.asReadonly()</code> 将返回一个只读 <code>Ressource</code>，该资源可以与应用程序的其他部分共享，从而冒暴露可写行为的风险。</p>
+<h2 data-comment-block-id="cb-rxjs-作为一等公民-rxresource-d498f6418150" data-comment-heading-id="rxjs-作为一等公民-rxresource" id="rxjs-作为一等公民rxresource">RxJS 作为一等公民：<code>rxResource</code></h2>
+<p data-comment-block-id="cb-rxjs-作为一等公民-rxresource-ca94f97d1ee3" data-comment-heading-id="rxjs-作为一等公民-rxresource">Angular 团队已经多次提到过，RxJS 是一等公民，
 虽然 Angular 不应该要求您学习/使用 RxJS，但将 RxJS 与 Angular 一起使用应该感觉像是一种自然、优雅的体验。</p>
-<p>到目前为止，我们只讨论了 <code>resource</code> 作为基于 Promise 的 API。 v19 还将引入基于 <code>Observable</code> 的对应版本：来自 <code>@angular/core/rxjs-interop</code> 模块的 <code>rxResource</code>。</p>
-<h3 id="基于可观察的示例">基于可观察的示例</h3>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>effect(() =&gt; {</span></span>
+<p data-comment-block-id="cb-rxjs-作为一等公民-rxresource-4252c34e082b" data-comment-heading-id="rxjs-作为一等公民-rxresource">到目前为止，我们只讨论了 <code>resource</code> 作为基于 Promise 的 API。 v19 还将引入基于 <code>Observable</code> 的对应版本：来自 <code>@angular/core/rxjs-interop</code> 模块的 <code>rxResource</code>。</p>
+<h3 data-comment-block-id="cb-基于可观察的示例-ea319c923447" data-comment-heading-id="基于可观察的示例" id="基于可观察的示例">基于可观察的示例</h3>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-基于可观察的示例-4ea2dfc3304a" data-comment-heading-id="基于可观察的示例"><code><span class="line"><span>effect(() =&gt; {</span></span>
 <span class="line"><span>  console.log('value: ', this.myResource.value());</span></span>
 <span class="line"><span>  console.log('status: ', this.myResource.status(), myResource.status());</span></span>
 <span class="line"><span>  console.log('error: ', this.myResource.error());</span></span>
@@ -383,12 +383,12 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>#### `not a pulling example`</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span></span></span></code></pre>
-<p>effect(() =&gt; {
+<p data-comment-block-id="cb-基于可观察的示例-939b30c85b52" data-comment-heading-id="基于可观察的示例">effect(() =&gt; {
 console.log(‘value: ’, this.myResource.value());
 console.log(‘status: ’, this.myResource.status(), myResource.status());
 console.log(‘error: ’, this.myResource.error());
 });</p>
-<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span></span></span>
+<pre class="astro-code one-dark-pro" style="color:#abb2bf;white-space:pre-wrap;word-wrap:break-word;background-color:#282c34;overflow-x:auto" tabindex="0" data-language="plaintext" data-comment-block-id="cb-基于可观察的示例-de9ff3b7d755" data-comment-heading-id="基于可观察的示例"><code><span class="line"><span></span></span>
 <span class="line"><span>此示例不会实现基于信号的拉动。如前所述，只有第一个值会传递给资源。</span></span>
 <span class="line"><span>仅当发出 `postId` 信号时才会发出新请求。</span></span>
 <span class="line"><span></span></span>
@@ -398,7 +398,8 @@ console.log(‘error: ’, this.myResource.error());
 <span class="line"><span>这意味着它们可能根本不会变得稳定，或者在稳定之前发生重大变化。</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>请随时向团队报告 [any feedback](https://github.com/angular/angular/issues/new)。</span></span>
-<span class="line"><span></span></span></code></pre> </article> </div>  <ul class="astro-vj4tpspi my-8"> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+<span class="line"><span></span></span></code></pre> </article> </div>  <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
+</script><astro-island uid="Z1Jnl7q" component-url="/_astro/InlineComments.Cc0x4jDr.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;apiUrl&quot;:[0,&quot;https://rowan-blog-comments.lcf33123.workers.dev&quot;],&quot;articlePath&quot;:[0,&quot;/posts/resources-as-signals/&quot;],&quot;articleTitle&quot;:[0,&quot;[译] Resource: async loading with signals&quot;],&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;InlineComments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> <ul class="astro-vj4tpspi my-8"> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/angular/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
 &nbsp;<span class="astro-blwjyjpt">angular</span> </a> </li> <li class="inline-block astro-blwjyjpt my-1 underline-offset-4"> <a href="/tags/signals/" class="astro-blwjyjpt group pr-2 text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-blwjyjpt scale-75"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
 &nbsp;<span class="astro-blwjyjpt">signals</span> </a> </li>  </ul> <div class="astro-vj4tpspi flex items-center flex-col-reverse gap-6 justify-between sm:flex-row-reverse sm:gap-4 sm:items-end"> <button id="back-to-top" class="astro-vj4tpspi focus-outline hover:opacity-75 py-1 whitespace-nowrap"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi rotate-90"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="astro-wkojbtzc social-icons"> <span class="astro-wkojbtzc italic">Share this post on:</span> <div class="astro-wkojbtzc text-center"> <a href="https://wa.me/?text=https://rowanliu.com/posts/resources-as-signals/" class="astro-wkojbtzc group hover:text-skin-accent inline-block link-button" title="Share this post via WhatsApp"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -422,8 +423,7 @@ console.log(‘error: ’, this.myResource.error());
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <rect x="3" y="5" width="18" height="14" rx="2"></rect>
       <polyline points="3 7 12 13 21 7"></polyline>
-    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var u=async m=>{await(await m())()};(self.Astro||(self.Astro={})).only=u,window.dispatchEvent(new Event("astro:only"))})(),(()=>{var u=Object.defineProperty,m=(o,s,a)=>s in o?u(o,s,{enumerable:!0,configurable:!0,writable:!0,value:a}):o[s]=a,c=(o,s,a)=>m(o,typeof s!="symbol"?s+"":s,a);{let o={0:t=>b(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},s=t=>{let[e,r]=t;return e in o?o[e](r):void 0},a=t=>t.map(s),b=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,s(r)]));class y extends HTMLElement{constructor(){super(...arguments),c(this,"Component"),c(this,"hydrator"),c(this,"hydrate",async()=>{var e;if(!this.hydrator||!this.isConnected)return;let r=(e=this.parentElement)==null?void 0:e.closest("astro-island[ssr]");if(r){r.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let i=this.querySelectorAll("astro-slot"),h={},p=this.querySelectorAll("template[data-astro-template]");for(let n of p){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of i){let l=n.closest(this.tagName);l!=null&&l.isSameNode(this)&&(h[n.getAttribute("name")||"default"]=n.innerHTML)}let d;try{d=this.hasAttribute("props")?b(JSON.parse(this.getAttribute("props"))):{}}catch(n){let l=this.getAttribute("component-url")||"<unknown>",f=this.getAttribute("component-export");throw f&&(l+=` (export ${f})`),console.error(`[hydrate] Error parsing props for component ${l}`,this.getAttribute("props"),n),n}let v;await this.hydrator(this)(this.Component,d,h,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}),c(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var i;((i=this.lastChild)==null?void 0:i.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let i=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),i?import(i):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let v of d.split("."))this.Component=this.Component[v]}return this.hydrator=p,this.hydrate},e,this)}catch(i){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,i)}}attributeChangedCallback(){this.hydrate()}}c(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();
-</script><astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
+    </svg> <span class="astro-wkojbtzc sr-only">Share this post via email</span> </a> </div> </div>  </div> <astro-island uid="1VxurH" component-url="/_astro/Comments.z1Ck1VJT.js" component-export="default" renderer-url="/_astro/client.DrE9CFQR.js" props="{&quot;class&quot;:[0,&quot;astro-vj4tpspi&quot;]}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Comments&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island> </main> <footer class="astro-sz7xmlte mt-auto"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="astro-sz7xmlte footer-wrapper"> <div class="astro-upu6fzxr flex social-icons"> <a href="https://github.com/llccing" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title=" Rowan's Blog on Github"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
   </svg> <span class="sr-only astro-upu6fzxr"> Rowan's Blog on Github</span> </a><a href="mailto:lcf33123@gmail.com" class="inline-block group hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to Rowan's Blog"> <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler" stroke-linecap="round" stroke-linejoin="round">
