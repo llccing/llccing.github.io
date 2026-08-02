@@ -13,7 +13,7 @@
     "GITHUB_CATEGORY_ID": "DIC_kwDOL98uEc4C7B0s",
     "OWNER_LOGIN": "llccing",
     "SITE_URL": "https://rowanliu.com",
-    "ALLOWED_ORIGINS": "https://rowanliu.com,https://phase-1.rowan-blog.pages.dev,http://localhost:4321,http://127.0.0.1:4321"
+    "ALLOWED_ORIGINS": "https://rowanliu.com,https://phase-1.rowan-blog.pages.dev,https://codex-cloudflare-pages-phase.rowan-blog.pages.dev,https://a5e22028.rowan-blog.pages.dev,http://localhost:4321,http://127.0.0.1:4321"
   },
   "observability": {
     "enabled": true,

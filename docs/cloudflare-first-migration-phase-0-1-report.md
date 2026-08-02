@@ -2,7 +2,7 @@
 
 Date: 2026-08-02
 
-Status: Phase 0 complete; Phase 1 preview verification in progress
+Status: Phase 0 and Phase 1 complete
 
 Production domain: `https://rowanliu.com`
 
@@ -124,7 +124,7 @@ The first isolated direct-upload deployment uses the verified local build:
 
 The existing comments Worker allowlist contains the exact stable preview
 origin. No wildcard origin was introduced. Worker version
-`0b6003b9-784a-4d92-8d45-e36374b0abb1` deployed successfully after its type
+`f74bd782-10a0-4d2b-ab30-c4bcda07a37a` deployed successfully after its type
 check and dry run passed.
 
 ### Preview validation
@@ -151,13 +151,32 @@ Real Chromium checks:
 
 ### Git build evidence
 
-Pending validation from the Git-integrated preview branch.
+- Branch: `codex/cloudflare-pages-phase-1`.
+- Commit: `d8bdc36290cb67c68510c68dc1964f5a29e73baf`.
+- Deployment: `https://a5e22028.rowan-blog.pages.dev`.
+- Stable branch alias:
+  `https://codex-cloudflare-pages-phase.rowan-blog.pages.dev`.
+- Deployment ID: `a5e22028-c111-4327-afc9-6576326eef8b`.
+- Queue, initialize, repository clone, build, and deploy stages: passed.
+- Build stage: 2 minutes 40 seconds.
+- Deploy stage: 9 seconds.
+- The stable branch alias passed the complete HTTP route matrix.
+- Real Chromium on the immutable Git deployment URL loaded the existing
+  annotation with no inline-comment error and exposed no public owner controls.
+
+One local Chromium navigation to the longer stable branch alias returned
+`ERR_CONNECTION_CLOSED`, while PowerShell HTTP checks against the same alias
+returned the expected responses and Chromium loaded the immutable deployment
+URL. This was not reproducible at the deployment URL, but Phase 2 should repeat
+the browser check from an independent network before DNS cutover.
 
 ## Blockers and Recommendation
 
-Current recommendation: **no-go for Phase 2 until the Git-integrated preview
-build passes and `rowanliu.com` is onboarded into the Cloudflare account**.
+Current recommendation: **go for Phase 2 preparation, but no-go for a DNS
+cutover until `rowanliu.com` is onboarded into the Cloudflare account and Pages
+TLS is verified**.
 
-The direct-upload Pages preview is healthy, but it is not sufficient evidence
-for the required Git build path. No production switch should occur based only
-on this deployment.
+Both direct-upload and Git-integrated Pages previews are healthy. The remaining
+pre-cutover dependency is domain onboarding and certificate validation. Phase 2
+must retain the recorded GitHub Pages DNS values and rollback instructions
+until the observation period is complete.
