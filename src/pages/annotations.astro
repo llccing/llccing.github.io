@@ -1,0 +1,15 @@
+---
+import AnnotationOwnerPanel from "@components/AnnotationOwnerPanel";
+import Footer from "@components/Footer.astro";
+import Header from "@components/Header.astro";
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+---
+
+<Layout title="文章批注 | Rowan Liu">
+  <Header />
+  <Main pageTitle="文章批注" pageDesc="作者工作区">
+    <AnnotationOwnerPanel client:load />
+  </Main>
+  <Footer />
+</Layout>

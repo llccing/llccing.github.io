@@ -32,8 +32,7 @@ const { Content, headings, remarkPluginFrontmatter } = await post.render();
 const minutesRead = remarkPluginFrontmatter?.minutesRead;
 const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 const commentsApiUrl = import.meta.env.PUBLIC_COMMENTS_API_URL;
-const inlineCommentsEnabled =
-  import.meta.env.PUBLIC_INLINE_COMMENTS === "true" && Boolean(commentsApiUrl);
+const inlineCommentsEnabled = import.meta.env.PUBLIC_INLINE_COMMENTS === "true";
 
 // Translation support
 const isTranslation =
@@ -163,7 +162,7 @@ const layoutProps = {
     {
       inlineCommentsEnabled && (
         <InlineComments
-          apiUrl={commentsApiUrl}
+          apiUrl={commentsApiUrl ?? ""}
           articlePath={Astro.url.pathname}
           articleTitle={title}
           client:only="react"
