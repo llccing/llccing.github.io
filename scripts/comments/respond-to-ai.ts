@@ -185,4 +185,7 @@ async function main(): Promise<void> {
   console.log("AI reply created.");
 }
 
-await main();
+main().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});
