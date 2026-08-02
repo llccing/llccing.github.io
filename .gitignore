@@ -2,6 +2,11 @@
 dist/
 .output/
 
+# local migration backups and browser evidence
+artifacts/cloudflare-migration/
+output/playwright/
+.playwright-cli/
+
 # dependencies
 node_modules/
 
