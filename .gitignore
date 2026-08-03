@@ -6,6 +6,7 @@ dist/
 artifacts/cloudflare-migration/
 output/playwright/
 .playwright-cli/
+.wrangler/
 
 # dependencies
 node_modules/

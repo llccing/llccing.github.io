@@ -10,6 +10,14 @@
     { "pattern": "rowanliu.com/api/*", "zone_name": "rowanliu.com" },
     { "pattern": "rowanliu.com/auth/*", "zone_name": "rowanliu.com" }
   ],
+  "d1_databases": [
+    {
+      "binding": "ANNOTATIONS_DB",
+      "database_name": "rowan-blog-annotations",
+      "database_id": "af86d172-7c99-4bb1-8512-80175a1bcbb7",
+      "migrations_dir": "migrations/comments-api"
+    }
+  ],
   "vars": {
     "GITHUB_OWNER": "llccing",
     "GITHUB_REPO": "llccing.github.io",
