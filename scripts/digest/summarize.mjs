@@ -33,6 +33,20 @@ function textFromContentParts(content) {
  * Chat Completions (`choices`) and Responses (`output_text` / `output`).
  */
 export function extractResponseText(response) {
+  if (typeof response === "string") {
+    const raw = response.trim();
+    if (!raw) return "";
+
+    try {
+      return extractResponseText(JSON.parse(raw));
+    } catch {
+      // Some gateways now return the model body as text/plain. Only accept a
+      // body that looks like the requested digest Markdown, not an HTML error
+      // page or a successful HTTP response containing an error sentence.
+      return /^##\s+\S/m.test(raw) ? raw : "";
+    }
+  }
+
   if (!response || typeof response !== "object") return "";
 
   const chatChoice = response.choices?.[0];

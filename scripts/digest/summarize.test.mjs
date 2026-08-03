@@ -52,6 +52,25 @@ describe("digest model response extraction", () => {
     expect(extractResponseText(response)).toBe("## AI\n嵌套响应");
   });
 
+  it("accepts raw Markdown returned as text/plain", () => {
+    expect(extractResponseText("## AI\n原始 Markdown 响应")).toBe(
+      "## AI\n原始 Markdown 响应"
+    );
+  });
+
+  it("parses a JSON response returned as text/plain", () => {
+    const response = JSON.stringify({
+      choices: [{ message: { content: "## Web\nJSON 字符串响应" } }],
+    });
+
+    expect(extractResponseText(response)).toBe("## Web\nJSON 字符串响应");
+  });
+
+  it("rejects non-Markdown string envelopes", () => {
+    expect(extractResponseText("<html>gateway error</html>")).toBe("");
+    expect(extractResponseText("request accepted")).toBe("");
+  });
+
   it("rejects unknown success envelopes and describes only their shape", () => {
     const response = { id: "secret-id", object: "job", status: "queued" };
 
