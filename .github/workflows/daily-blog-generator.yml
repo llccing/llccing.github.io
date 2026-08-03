@@ -88,8 +88,10 @@ jobs:
           GIT_COMMITTER_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
         run: |
           git add src/content/digest
+          # Do not add a CI skip token here. Cloudflare Pages honors it too,
+          # which leaves the generated digest committed but unpublished.
           git commit \
-            -m "chore(digest): add daily tech digest [skip ci]" \
+            -m "chore(digest): add daily tech digest" \
             -m "Generated automatically by the Daily Tech Digest workflow." \
             -m "Co-authored-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           git push origin HEAD:main
