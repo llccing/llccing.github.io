@@ -13,6 +13,64 @@ import { DOMAIN_LABELS } from "./sources.mjs";
 
 const MAX_COMPLETION_TOKENS = 8000;
 
+function textFromContentParts(content) {
+  if (typeof content === "string") return content;
+  if (!Array.isArray(content)) return "";
+
+  return content
+    .map(part => {
+      if (typeof part === "string") return part;
+      if (!part || typeof part !== "object") return "";
+      if (part.type && !["text", "output_text"].includes(part.type)) return "";
+      return typeof part.text === "string" ? part.text : "";
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
+/**
+ * Accept the two text response contracts used by OpenAI-compatible gateways:
+ * Chat Completions (`choices`) and Responses (`output_text` / `output`).
+ */
+export function extractResponseText(response) {
+  if (!response || typeof response !== "object") return "";
+
+  const chatChoice = response.choices?.[0];
+  const chatText =
+    textFromContentParts(chatChoice?.message?.content) ||
+    (typeof chatChoice?.text === "string" ? chatChoice.text : "");
+  if (chatText.trim()) return chatText;
+
+  if (typeof response.output_text === "string" && response.output_text.trim()) {
+    return response.output_text;
+  }
+
+  if (Array.isArray(response.output)) {
+    const outputText = response.output
+      .map(item => textFromContentParts(item?.content))
+      .filter(Boolean)
+      .join("\n");
+    if (outputText.trim()) return outputText;
+  }
+
+  return textFromContentParts(response.content);
+}
+
+export function describeResponseShape(response) {
+  if (response === null) return "null";
+  if (typeof response !== "object") return typeof response;
+
+  const keys = Object.keys(response).sort().slice(0, 20).join(",") || "none";
+  const objectType =
+    typeof response.object === "string" ? response.object : "unknown";
+  const choices = Array.isArray(response.choices)
+    ? response.choices.length
+    : "absent";
+  const output = Array.isArray(response.output) ? response.output.length : "absent";
+
+  return `object=${objectType} keys=[${keys}] choices=${choices} output=${output}`;
+}
+
 /**
  * Some OpenAI-compatible proxies are configured as a bare host. The SDK appends
  * "/chat/completions" straight onto baseURL, which 404s without the /v1 prefix.
@@ -123,7 +181,7 @@ export async function summarize(itemsByDomain, dateStr) {
     try {
       const response = await openai.chat.completions.create({ model, messages, ...params });
       const choice = response.choices?.[0];
-      const content = choice?.message?.content;
+      const content = extractResponseText(response);
 
       console.log(`Request succeeded using: ${label}`);
       console.log(`finish_reason: ${choice?.finish_reason ?? "n/a"}`);
@@ -131,16 +189,17 @@ export async function summarize(itemsByDomain, dateStr) {
 
       if (!content?.trim()) {
         throw new Error(
-          `model returned empty content (finish_reason=${choice?.finish_reason ?? "n/a"})`
+          `model returned empty content (finish_reason=${choice?.finish_reason ?? "n/a"}; ${describeResponseShape(response)})`
         );
       }
       return { body: content.trim(), indexed };
     } catch (err) {
       lastError = err;
       logApiError(err, label);
-      // Only a rejected parameter is worth retrying with a different shape.
-      // Auth failures, wrong endpoints and unknown models fail identically.
-      if (err?.status && err.status !== 400) break;
+      // Only an explicit rejected-parameter response is worth retrying with a
+      // different shape. A successful but unknown response contract will not
+      // become compatible by sending the same request two more times.
+      if (err?.status !== 400) break;
     }
   }
 
