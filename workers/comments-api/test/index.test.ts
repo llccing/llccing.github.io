@@ -70,6 +70,17 @@ describe("comments Worker", () => {
     });
   });
 
+  it("reports a public read-only session without a browser error", async () => {
+    const response = await worker.fetch(
+      new Request("https://rowanliu.com/api/owner/session"),
+      env as never,
+      ctx as never
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    await expect(response.json()).resolves.toEqual({ canWrite: false });
+  });
+
   it("returns only metadata-backed inline annotations", async () => {
     const fetchMock = vi
       .fn()
@@ -187,10 +198,10 @@ describe("comments Worker", () => {
   });
 
   it("returns an owner session to the validated article URL", async () => {
-    const returnTo = "https://rowanliu.com/posts/example/?annotate=1";
+    const returnTo = "http://localhost:4321/posts/example/?annotate=1";
     const startResponse = await worker.fetch(
       new Request(
-        `https://comments.example/auth/github/start?origin=${encodeURIComponent("https://rowanliu.com")}&returnTo=${encodeURIComponent(returnTo)}`
+        `https://comments.example/auth/github/start?origin=${encodeURIComponent("http://localhost:4321")}&returnTo=${encodeURIComponent(returnTo)}`
       ),
       env as never,
       ctx as never
@@ -199,6 +210,9 @@ describe("comments Worker", () => {
     const state = authorizeUrl.searchParams.get("state");
     expect(startResponse.status).toBe(302);
     expect(authorizeUrl.origin).toBe("https://github.com");
+    expect(authorizeUrl.searchParams.get("redirect_uri")).toBe(
+      "https://rowanliu.com/auth/github/callback"
+    );
     expect(state).toBeTruthy();
 
     const fetchMock = vi
@@ -208,7 +222,7 @@ describe("comments Worker", () => {
     vi.stubGlobal("fetch", fetchMock);
     const callbackResponse = await worker.fetch(
       new Request(
-        `https://comments.example/auth/github/callback?code=test-code&state=${encodeURIComponent(state ?? "")}`
+        `https://rowanliu.com/auth/github/callback?code=test-code&state=${encodeURIComponent(state ?? "")}`
       ),
       env as never,
       ctx as never
@@ -220,6 +234,135 @@ describe("comments Worker", () => {
       returnTo
     );
     expect(callbackUrl.hash).toMatch(/^#rowan-comments-auth=eyJ/);
+  });
+
+  it("rejects a signed-in GitHub account other than the exact owner", async () => {
+    const returnTo = "https://rowanliu.com/annotations/";
+    const startResponse = await worker.fetch(
+      new Request(
+        `https://rowanliu.com/auth/github/start?origin=${encodeURIComponent("https://rowanliu.com")}&returnTo=${encodeURIComponent(returnTo)}`
+      ),
+      env as never,
+      ctx as never
+    );
+    const state = new URL(startResponse.headers.get("Location") ?? "").searchParams.get(
+      "state"
+    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ access_token: "github-user-token" }))
+      .mockResolvedValueOnce(Response.json({ login: "someone-else" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await worker.fetch(
+      new Request(
+        `https://rowanliu.com/auth/github/callback?code=test-code&state=${encodeURIComponent(state ?? "")}`
+      ),
+      env as never,
+      ctx as never
+    );
+
+    expect(response.status).toBe(403);
+    expect(response.headers.get("Set-Cookie")).toBeNull();
+    await expect(response.json()).resolves.toMatchObject({
+      error: { code: "forbidden" },
+    });
+  });
+
+  it("uses an HTTP-only cookie for the same-origin OAuth callback", async () => {
+    const returnTo = "https://rowanliu.com/annotations/";
+    const startResponse = await worker.fetch(
+      new Request(
+        `https://rowanliu.com/auth/github/start?origin=${encodeURIComponent("https://rowanliu.com")}&returnTo=${encodeURIComponent(returnTo)}`
+      ),
+      env as never,
+      ctx as never
+    );
+    const state = new URL(startResponse.headers.get("Location") ?? "").searchParams.get(
+      "state"
+    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ access_token: "github-user-token" }))
+      .mockResolvedValueOnce(Response.json({ login: "llccing" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const callbackResponse = await worker.fetch(
+      new Request(
+        `https://rowanliu.com/auth/github/callback?code=test-code&state=${encodeURIComponent(state ?? "")}`
+      ),
+      env as never,
+      ctx as never
+    );
+    const cookie = callbackResponse.headers.get("Set-Cookie") ?? "";
+    const sessionToken = cookie.match(/__Host-rowan-comments-owner=([^;]+)/)?.[1];
+
+    expect(callbackResponse.headers.get("Location")).toBe(returnTo);
+    expect(cookie).toContain("HttpOnly");
+    expect(cookie).toContain("Secure");
+    expect(cookie).toContain("SameSite=Lax");
+    expect(sessionToken).toBeTruthy();
+
+    const sessionResponse = await worker.fetch(
+      new Request("https://rowanliu.com/api/owner/session", {
+        headers: { Cookie: `__Host-rowan-comments-owner=${sessionToken}` },
+      }),
+      env as never,
+      ctx as never
+    );
+    const session = (await sessionResponse.json()) as {
+      canWrite: boolean;
+      login: string;
+      csrfToken: string;
+    };
+    expect(session).toMatchObject({ canWrite: true, login: "llccing" });
+    expect(session.csrfToken).toBeTruthy();
+  });
+
+  it("requires CSRF validation for cookie-authenticated mutations", async () => {
+    const tokenResponse = await worker.fetch(
+      new Request(
+        `https://comments.example/auth/github/start?origin=${encodeURIComponent("https://rowanliu.com")}&returnTo=${encodeURIComponent("https://rowanliu.com/annotations/")}`
+      ),
+      env as never,
+      ctx as never
+    );
+    const state = new URL(tokenResponse.headers.get("Location") ?? "").searchParams.get(
+      "state"
+    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ access_token: "github-user-token" }))
+      .mockResolvedValueOnce(Response.json({ login: "llccing" }));
+    vi.stubGlobal("fetch", fetchMock);
+    const callbackResponse = await worker.fetch(
+      new Request(
+        `https://rowanliu.com/auth/github/callback?code=test-code&state=${encodeURIComponent(state ?? "")}`
+      ),
+      env as never,
+      ctx as never
+    );
+    const cookie = callbackResponse.headers.get("Set-Cookie") ?? "";
+    const sessionToken = cookie.match(/__Host-rowan-comments-owner=([^;]+)/)?.[1];
+
+    const response = await worker.fetch(
+      new Request("https://rowanliu.com/api/owner/comments", {
+        method: "POST",
+        headers: {
+          Cookie: `__Host-rowan-comments-owner=${sessionToken}`,
+          Origin: "https://rowanliu.com",
+          "Content-Type": "application/json",
+        },
+        body: "{}",
+      }),
+      env as never,
+      ctx as never
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({
+      error: { code: "csrf_invalid" },
+    });
   });
 
   it("rejects an OAuth return URL on another origin", async () => {

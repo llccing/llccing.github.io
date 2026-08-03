@@ -1,11 +1,28 @@
 # Cloudflare-First Migration Plan
 
-Status: Approved direction, implementation pending
+Status: Phases 0 through 3 complete
 
 Last updated: 2026-08-02
 
 Repository: `llccing/llccing.github.io`
 Production domain: `https://rowanliu.com`
+
+## Execution Status
+
+- Phase 0 and Phase 1 completed on 2026-08-02. Evidence:
+  `docs/cloudflare-first-migration-phase-0-1-report.md`.
+- Phase 2 completed on 2026-08-02. Cloudflare Pages now serves the apex domain,
+  `www` redirects to the apex with path and query preservation, and the GitHub
+  Pages rollback path remains active. Evidence:
+  `docs/cloudflare-first-migration-phase-2-report.md`.
+- Current operational state, DNS propagation notes, and next-agent instructions
+  are recorded in `docs/cloudflare-first-migration-handoff.md`.
+- Phase 3 completed on 2026-08-02. The existing GitHub-backed annotation API
+  now serves same-origin `/api/*` and `/auth/*` routes, owner authentication
+  uses an HTTP-only cookie with CSRF protection, and `/annotations/` provides
+  the stable owner entry. Evidence:
+  `docs/cloudflare-first-migration-phase-3-report.md`.
+- Phases 4 through 8 have not started.
 
 ## 1. Purpose
 

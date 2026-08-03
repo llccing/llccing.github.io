@@ -6,6 +6,10 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": true,
+  "routes": [
+    { "pattern": "rowanliu.com/api/*", "zone_name": "rowanliu.com" },
+    { "pattern": "rowanliu.com/auth/*", "zone_name": "rowanliu.com" }
+  ],
   "vars": {
     "GITHUB_OWNER": "llccing",
     "GITHUB_REPO": "llccing.github.io",

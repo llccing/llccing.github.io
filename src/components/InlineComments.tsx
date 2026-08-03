@@ -2,6 +2,7 @@ import {
   ExternalLink,
   Loader2,
   LogIn,
+  LogOut,
   MessageSquare,
   MessageSquarePlus,
   Pencil,
@@ -20,8 +21,16 @@ import {
 } from "../comments/protocol";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const SESSION_KEY = "rowan-comments-owner-session";
+const ANNOTATION_MODE_KEY = "rowan-comments-annotation-mode";
 const BLOCK_SELECTOR = "[data-comment-block-id]";
+
+type OwnerSession = {
+  canWrite: true;
+  login: string;
+  csrfToken: string;
+};
+
+type PublicSession = { canWrite: false };
 
 type Props = {
   apiUrl: string;
@@ -130,15 +139,20 @@ export default function InlineComments({
   articlePath,
   articleTitle,
 }: Props) {
-  const endpoint = apiUrl.replace(/\/$/, "");
-  const ownerMode = useMemo(
-    () => new URLSearchParams(window.location.search).get("annotate") === "1",
-    []
-  );
+  const endpoint =
+    window.location.origin === "https://rowanliu.com"
+      ? ""
+      : apiUrl.replace(/\/$/, "");
+  const [ownerMode, setOwnerMode] = useState(() => {
+    const deepLink =
+      new URLSearchParams(window.location.search).get("annotate") === "1";
+    if (deepLink) localStorage.setItem(ANNOTATION_MODE_KEY, "true");
+    return deepLink || localStorage.getItem(ANNOTATION_MODE_KEY) === "true";
+  });
   const [threads, setThreads] = useState<AnnotationThread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [token, setToken] = useState("");
+  const [ownerSession, setOwnerSession] = useState<OwnerSession | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [positions, setPositions] = useState<PositionedBlock[]>([]);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -158,8 +172,14 @@ export default function InlineComments({
     async <T,>(path: string, init: RequestInit = {}): Promise<T> => {
       const headers = new Headers(init.headers);
       if (init.body) headers.set("Content-Type", "application/json");
-      if (token) headers.set("Authorization", `Bearer ${token}`);
-      const response = await fetch(`${endpoint}${path}`, { ...init, headers });
+      if (init.method && init.method !== "GET" && ownerSession?.csrfToken) {
+        headers.set("X-CSRF-Token", ownerSession.csrfToken);
+      }
+      const response = await fetch(`${endpoint}${path}`, {
+        ...init,
+        credentials: "include",
+        headers,
+      });
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as {
           error?: { message?: string };
@@ -170,7 +190,7 @@ export default function InlineComments({
       }
       return (response.status === 204 ? null : await response.json()) as T;
     },
-    [endpoint, token]
+    [endpoint, ownerSession]
   );
 
   const reload = useCallback(async () => {
@@ -192,38 +212,21 @@ export default function InlineComments({
   }, [reload]);
 
   useEffect(() => {
-    if (!ownerMode) return;
-    const authMatch = window.location.hash.match(
-      /^#rowan-comments-auth=([^&]+)$/
-    );
-    if (authMatch) {
-      try {
-        sessionStorage.setItem(SESSION_KEY, decodeURIComponent(authMatch[1]));
-      } catch {
-        sessionStorage.removeItem(SESSION_KEY);
-      }
-      history.replaceState(
-        history.state,
-        "",
-        `${window.location.pathname}${window.location.search}`
-      );
-    }
-
-    const stored = sessionStorage.getItem(SESSION_KEY) ?? "";
-    if (!stored) {
-      setAuthChecked(true);
-      return;
-    }
     fetch(`${endpoint}/api/owner/session`, {
-      headers: { Authorization: `Bearer ${stored}` },
+      credentials: "include",
     })
-      .then(response => {
-        if (!response.ok) throw new Error("expired");
-        setToken(stored);
+      .then(async response => {
+        if (!response.ok) throw new Error("session check failed");
+        const session = (await response.json()) as OwnerSession | PublicSession;
+        setOwnerSession(session.canWrite ? session : null);
       })
-      .catch(() => sessionStorage.removeItem(SESSION_KEY))
+      .catch(() => setOwnerSession(null))
       .finally(() => setAuthChecked(true));
-  }, [endpoint, ownerMode]);
+  }, [endpoint]);
+
+  useEffect(() => {
+    localStorage.setItem(ANNOTATION_MODE_KEY, String(ownerMode));
+  }, [ownerMode]);
 
   const grouped = useMemo(() => {
     const result = new Map<string, AnnotationThread[]>();
@@ -282,7 +285,7 @@ export default function InlineComments({
   }, [selectedKey]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!ownerSession || !ownerMode) return;
     const blocks = Array.from(
       document.querySelectorAll<HTMLElement>(BLOCK_SELECTOR)
     );
@@ -301,10 +304,10 @@ export default function InlineComments({
         block.removeEventListener("mouseleave", leave);
       });
     };
-  }, [token]);
+  }, [ownerMode, ownerSession]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!ownerSession || !ownerMode) return;
     const captureSelection = () => {
       const selection = window.getSelection();
       if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
@@ -360,7 +363,7 @@ export default function InlineComments({
     document.addEventListener("selectionchange", captureSelection);
     return () =>
       document.removeEventListener("selectionchange", captureSelection);
-  }, [token]);
+  }, [ownerMode, ownerSession]);
 
   function anchorForBlock(block: HTMLElement): AnnotationAnchor {
     const exact = cleanBlockText(block).slice(0, 1200);
@@ -463,23 +466,29 @@ export default function InlineComments({
         </button>
       ))}
 
-      {token && hoveredBlock && hoverRect && !selectionAnchor && (
-        <button
-          aria-label="给整段添加批注"
-          className="fixed z-30 inline-flex h-8 w-8 items-center justify-center rounded border border-skin-line bg-skin-fill text-skin-base shadow-sm hover:border-skin-accent hover:text-skin-accent"
-          onClick={() => openComposer({ anchor: anchorForBlock(hoveredBlock) })}
-          style={{
-            left: Math.min(window.innerWidth - 38, hoverRect.right + 8),
-            top: hoverRect.top + 4,
-          }}
-          title="给整段添加批注"
-          type="button"
-        >
-          <MessageSquarePlus aria-hidden="true" size={16} />
-        </button>
-      )}
+      {ownerSession &&
+        ownerMode &&
+        hoveredBlock &&
+        hoverRect &&
+        !selectionAnchor && (
+          <button
+            aria-label="给整段添加批注"
+            className="fixed z-30 inline-flex h-8 w-8 items-center justify-center rounded border border-skin-line bg-skin-fill text-skin-base shadow-sm hover:border-skin-accent hover:text-skin-accent"
+            onClick={() =>
+              openComposer({ anchor: anchorForBlock(hoveredBlock) })
+            }
+            style={{
+              left: Math.min(window.innerWidth - 38, hoverRect.right + 8),
+              top: hoverRect.top + 4,
+            }}
+            title="给整段添加批注"
+            type="button"
+          >
+            <MessageSquarePlus aria-hidden="true" size={16} />
+          </button>
+        )}
 
-      {token && selectionAnchor && (
+      {ownerSession && ownerMode && selectionAnchor && (
         <button
           aria-label="给选中文字添加批注"
           className="fixed z-40 inline-flex h-9 w-9 items-center justify-center rounded bg-skin-accent text-skin-inverted shadow-lg"
@@ -492,12 +501,15 @@ export default function InlineComments({
         </button>
       )}
 
-      {ownerMode && authChecked && !token && (
+      {ownerMode && authChecked && !ownerSession && (
         <button
           aria-label="作者登录"
           className="fixed bottom-5 right-5 z-30 inline-flex h-10 w-10 items-center justify-center rounded border border-skin-line bg-skin-fill shadow-md hover:border-skin-accent hover:text-skin-accent"
           onClick={() => {
-            const authorizeUrl = new URL("/auth/github/start", endpoint);
+            const authorizeUrl = new URL(
+              `${endpoint}/auth/github/start`,
+              window.location.origin
+            );
             authorizeUrl.searchParams.set("origin", window.location.origin);
             authorizeUrl.searchParams.set(
               "returnTo",
@@ -510,6 +522,36 @@ export default function InlineComments({
         >
           <LogIn aria-hidden="true" size={17} />
         </button>
+      )}
+
+      {ownerSession && authChecked && (
+        <div className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded border border-skin-line bg-skin-fill p-1 shadow-md">
+          <button
+            aria-pressed={ownerMode}
+            className={`inline-flex h-9 items-center gap-2 rounded px-3 text-sm font-medium ${ownerMode ? "bg-skin-accent text-skin-inverted" : "hover:bg-skin-card"}`}
+            onClick={() => setOwnerMode(value => !value)}
+            title={ownerMode ? "关闭批注模式" : "开启批注模式"}
+            type="button"
+          >
+            <MessageSquarePlus aria-hidden="true" size={16} />
+            批注
+          </button>
+          <IconButton
+            label="退出作者登录"
+            onClick={() => {
+              void request("/api/owner/logout", { method: "POST" })
+                .then(() => {
+                  setOwnerSession(null);
+                  setOwnerMode(false);
+                })
+                .catch(cause => {
+                  setError(cause instanceof Error ? cause.message : "退出失败");
+                });
+            }}
+          >
+            <LogOut aria-hidden="true" size={16} />
+          </IconButton>
+        </div>
       )}
 
       {(selectedKey || composer) && (
@@ -575,35 +617,37 @@ export default function InlineComments({
                     @{reply.author.login}
                   </div>
                   <RichText text={readableReply(reply.bodyText)} />
-                  {token && reply.author.login === "llccing" && (
-                    <div className="mt-2 flex gap-2">
-                      <IconButton
-                        label="编辑回复"
-                        onClick={() =>
-                          openComposer({
-                            editId: reply.id,
-                            initialBody: readableReply(reply.bodyText),
-                          })
-                        }
-                      >
-                        <Pencil aria-hidden="true" size={15} />
-                      </IconButton>
-                      <IconButton
-                        danger
-                        label={
-                          confirmDeleteId === reply.id
-                            ? "再次点击确认删除"
-                            : "删除回复"
-                        }
-                        onClick={() => void deleteComment(reply.id)}
-                      >
-                        <Trash2 aria-hidden="true" size={15} />
-                      </IconButton>
-                    </div>
-                  )}
+                  {ownerSession &&
+                    ownerMode &&
+                    reply.author.login === "llccing" && (
+                      <div className="mt-2 flex gap-2">
+                        <IconButton
+                          label="编辑回复"
+                          onClick={() =>
+                            openComposer({
+                              editId: reply.id,
+                              initialBody: readableReply(reply.bodyText),
+                            })
+                          }
+                        >
+                          <Pencil aria-hidden="true" size={15} />
+                        </IconButton>
+                        <IconButton
+                          danger
+                          label={
+                            confirmDeleteId === reply.id
+                              ? "再次点击确认删除"
+                              : "删除回复"
+                          }
+                          onClick={() => void deleteComment(reply.id)}
+                        >
+                          <Trash2 aria-hidden="true" size={15} />
+                        </IconButton>
+                      </div>
+                    )}
                 </div>
               ))}
-              {token && (
+              {ownerSession && ownerMode && (
                 <div className="mt-3 flex gap-2">
                   <IconButton
                     label="回复"

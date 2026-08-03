@@ -17,6 +17,8 @@ const GITHUB_API_VERSION = "2022-11-28";
 const MAX_REQUEST_BYTES = 24_000;
 const SESSION_AUDIENCE = "rowan-comments-owner";
 const STATE_AUDIENCE = "rowan-comments-oauth-state";
+const SESSION_COOKIE = "__Host-rowan-comments-owner";
+const SESSION_MAX_AGE_SECONDS = 8 * 60 * 60;
 
 class HttpError extends Error {
   constructor(
@@ -117,7 +119,8 @@ function allowedOrigins(env: Env): Set<string> {
 
 function corsHeaders(request: Request, env: Env): Headers {
   const headers = new Headers({
-    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Allow-Headers":
+      "Authorization, Content-Type, X-CSRF-Token",
     "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
@@ -125,6 +128,7 @@ function corsHeaders(request: Request, env: Env): Headers {
   const origin = request.headers.get("Origin");
   if (origin && allowedOrigins(env).has(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Access-Control-Allow-Credentials", "true");
   }
   return headers;
 }
@@ -511,34 +515,101 @@ function sessionKey(env: Env): Uint8Array {
   return new TextEncoder().encode(requireSecret(env, "SESSION_SECRET"));
 }
 
-async function signSession(env: Env, login: string): Promise<string> {
-  return new SignJWT({ login })
+function readCookie(request: Request, name: string): string | null {
+  const cookie = request.headers.get("Cookie");
+  if (!cookie) return null;
+  for (const part of cookie.split(";")) {
+    const [cookieName, ...valueParts] = part.trim().split("=");
+    if (cookieName === name) return valueParts.join("=");
+  }
+  return null;
+}
+
+function sessionCookie(token: string): string {
+  return `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_MAX_AGE_SECONDS}`;
+}
+
+function clearedSessionCookie(): string {
+  return `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
+async function signSession(
+  env: Env,
+  login: string,
+  csrfToken: string
+): Promise<string> {
+  return new SignJWT({ login, csrfToken })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setSubject(login)
     .setAudience(SESSION_AUDIENCE)
     .setIssuedAt()
-    .setExpirationTime("8h")
+    .setExpirationTime(`${SESSION_MAX_AGE_SECONDS}s`)
     .sign(sessionKey(env));
 }
 
-async function requireOwnerSession(request: Request, env: Env): Promise<string> {
+type OwnerSession = {
+  login: string;
+  csrfToken: string | null;
+};
+
+async function secretsMatch(provided: string, expected: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const [providedHash, expectedHash] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(provided)),
+    crypto.subtle.digest("SHA-256", encoder.encode(expected)),
+  ]);
+  return crypto.subtle.timingSafeEqual(providedHash, expectedHash);
+}
+
+async function requireOwnerSession(
+  request: Request,
+  env: Env,
+  requireCsrf = false
+): Promise<OwnerSession> {
   const authorization = request.headers.get("Authorization");
-  if (!authorization?.startsWith("Bearer ")) {
+  const bearerToken = authorization?.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length)
+    : null;
+  const cookieToken = readCookie(request, SESSION_COOKIE);
+  const token = bearerToken ?? cookieToken;
+  if (!token) {
     throw new HttpError(401, "Owner session is required", "unauthorized");
   }
   try {
-    const { payload } = await jwtVerify(
-      authorization.slice("Bearer ".length),
-      sessionKey(env),
-      { audience: SESSION_AUDIENCE }
-    );
+    const { payload } = await jwtVerify(token, sessionKey(env), {
+      audience: SESSION_AUDIENCE,
+    });
     if (payload.sub !== env.OWNER_LOGIN || payload.login !== env.OWNER_LOGIN) {
       throw new Error("owner mismatch");
     }
-    return env.OWNER_LOGIN;
-  } catch {
+    const csrfToken =
+      typeof payload.csrfToken === "string" ? payload.csrfToken : null;
+    if (requireCsrf && cookieToken) {
+      const providedCsrf = request.headers.get("X-CSRF-Token");
+      if (
+        !csrfToken ||
+        !providedCsrf ||
+        !(await secretsMatch(providedCsrf, csrfToken))
+      ) {
+        throw new HttpError(403, "CSRF token is invalid", "csrf_invalid");
+      }
+    }
+    return {
+      login: env.OWNER_LOGIN,
+      csrfToken,
+    };
+  } catch (error) {
+    if (error instanceof HttpError) throw error;
     throw new HttpError(401, "Owner session is invalid", "unauthorized");
   }
+}
+
+function isAllowedReturnPath(pathname: string): boolean {
+  return pathname === "/annotations/" || normalizeArticlePath(pathname) === pathname;
+}
+
+function oauthCallbackUrl(env: Env): string {
+  return `${new URL(env.SITE_URL).origin}/auth/github/callback`;
 }
 
 async function handleOAuthStart(request: Request, env: Env): Promise<Response> {
@@ -556,7 +627,7 @@ async function handleOAuthStart(request: Request, env: Env): Promise<Response> {
     returnTo = new URL(returnToValue);
     if (
       returnTo.origin !== origin ||
-      normalizeArticlePath(returnTo.pathname) !== returnTo.pathname
+      !isAllowedReturnPath(returnTo.pathname)
     ) {
       throw new Error("invalid return URL");
     }
@@ -576,7 +647,7 @@ async function handleOAuthStart(request: Request, env: Env): Promise<Response> {
     .sign(sessionKey(env));
   const authorize = new URL("https://github.com/login/oauth/authorize");
   authorize.searchParams.set("client_id", oauthClientId);
-  authorize.searchParams.set("redirect_uri", `${url.origin}/auth/github/callback`);
+  authorize.searchParams.set("redirect_uri", oauthCallbackUrl(env));
   authorize.searchParams.set("scope", "read:user");
   authorize.searchParams.set("state", state);
   return Response.redirect(authorize.toString(), 302);
@@ -607,7 +678,7 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
     returnTo = new URL(payload.returnTo);
     if (
       returnTo.origin !== payload.origin ||
-      normalizeArticlePath(returnTo.pathname) !== returnTo.pathname
+      !isAllowedReturnPath(returnTo.pathname)
     ) {
       throw new Error("return URL mismatch");
     }
@@ -623,7 +694,7 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
       client_id: oauthClientId,
       client_secret: oauthClientSecret,
       code,
-      redirect_uri: `${url.origin}/auth/github/callback`,
+      redirect_uri: oauthCallbackUrl(env),
     }),
   });
   const tokenPayload: unknown = await tokenResponse.json();
@@ -654,16 +725,22 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
     throw new HttpError(403, "This GitHub account cannot write comments", "forbidden");
   }
 
-  const token = await signSession(env, env.OWNER_LOGIN);
-  returnTo.hash = `rowan-comments-auth=${encodeURIComponent(token)}`;
+  const csrfToken = crypto.randomUUID();
+  const token = await signSession(env, env.OWNER_LOGIN, csrfToken);
+  const sameOriginSession = returnTo.origin === new URL(env.SITE_URL).origin;
+  if (!sameOriginSession) {
+    returnTo.hash = `rowan-comments-auth=${encodeURIComponent(token)}`;
+  }
+  const headers = new Headers({
+    "Cache-Control": "no-store",
+    Location: returnTo.toString(),
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+  });
+  if (sameOriginSession) headers.set("Set-Cookie", sessionCookie(token));
   return new Response(null, {
     status: 302,
-    headers: {
-      "Cache-Control": "no-store",
-      Location: returnTo.toString(),
-      "Referrer-Policy": "no-referrer",
-      "X-Content-Type-Options": "nosniff",
-    },
+    headers,
   });
 }
 
@@ -714,7 +791,7 @@ async function handleGetComments(
 
 async function handleCreateComment(request: Request, env: Env): Promise<Response> {
   requireAllowedOrigin(request, env);
-  await requireOwnerSession(request, env);
+  await requireOwnerSession(request, env, true);
   const input = createCommentSchema.safeParse(await readJson(request));
   if (!input.success) {
     throw new HttpError(400, "Comment input is invalid", "invalid_comment");
@@ -757,7 +834,7 @@ async function handleUpdateComment(
   id: string
 ): Promise<Response> {
   requireAllowedOrigin(request, env);
-  await requireOwnerSession(request, env);
+  await requireOwnerSession(request, env, true);
   const input = updateCommentSchema.safeParse(await readJson(request));
   if (!input.success) {
     throw new HttpError(400, "Comment input is invalid", "invalid_comment");
@@ -780,7 +857,7 @@ async function handleDeleteComment(
   id: string
 ): Promise<Response> {
   requireAllowedOrigin(request, env);
-  await requireOwnerSession(request, env);
+  await requireOwnerSession(request, env, true);
   const resource = await getCommentResource(env, id);
   await deleteDiscussionComment(env, id);
   const path = normalizeArticlePath(resource?.discussion.title ?? "");
@@ -810,8 +887,39 @@ async function routeRequest(
     return handleGetComments(request, env, ctx);
   }
   if (request.method === "GET" && url.pathname === "/api/owner/session") {
-    const login = await requireOwnerSession(request, env);
-    return jsonResponse(request, env, { canWrite: true, login });
+    try {
+      const session = await requireOwnerSession(request, env);
+      return jsonResponse(
+        request,
+        env,
+        {
+          canWrite: true,
+          login: session.login,
+          csrfToken: session.csrfToken,
+        },
+        { headers: { "Cache-Control": "no-store" } }
+      );
+    } catch (error) {
+      if (!(error instanceof HttpError) || error.status !== 401) throw error;
+      return jsonResponse(
+        request,
+        env,
+        { canWrite: false },
+        { headers: { "Cache-Control": "no-store" } }
+      );
+    }
+  }
+  if (request.method === "POST" && url.pathname === "/api/owner/logout") {
+    requireAllowedOrigin(request, env);
+    await requireOwnerSession(request, env, true);
+    return new Response(null, {
+      status: 204,
+      headers: {
+        ...Object.fromEntries(corsHeaders(request, env)),
+        "Cache-Control": "no-store",
+        "Set-Cookie": clearedSessionCookie(),
+      },
+    });
   }
   if (request.method === "POST" && url.pathname === "/api/owner/comments") {
     return handleCreateComment(request, env);
