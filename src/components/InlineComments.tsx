@@ -7,6 +7,7 @@ import {
   MessageSquarePlus,
   Pencil,
   Reply,
+  RotateCcw,
   Send,
   Trash2,
   X,
@@ -17,9 +18,16 @@ import {
   type AnnotationAnchor,
   type AnnotationThread,
   type CommentListResponse,
+  type CommentMutationResponse,
   type CommentView,
 } from "../comments/protocol";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  removeOptimisticResource,
+  replaceOptimisticReply,
+  replaceOptimisticThread,
+  updateOptimisticBody,
+} from "../comments/optimistic";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const ANNOTATION_MODE_KEY = "rowan-comments-annotation-mode";
 const BLOCK_SELECTOR = "[data-comment-block-id]";
@@ -150,6 +158,9 @@ export default function InlineComments({
     return deepLink || localStorage.getItem(ANNOTATION_MODE_KEY) === "true";
   });
   const [threads, setThreads] = useState<AnnotationThread[]>([]);
+  const versionRef = useRef(0);
+  const [syncStates, setSyncStates] = useState<Record<string, "pending">>({});
+  const [retryAction, setRetryAction] = useState<null | (() => void)>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [ownerSession, setOwnerSession] = useState<OwnerSession | null>(null);
@@ -196,16 +207,25 @@ export default function InlineComments({
   const reload = useCallback(async () => {
     try {
       setError("");
-      const data = await request<CommentListResponse>(
-        `/api/comments?path=${encodeURIComponent(articlePath)}`
+      const headers = new Headers();
+      if (versionRef.current > 0) {
+        headers.set("If-None-Match", `"comments-${versionRef.current}"`);
+      }
+      const response = await fetch(
+        `${endpoint}/api/comments?path=${encodeURIComponent(articlePath)}`,
+        { credentials: "include", headers }
       );
+      if (response.status === 304) return;
+      if (!response.ok) throw new Error(`请求失败 (${response.status})`);
+      const data = (await response.json()) as CommentListResponse;
+      versionRef.current = data.version;
       setThreads(data.threads);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "批注加载失败");
     } finally {
       setLoading(false);
     }
-  }, [articlePath, request]);
+  }, [articlePath, endpoint]);
 
   useEffect(() => {
     void reload();
@@ -384,58 +404,149 @@ export default function InlineComments({
       setSelectedKey(`${next.anchor.view}:${next.anchor.blockId}`);
   }
 
-  async function saveComment() {
-    if (!composer || !body.trim()) return;
+  async function performSave(next: ComposerState, text: string) {
+    const previous = threads;
+    const temporaryId = `pending-${crypto.randomUUID()}`;
+    const now = new Date().toISOString();
+    const localAuthor = {
+      login: ownerSession?.login ?? "llccing",
+      avatarUrl: `https://github.com/${ownerSession?.login ?? "llccing"}.png`,
+      url: `https://github.com/${ownerSession?.login ?? "llccing"}`,
+    };
     setSaving(true);
     setError("");
+    setRetryAction(null);
+    setSyncStates(states => ({ ...states, [temporaryId]: "pending" }));
+    if (next.editId) {
+      setSyncStates(states => ({ ...states, [next.editId!]: "pending" }));
+      setThreads(current => updateOptimisticBody(current, next.editId!, text));
+    } else if (next.replyToId) {
+      setThreads(current =>
+        current.map(thread =>
+          thread.id === next.replyToId
+            ? {
+                ...thread,
+                replies: [
+                  ...thread.replies,
+                  {
+                    id: temporaryId,
+                    bodyHtml: "",
+                    bodyText: text,
+                    createdAt: now,
+                    updatedAt: now,
+                    author: localAuthor,
+                  },
+                ],
+              }
+            : thread
+        )
+      );
+    } else if (next.anchor) {
+      setThreads(current => [
+        ...current,
+        {
+          id: temporaryId,
+          url: "",
+          bodyHtml: "",
+          bodyText: text,
+          createdAt: now,
+          updatedAt: now,
+          author: localAuthor,
+          anchor: next.anchor!,
+          replies: [],
+        },
+      ]);
+    }
+    setComposer(null);
+    setBody("");
+    setSelectionAnchor(null);
+    window.getSelection()?.removeAllRanges();
     try {
-      if (composer.editId) {
-        await request(
-          `/api/owner/comments/${encodeURIComponent(composer.editId)}`,
+      if (next.editId) {
+        const result = await request<CommentMutationResponse>(
+          `/api/owner/comments/${encodeURIComponent(next.editId)}`,
           {
             method: "PATCH",
-            body: JSON.stringify({ body }),
+            body: JSON.stringify({ body: text }),
           }
         );
+        versionRef.current = result.version;
       } else {
-        await request("/api/owner/comments", {
-          method: "POST",
-          body: JSON.stringify({
-            path: articlePath,
-            articleTitle,
-            body,
-            anchor: composer.anchor,
-            replyToId: composer.replyToId,
-          }),
-        });
+        const result = await request<CommentMutationResponse>(
+          "/api/owner/comments",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              path: articlePath,
+              articleTitle,
+              body: text,
+              anchor: next.anchor,
+              replyToId: next.replyToId,
+            }),
+          }
+        );
+        versionRef.current = result.version;
+        if (result.thread) {
+          setThreads(current =>
+            replaceOptimisticThread(current, temporaryId, result.thread!)
+          );
+        } else if (result.reply) {
+          setThreads(current =>
+            replaceOptimisticReply(current, temporaryId, result.reply!)
+          );
+        }
       }
-      setComposer(null);
-      setBody("");
-      setSelectionAnchor(null);
-      window.getSelection()?.removeAllRanges();
-      await reload();
     } catch (cause) {
+      setThreads(previous);
       setError(cause instanceof Error ? cause.message : "保存失败");
+      setRetryAction(() => () => void performSave(next, text));
     } finally {
+      setSyncStates(states => {
+        const nextStates = { ...states };
+        delete nextStates[temporaryId];
+        if (next.editId) delete nextStates[next.editId];
+        return nextStates;
+      });
       setSaving(false);
     }
   }
 
-  async function deleteComment(id: string) {
-    if (confirmDeleteId !== id) {
+  async function saveComment() {
+    if (saving || !composer || !body.trim()) return;
+    await performSave(composer, body.trim());
+  }
+
+  async function deleteComment(id: string, confirmed = false) {
+    if (saving) return;
+    if (!confirmed && confirmDeleteId !== id) {
       setConfirmDeleteId(id);
       return;
     }
+    const previous = threads;
+    setThreads(current => removeOptimisticResource(current, id));
+    setSyncStates(states => ({ ...states, [id]: "pending" }));
     setSaving(true);
+    setError("");
+    setRetryAction(null);
     try {
-      await request(`/api/owner/comments/${encodeURIComponent(id)}`, {
-        method: "DELETE",
-      });
+      const result = await request<CommentMutationResponse>(
+        `/api/owner/comments/${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+        }
+      );
+      versionRef.current = result.version;
       setConfirmDeleteId(null);
-      await reload();
     } catch (cause) {
+      setThreads(previous);
       setError(cause instanceof Error ? cause.message : "删除失败");
+      setRetryAction(() => () => void deleteComment(id, true));
     } finally {
+      setSyncStates(states => {
+        const nextStates = { ...states };
+        delete nextStates[id];
+        return nextStates;
+      });
       setSaving(false);
     }
   }
@@ -576,9 +687,21 @@ export default function InlineComments({
           </div>
 
           {error && (
-            <p className="mb-3 border-l-2 border-red-600 pl-3 text-sm text-red-600">
-              {error}
-            </p>
+            <div className="mb-3 flex min-h-9 items-center justify-between gap-3 border-l-2 border-red-600 pl-3 text-sm text-red-600">
+              <span>{error}</span>
+              {retryAction && (
+                <button
+                  aria-label="重试"
+                  className="inline-flex h-8 shrink-0 items-center gap-1 rounded px-2 hover:bg-skin-card"
+                  onClick={() => retryAction()}
+                  title="重试"
+                  type="button"
+                >
+                  <RotateCcw aria-hidden="true" size={15} />
+                  重试
+                </button>
+              )}
+            </div>
           )}
           {loading && (
             <Loader2 aria-label="正在加载" className="animate-spin" size={20} />
@@ -586,7 +709,7 @@ export default function InlineComments({
 
           {activeThreads.map(thread => (
             <article
-              className="border-b border-skin-line py-4 first:pt-0"
+              className={`border-b border-skin-line py-4 first:pt-0 ${syncStates[thread.id] ? "opacity-60" : ""}`}
               key={thread.id}
             >
               <blockquote className="mb-3 border-l-2 border-skin-accent pl-3 text-xs opacity-70">
@@ -597,24 +720,39 @@ export default function InlineComments({
                   @{thread.author.login} ·{" "}
                   {new Date(thread.createdAt).toLocaleDateString("zh-CN")}
                 </span>
-                <a
-                  aria-label="在 GitHub 查看"
-                  href={thread.url}
-                  rel="noreferrer"
-                  target="_blank"
-                  title="在 GitHub 查看"
-                >
-                  <ExternalLink aria-hidden="true" size={15} />
-                </a>
+                {syncStates[thread.id] ? (
+                  <Loader2
+                    aria-label="正在保存"
+                    className="animate-spin"
+                    size={15}
+                  />
+                ) : thread.url ? (
+                  <a
+                    aria-label="在 GitHub 查看"
+                    href={thread.url}
+                    rel="noreferrer"
+                    target="_blank"
+                    title="在 GitHub 查看"
+                  >
+                    <ExternalLink aria-hidden="true" size={15} />
+                  </a>
+                ) : null}
               </div>
               <RichText text={extractAnnotationText(thread.bodyText)} />
               {thread.replies.map(reply => (
                 <div
-                  className="ml-4 mt-3 border-l border-skin-line pl-3"
+                  className={`ml-4 mt-3 border-l border-skin-line pl-3 ${syncStates[reply.id] ? "opacity-60" : ""}`}
                   key={reply.id}
                 >
                   <div className="mb-1 text-xs opacity-70">
-                    @{reply.author.login}
+                    <span>@{reply.author.login}</span>
+                    {syncStates[reply.id] && (
+                      <Loader2
+                        aria-label="正在保存"
+                        className="ml-2 inline animate-spin"
+                        size={13}
+                      />
+                    )}
                   </div>
                   <RichText text={readableReply(reply.bodyText)} />
                   {ownerSession &&
