@@ -11,6 +11,15 @@ import {
   type CommentListResponse,
   type CommentReply,
 } from "../../../src/comments/protocol";
+import {
+  scheduleShadowWrite,
+  shadowCreateAnnotation,
+  shadowCreateReply,
+  shadowDeleteAnnotation,
+  shadowDeleteReply,
+  shadowUpdateAnnotation,
+  shadowUpdateReply,
+} from "./d1";
 
 const GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
 const GITHUB_API_VERSION = "2022-11-28";
@@ -789,7 +798,11 @@ async function handleGetComments(
   return response;
 }
 
-async function handleCreateComment(request: Request, env: Env): Promise<Response> {
+async function handleCreateComment(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<Response> {
   requireAllowedOrigin(request, env);
   await requireOwnerSession(request, env, true);
   const input = createCommentSchema.safeParse(await readJson(request));
@@ -825,12 +838,55 @@ async function handleCreateComment(request: Request, env: Env): Promise<Response
     input.data.replyToId
   );
   await invalidateCommentCache(request, input.data.path);
+  const article = {
+    path: input.data.path,
+    title: input.data.articleTitle,
+    discussion,
+  };
+  if (input.data.replyToId) {
+    scheduleShadowWrite(
+      ctx,
+      {
+        operation: "create_reply",
+        resourceId: comment.id,
+        articlePath: input.data.path,
+      },
+      () =>
+        shadowCreateReply(env.ANNOTATIONS_DB, {
+          article,
+          comment,
+          annotationId: input.data.replyToId!,
+          body: input.data.body,
+        })
+    );
+  } else {
+    scheduleShadowWrite(
+      ctx,
+      {
+        operation: "create_annotation",
+        resourceId: comment.id,
+        articlePath: input.data.path,
+      },
+      () =>
+        shadowCreateAnnotation(env.ANNOTATIONS_DB, {
+          article,
+          comment,
+          body: comment.body,
+          metadata: {
+            version: 1,
+            path: input.data.path,
+            anchor: input.data.anchor!,
+          },
+        })
+    );
+  }
   return jsonResponse(request, env, { comment }, { status: 201 });
 }
 
 async function handleUpdateComment(
   request: Request,
   env: Env,
+  ctx: ExecutionContext,
   id: string
 ): Promise<Response> {
   requireAllowedOrigin(request, env);
@@ -848,12 +904,38 @@ async function handleUpdateComment(
   const comment = await updateDiscussionComment(env, id, body);
   const path = normalizeArticlePath(resource.discussion.title);
   if (path) await invalidateCommentCache(request, path);
+  if (path) {
+    const article = {
+      path,
+      title: resource.discussion.title,
+      discussion: resource.discussion,
+    };
+    const operation = metadata ? "update_annotation" : "update_reply";
+    scheduleShadowWrite(
+      ctx,
+      { operation, resourceId: comment.id, articlePath: path },
+      () =>
+        metadata
+          ? shadowUpdateAnnotation(env.ANNOTATIONS_DB, {
+              article,
+              comment,
+              body: comment.body,
+              metadata,
+            })
+          : shadowUpdateReply(env.ANNOTATIONS_DB, {
+              article,
+              comment,
+              body: input.data.body,
+            })
+    );
+  }
   return jsonResponse(request, env, { comment });
 }
 
 async function handleDeleteComment(
   request: Request,
   env: Env,
+  ctx: ExecutionContext,
   id: string
 ): Promise<Response> {
   requireAllowedOrigin(request, env);
@@ -862,6 +944,35 @@ async function handleDeleteComment(
   await deleteDiscussionComment(env, id);
   const path = normalizeArticlePath(resource?.discussion.title ?? "");
   if (path) await invalidateCommentCache(request, path);
+  if (path && resource) {
+    const metadata = parseAnnotationMetadata(resource.body);
+    const deletedAt = new Date().toISOString();
+    const article = {
+      path,
+      title: resource.discussion.title,
+      discussion: resource.discussion,
+    };
+    scheduleShadowWrite(
+      ctx,
+      {
+        operation: metadata ? "delete_annotation" : "delete_reply",
+        resourceId: id,
+        articlePath: path,
+      },
+      () =>
+        metadata
+          ? shadowDeleteAnnotation(env.ANNOTATIONS_DB, {
+              article,
+              resourceId: id,
+              deletedAt,
+            })
+          : shadowDeleteReply(env.ANNOTATIONS_DB, {
+              article,
+              resourceId: id,
+              deletedAt,
+            })
+    );
+  }
   return new Response(null, { status: 204, headers: corsHeaders(request, env) });
 }
 
@@ -922,14 +1033,24 @@ async function routeRequest(
     });
   }
   if (request.method === "POST" && url.pathname === "/api/owner/comments") {
-    return handleCreateComment(request, env);
+    return handleCreateComment(request, env, ctx);
   }
   const commentMatch = url.pathname.match(/^\/api\/owner\/comments\/([^/]+)$/);
   if (commentMatch && request.method === "PATCH") {
-    return handleUpdateComment(request, env, decodeURIComponent(commentMatch[1]));
+    return handleUpdateComment(
+      request,
+      env,
+      ctx,
+      decodeURIComponent(commentMatch[1])
+    );
   }
   if (commentMatch && request.method === "DELETE") {
-    return handleDeleteComment(request, env, decodeURIComponent(commentMatch[1]));
+    return handleDeleteComment(
+      request,
+      env,
+      ctx,
+      decodeURIComponent(commentMatch[1])
+    );
   }
   throw new HttpError(404, "Route was not found", "not_found");
 }

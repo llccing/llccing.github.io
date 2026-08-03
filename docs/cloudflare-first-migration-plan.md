@@ -1,8 +1,8 @@
 # Cloudflare-First Migration Plan
 
-Status: Phases 0 through 3 complete
+Status: Phases 0 through 4 complete; Phase 4 shadow-write observation active
 
-Last updated: 2026-08-02
+Last updated: 2026-08-04
 
 Repository: `llccing/llccing.github.io`
 Production domain: `https://rowanliu.com`
@@ -15,14 +15,16 @@ Production domain: `https://rowanliu.com`
   `www` redirects to the apex with path and query preservation, and the GitHub
   Pages rollback path remains active. Evidence:
   `docs/cloudflare-first-migration-phase-2-report.md`.
+- Phase 3 completed on 2026-08-02. Same-origin annotation APIs, cookie-based
+  owner authentication, and `/annotations/` are live. Evidence:
+  `docs/cloudflare-first-migration-phase-3-report.md`.
+- Phase 4 completed on 2026-08-04. D1 contains a count-verified import and the
+  Worker now mirrors successful GitHub mutations to D1 without making public
+  reads depend on D1. Evidence:
+  `docs/cloudflare-first-migration-phase-4-report.md`.
 - Current operational state, DNS propagation notes, and next-agent instructions
   are recorded in `docs/cloudflare-first-migration-handoff.md`.
-- Phase 3 completed on 2026-08-02. The existing GitHub-backed annotation API
-  now serves same-origin `/api/*` and `/auth/*` routes, owner authentication
-  uses an HTTP-only cookie with CSRF protection, and `/annotations/` provides
-  the stable owner entry. Evidence:
-  `docs/cloudflare-first-migration-phase-3-report.md`.
-- Phases 4 through 8 have not started.
+- Phases 5 through 8 have not started.
 
 ## 1. Purpose
 

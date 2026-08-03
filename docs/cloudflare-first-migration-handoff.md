@@ -1,172 +1,106 @@
 # Cloudflare Migration Agent Handoff
 
-Status: Phase 3 complete; observation period active
+Status: Phase 4 complete; shadow-write observation active
 
-Last verified: 2026-08-02 (Asia/Shanghai)
+Last verified: 2026-08-04 (Asia/Shanghai)
 
 Repository: `llccing/llccing.github.io`
 
-Branch: `codex/cloudflare-pages-phase-3`
+Branch: `codex/cloudflare-pages-phase-4`
 
-Phase 3 base commit: `f9943bae docs(cloudflare): record phase 2 production cutover`
+Base: `main` at `2ed4469f`
 
 ## Objective
 
-Continue the approved Cloudflare-first migration in
-`docs/cloudflare-first-migration-plan.md` one phase at a time. Preserve the
-existing GitHub rollback paths, Giscus, GitHub Discussions, annotation data,
-Chinese locale behavior, and Asia/Shanghai publishing assumptions.
+Continue the Cloudflare-first migration one phase at a time. Preserve GitHub
+source, Discussions, Giscus, Pages rollback infrastructure, the legacy Worker
+URL, Chinese locale behavior, and Asia/Shanghai publishing assumptions.
 
-This file is the operational handoff for the next agent. Detailed evidence is
-in `docs/cloudflare-first-migration-phase-2-report.md` and
-`docs/cloudflare-first-migration-phase-3-report.md`.
+Detailed Phase 4 evidence is in
+`docs/cloudflare-first-migration-phase-4-report.md`.
 
-## Current State
+## Current Production State
 
-### Completed
+- `rowanliu.com` and `www.rowanliu.com` are served by Cloudflare Pages.
+- Cloudflare is registrar and authoritative DNS provider.
+- The custom-domain Worker routes are `rowanliu.com/api/*` and
+  `rowanliu.com/auth/*`.
+- Worker `rowan-blog-comments` version
+  `9b4b990d-9c60-492a-924b-2dcf17baea92` is deployed.
+- `https://rowan-blog-comments.lcf33123.workers.dev` remains enabled.
+- D1 `rowan-blog-annotations`
+  (`af86d172-7c99-4bb1-8512-80175a1bcbb7`, APAC) has migration
+  `0001_annotations_shadow.sql` applied.
+- Remote D1 contains 1 article, 3 annotations, and 2 replies with zero
+  reconciliation mismatches.
+- GitHub Discussions remains authoritative for all public reads and mutations.
+- Successful GitHub mutations now schedule non-blocking D1 shadow writes.
 
-- Phase 0 and Phase 1 are complete. Their evidence is in
-  `docs/cloudflare-first-migration-phase-0-1-report.md`.
-- Phase 2 is complete. Cloudflare Pages project `rowan-blog` has active custom
-  domains for `rowanliu.com` and `www.rowanliu.com`, with SSL enabled.
-- Phase 3 is complete. The GitHub-backed annotation Worker serves same-origin
-  `/api/*` and `/auth/*`, production owner authentication uses an HTTP-only
-  cookie with CSRF protection, and `/annotations/` is the owner entry.
-- The registrar transfer to Cloudflare completed. Google and Cloudflare public
-  resolvers now agree on the Cloudflare authoritative nameservers.
-- Cloudflare DNS contains these production records:
-  - `rowanliu.com CNAME rowan-blog.pages.dev`, proxied, TTL Auto.
-  - `www.rowanliu.com CNAME rowan-blog.pages.dev`, proxied, TTL Auto.
-- Cloudflare Single Redirect `Redirect www to apex` is active. It returns 301
-  and preserves the request path and query string.
-- The accidental `llccing.github.io.rowanliu.com` record was deleted after
-  explicit user confirmation. It is absent from the Cloudflare DNS table and
-  Google Public DNS returns NXDOMAIN.
-- GitHub Pages remains available for rollback. The `origin/gh-pages` branch and
-  `.github/workflows/deploy.yml` must remain intact during the observation
-  period.
-- The Phase 2 branch remains pushed at `f9943bae`; the Phase 3 implementation
-  continues on `codex/cloudflare-pages-phase-3`.
+## Preserved Rollback Paths
 
-### External State
+- Do not delete or modify GitHub Discussions or Giscus data.
+- Keep `.github/workflows/annotation-ai.yml` active until Phase 6 has passed its
+  observation period.
+- Keep `.github/workflows/deploy.yml` and `origin/gh-pages`.
+- Keep the current Pages production deployment and `workers.dev` fallback.
+- Do not delete D1 on rollback; it is not required by public reads in Phase 4.
+- Previous Worker version:
+  `e443de6c-06e9-4bfb-9edb-91c9b6fcb474`.
 
-- Cloudflare is now the registrar and authoritative DNS provider.
-- The local Windows resolver may still show cached Hostinger nameservers even
-  though Google and Cloudflare DNS-over-HTTPS agree on Cloudflare delegation.
-- GitHub OAuth App `Rowan Blog Inline Comments` uses the same-origin callback
-  `https://rowanliu.com/auth/github/callback`.
-- Worker version `e443de6c-06e9-4bfb-9edb-91c9b6fcb474` is deployed with the
-  same-origin routes. The latest Phase 3 Pages production deployment ID is
-  `e070f630-6378-475e-b977-7cba89e540fd`.
+## Phase 4 Observation
 
-Do not treat a stale GitHub Pages response from one resolver as evidence that
-the Cloudflare records need to be recreated. First compare multiple public
-DNS-over-HTTPS resolvers and the Cloudflare dashboard.
-
-## Phase 2 Validation Evidence
-
-The following checks passed before the Phase 2 report was committed:
-
-- `pnpm lint`
-- `pnpm test`: 3 files, 11 tests
-- `pnpm check:worker`
-- Production-flagged `pnpm build`
-- Astro Check with no errors, warnings, or hints
-- Jampack: 717 files, 36.56 MiB reduced to 28.73 MiB
-- Targeted Prettier checks
-- `git diff --check`
-
-Production verification covered representative pages, the 404 route,
-canonical and Open Graph URLs, RSS, sitemap, Giscus, inline annotations,
-mixed-content references, and desktop/mobile horizontal overflow. Existing
-informational warnings for stale Browserslist data and unsupported Shiki
-language labels were not introduced by this migration.
-
-## Next Actions
-
-1. Keep observing normal Cloudflare Pages deployments and preserve the GitHub
-   Pages rollback path. Do not disable or delete `.github/workflows/deploy.yml`
-   and do not delete `origin/gh-pages`.
-2. Keep GitHub Discussions authoritative and do not start D1 shadow writes
-   until a new explicit Phase 4 request.
-3. Before Phase 4, reread `docs/cloudflare-first-migration-phase-3-report.md`,
-   export a fresh annotation backup, and verify the current production Worker
-   and Pages deployment IDs.
-4. Preserve the GitHub OAuth App callback, Worker secrets, Discussions, Giscus,
-   and the `workers.dev` fallback.
-
-## Phase 4 Scope When Authorized
-
-Phase 4 adds D1 migrations, imports the exported GitHub annotation data, and
-shadow-writes new mutations while GitHub remains authoritative for reads.
-
-Required boundaries:
-
-- Preserve GitHub Discussions as authoritative storage during Phase 4.
-- Back up and count-verify exported annotations before D1 changes.
-- Make imports and reconciliation idempotent.
-- Record mismatches without silently repairing or deleting GitHub data.
-- D1 errors must not corrupt or block the GitHub source mutation.
-- Preserve Giscus without behavioral changes.
-- Keep the existing Worker deployment available as the API rollback path.
-- Do not switch public reads to D1, add Queue-based AI, add Durable Objects, or
-  retire GitHub workflows in Phase 4.
-- Never expose OAuth secrets, GitHub tokens, AI keys, or session tokens in the
-  URL, browser storage, logs, DOM, or response bodies.
-
-Phase 4 exit criteria require count-verified import and live shadow-write parity,
-idempotent re-runs, no GitHub corruption on D1 errors, and no user-visible D1
-read dependency.
-
-## Useful Verification Commands
-
-Run these from the repository root. Do not paste secrets into commands or
-terminal output.
+No synthetic production mutation was made for the Phase 4 release. After the
+owner next creates, edits, replies to, or deletes an annotation normally, run:
 
 ```powershell
-git status --short --branch
-git rev-list --left-right --count origin/codex/cloudflare-pages-phase-3...HEAD
-
-curl.exe -sS "https://dns.google/resolve?name=rowanliu.com&type=NS"
-curl.exe -sS "https://dns.google/resolve?name=rowanliu.com&type=A"
-curl.exe -sS "https://dns.google/resolve?name=www.rowanliu.com&type=A"
-curl.exe -sS "https://dns.google/resolve?name=llccing.github.io.rowanliu.com&type=A"
-
-curl.exe -sS "https://cloudflare-dns.com/dns-query?name=rowanliu.com&type=NS" `
-  -H "accept: application/dns-json"
-curl.exe -sS "https://cloudflare-dns.com/dns-query?name=www.rowanliu.com&type=A" `
-  -H "accept: application/dns-json"
-
-curl.exe --ssl-no-revoke -sS -o NUL -D - --max-redirs 0 https://rowanliu.com/
-curl.exe --ssl-no-revoke -sS -o NUL -D - --max-redirs 0 `
-  "https://www.rowanliu.com/posts/ai-changed-my-life/?source=handoff"
+pnpm comments:d1:reconcile -- `
+  --input artifacts/cloudflare-migration/annotations-2026-08-03.json `
+  --remote
 ```
 
-If the local resolver is still stale, use a currently returned Cloudflare proxy
-address only for diagnosis with `curl.exe --resolve`; do not hard-code that IP
-into DNS or repository configuration.
+The static backup will intentionally report differences after a legitimate new
+mutation. Export a fresh GitHub snapshot and reconcile against that snapshot to
+prove current shadow parity. Never run import merely to hide a mismatch; first
+classify whether it is a legitimate GitHub change or a D1 shadow failure.
 
-## Rollback and Safety Rules
+Structured Worker failures use message `d1_shadow_write_failed` and include the
+operation, resource ID, and article path without secrets.
 
-- Follow the exact Phase 2 rollback steps in
-  `docs/cloudflare-first-migration-phase-2-report.md` if a verified production
-  failure requires rollback.
-- Any production DNS deletion beyond the already removed accidental record
-  requires exact target identification and explicit user confirmation.
-- Do not mutate or delete production annotations, replies, GitHub Discussions,
-  or Giscus data during verification.
-- Do not commit secrets, exported production annotation data, Wrangler local
-  state, or generated tokens.
-- Preserve unrelated user changes if the worktree becomes dirty.
-- Use `pnpm` and run the validation matrix appropriate to any future phase.
+## Next Phases
 
-## Resume Checklist For The Next Agent
+Phase 5 makes D1 authoritative for reads and writes, adds optimistic frontend
+updates, versioned responses, conditional refetch, soft deletion, revision
+history, and latency/error metrics. It removes GitHub GraphQL and full-list
+reload latency from normal annotation CRUD.
 
-1. Read `AGENTS.md`.
-2. Read this handoff, the migration plan, and the Phase 2 and Phase 3 reports.
-3. Run `git status --short --branch` and confirm the current branch and local
-   changes before editing.
-4. Inspect the live Cloudflare and DNS state instead of assuming propagation is
-   complete from this snapshot.
-5. Confirm the user's requested phase and authorization before making external
-   changes.
+Phase 6 directly addresses slow `@AI` replies. It enqueues owner annotations
+containing `@ai`, processes them in an idempotent Cloudflare Queue consumer,
+writes replies to D1, and exposes queued/answering/completed/failed/retry UI
+states. GitHub Actions remains active until the Queue path has been observed and
+the old workflow is explicitly disabled.
+
+Do not start Phase 5, Phase 6, Queues, Durable Objects, public D1 reads, workflow
+retirement, or DNS changes without explicit authorization for that phase.
+
+## Validation Baseline
+
+- `pnpm lint`: passed
+- `pnpm test`: 6 files, 32 tests passed
+- `pnpm check:worker`: passed
+- Production `pnpm build`: passed
+- Astro Check: 0 errors, 0 warnings, 0 hints
+- Jampack: 720 files, 36.57 MiB to 28.75 MiB
+- Targeted Prettier: passed
+- `git diff --check`: passed
+- Same-origin and fallback reads: HTTP 200
+- Anonymous session: read-only
+- Anonymous mutation: HTTP 401
+- Final D1 reconciliation: 1/3/2, zero mismatches
+
+## Resume Checklist
+
+1. Read `AGENTS.md`, this handoff, the migration plan, and the Phase 4 report.
+2. Inspect `git status`, the current branch, and live Worker/Pages versions.
+3. Preserve unrelated dirty-worktree changes.
+4. Observe at least one normal owner mutation and reconcile a fresh export.
+5. Obtain explicit authorization before starting Phase 5.
