@@ -507,11 +507,16 @@ Exit criteria:
 
 ### Phase 5: D1 primary read/write switch
 
+Implementation status: completed on 2026-08-04. Production observation and
+the Phase 6 authorization boundary remain active.
+
 Tasks:
 
 - Switch reads to D1.
 - Switch writes to D1 and use optimistic client updates.
-- Move GitHub mirroring behind a Queue or disable it after an explicit decision.
+- Move GitHub mirroring off the synchronous request path with
+  `ExecutionContext.waitUntil()`. Queue-backed durability is deferred to the
+  explicitly separate Phase 6.
 - Add versioned responses, conditional refetch, soft delete, and revision
   history.
 - Add latency and error metrics.

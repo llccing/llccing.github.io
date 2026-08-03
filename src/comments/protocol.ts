@@ -53,6 +53,7 @@ export type AnnotationThread = {
 };
 
 export type CommentListResponse = {
+  version: number;
   discussion: null | {
     id: string;
     number: number;
@@ -61,6 +62,12 @@ export type CommentListResponse = {
   };
   threads: AnnotationThread[];
   truncated: boolean;
+};
+
+export type CommentMutationResponse = {
+  version: number;
+  thread?: AnnotationThread;
+  reply?: CommentReply & { annotationId: string };
 };
 
 export type CreateCommentInput = {

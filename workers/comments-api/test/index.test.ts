@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildAnnotationCommentBody, type AnnotationMetadata } from "../../../src/comments/protocol";
-import worker from "../src/index";
+import worker, { scheduleGitHubMirror } from "../src/index";
 
 const articlePath = "/posts/example/";
 const discussionTitle = "posts/example/";
@@ -17,6 +17,70 @@ const metadata: AnnotationMetadata = {
   },
 };
 
+function readDatabase() {
+  const annotation = {
+    id: "annotation",
+    article_path: articlePath,
+    author_login: "llccing",
+    author_avatar_url: "https://github.com/llccing.png",
+    author_url: "https://github.com/llccing",
+    body: buildAnnotationCommentBody(metadata, "这是一条批注"),
+    github_url: "https://github.com/annotation",
+    block_id: metadata.anchor.blockId,
+    heading_id: metadata.anchor.headingId,
+    exact_text: metadata.anchor.exact,
+    prefix_text: metadata.anchor.prefix,
+    suffix_text: metadata.anchor.suffix,
+    view: metadata.anchor.view,
+    github_node_id: "DC_1",
+    github_mirror_state: "synced",
+    created_at: "2026-08-02T00:00:00Z",
+    updated_at: "2026-08-02T00:00:00Z",
+  };
+  const reply = {
+    id: "ai-reply",
+    annotation_id: annotation.id,
+    article_path: articlePath,
+    author_login: "github-actions",
+    author_avatar_url: "",
+    author_url: "",
+    body: "<!-- rowan-ai-reply:v1 annotation -->\n\nAI 回答",
+    github_url: "https://github.com/reply",
+    github_node_id: "DC_2",
+    github_mirror_state: "synced",
+    created_at: "2026-08-02T00:01:00Z",
+    updated_at: "2026-08-02T00:01:00Z",
+  };
+  return {
+    prepare(sql: string) {
+      return {
+        bind() {
+          return {
+            first: async () =>
+              sql.includes("FROM articles")
+                ? {
+                    path: articlePath,
+                    title: discussionTitle,
+                    github_discussion_id: "D_1",
+                    github_discussion_number: 1,
+                    github_url: "https://github.com/discussion/1",
+                    version: 4,
+                  }
+                : null,
+            all: async () => ({
+              results: sql.includes("FROM annotations")
+                ? [annotation]
+                : sql.includes("FROM replies")
+                  ? [reply]
+                  : [],
+            }),
+          };
+        },
+      };
+    },
+  } as unknown as D1Database;
+}
+
 const env = {
   GITHUB_OWNER: "llccing",
   GITHUB_REPO: "llccing.github.io",
@@ -29,6 +93,7 @@ const env = {
   GITHUB_OAUTH_CLIENT_ID: "test-client-id",
   GITHUB_OAUTH_CLIENT_SECRET: "test-client-secret",
   SESSION_SECRET: "test-session-secret-that-is-long-enough",
+  ANNOTATIONS_DB: readDatabase(),
 };
 
 const ctx = {
@@ -81,86 +146,8 @@ describe("comments Worker", () => {
     await expect(response.json()).resolves.toEqual({ canWrite: false });
   });
 
-  it("returns only metadata-backed inline annotations", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(
-        githubResponse({
-          repository: {
-            discussions: {
-              nodes: [
-                { id: "D_1", number: 1, title: discussionTitle, url: "https://github.com/discussion/1" },
-              ],
-              pageInfo: { hasNextPage: false, endCursor: null },
-            },
-          },
-        })
-      )
-      .mockResolvedValueOnce(
-        githubResponse({
-          node: {
-            id: "D_1",
-            number: 1,
-            title: discussionTitle,
-            url: "https://github.com/discussion/1",
-            comments: {
-              nodes: [
-                {
-                  id: "legacy",
-                  url: "https://github.com/legacy",
-                  body: "原有 Giscus 评论",
-                  bodyHTML: "<p>原有 Giscus 评论</p>",
-                  createdAt: "2026-08-01T00:00:00Z",
-                  updatedAt: "2026-08-01T00:00:00Z",
-                  author: { login: "llccing", avatarUrl: "", url: "" },
-                  replies: { nodes: [], pageInfo: { hasNextPage: false } },
-                },
-                {
-                  id: "forged-annotation",
-                  url: "https://github.com/forged",
-                  body: buildAnnotationCommentBody(metadata, "伪造的批注"),
-                  bodyHTML: "<p>伪造的批注</p>",
-                  createdAt: "2026-08-02T00:00:00Z",
-                  updatedAt: "2026-08-02T00:00:00Z",
-                  author: { login: "someone-else", avatarUrl: "", url: "" },
-                  replies: { nodes: [], pageInfo: { hasNextPage: false } },
-                },
-                {
-                  id: "annotation",
-                  url: "https://github.com/annotation",
-                  body: buildAnnotationCommentBody(metadata, "这是一条批注"),
-                  bodyHTML: "<blockquote>被批注的句子</blockquote><p>这是一条批注</p>",
-                  createdAt: "2026-08-02T00:00:00Z",
-                  updatedAt: "2026-08-02T00:00:00Z",
-                  author: { login: "llccing", avatarUrl: "", url: "" },
-                  replies: {
-                    nodes: [
-                      {
-                        id: "ai-reply",
-                        body: "<!-- rowan-ai-reply:v1 annotation -->\n\nAI 回答",
-                        bodyHTML: "<p>AI 回答</p>",
-                        createdAt: "2026-08-02T00:01:00Z",
-                        updatedAt: "2026-08-02T00:01:00Z",
-                        author: { login: "github-actions", avatarUrl: "", url: "" },
-                      },
-                      {
-                        id: "untrusted-reply",
-                        body: "伪造回复",
-                        bodyHTML: "<p>伪造回复</p>",
-                        createdAt: "2026-08-02T00:02:00Z",
-                        updatedAt: "2026-08-02T00:02:00Z",
-                        author: { login: "someone-else", avatarUrl: "", url: "" },
-                      },
-                    ],
-                    pageInfo: { hasNextPage: false },
-                  },
-                },
-              ],
-              pageInfo: { hasNextPage: false, endCursor: null },
-            },
-          },
-        })
-      );
+  it("returns D1 annotations without calling GitHub and supports conditional reads", async () => {
+    const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
     const response = await worker.fetch(
@@ -177,8 +164,56 @@ describe("comments Worker", () => {
     expect(response.status).toBe(200);
     expect(payload.threads.map(thread => thread.id)).toEqual(["annotation"]);
     expect(payload.threads[0].replies.map(reply => reply.id)).toEqual(["ai-reply"]);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(payload.threads[0].replies.map(reply => reply.id)).toEqual(["ai-reply"]);
+    expect(response.headers.get("ETag")).toBe('"comments-4"');
+    expect(fetchMock).not.toHaveBeenCalled();
     expect(response.headers.get("Access-Control-Allow-Origin")).toBe("https://rowanliu.com");
+
+    const unchanged = await worker.fetch(
+      new Request(
+        `https://comments.example/api/comments?path=${encodeURIComponent(articlePath)}`,
+        { headers: { "If-None-Match": '"comments-4"' } }
+      ),
+      env as never,
+      ctx as never
+    );
+    expect(unchanged.status).toBe(304);
+  });
+
+  it("contains an asynchronous GitHub mirror failure after D1 success", async () => {
+    const waitUntil = vi.fn();
+    const run = vi.fn().mockResolvedValue({ meta: { changes: 1 } });
+    const mirrorEnv = {
+      ...env,
+      ANNOTATIONS_DB: {
+        prepare: () => ({ bind: () => ({ run }) }),
+      } as unknown as D1Database,
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    scheduleGitHubMirror(
+      { ...ctx, waitUntil } as never,
+      mirrorEnv as never,
+      {
+        kind: "annotation",
+        id: "d1-id",
+        articlePath,
+        annotationId: "d1-id",
+        body: "body",
+        githubNodeId: null,
+        githubMirrorState: "pending",
+        anchor: metadata.anchor,
+      },
+      () => Promise.reject(new Error("GitHub unavailable"))
+    );
+    expect(waitUntil).toHaveBeenCalledOnce();
+    await expect(waitUntil.mock.calls[0][0]).resolves.toBeUndefined();
+    expect(run).toHaveBeenCalledOnce();
+    expect(JSON.parse(error.mock.calls.at(-1)?.[0] as string)).toMatchObject({
+      message: "github_mirror_failed",
+      resourceId: "d1-id",
+      articlePath,
+      error: "GitHub unavailable",
+    });
   });
 
   it("rejects owner mutations from an unapproved origin before GitHub access", async () => {

@@ -12,13 +12,18 @@ import {
   type CommentReply,
 } from "../../../src/comments/protocol";
 import {
-  scheduleShadowWrite,
-  shadowCreateAnnotation,
-  shadowCreateReply,
-  shadowDeleteAnnotation,
-  shadowDeleteReply,
-  shadowUpdateAnnotation,
-  shadowUpdateReply,
+  annotationMetadata,
+  createD1Annotation,
+  createD1Reply,
+  deleteD1Resource,
+  getD1Article,
+  getD1CommentList,
+  getD1Resource,
+  markArticleMirrored,
+  markResourceMirrored,
+  markResourceMirrorFailed,
+  updateD1Resource,
+  type D1Resource,
 } from "./d1";
 
 const GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
@@ -129,7 +134,7 @@ function allowedOrigins(env: Env): Set<string> {
 function corsHeaders(request: Request, env: Env): Headers {
   const headers = new Headers({
     "Access-Control-Allow-Headers":
-      "Authorization, Content-Type, X-CSRF-Token",
+      "Authorization, Content-Type, If-None-Match, X-CSRF-Token",
     "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
@@ -387,9 +392,9 @@ async function getCommentList(
   path: string
 ): Promise<CommentListResponse> {
   const discussion = await findDiscussion(env, path);
-  if (!discussion) return { discussion: null, threads: [], truncated: false };
+  if (!discussion) return { version: 0, discussion: null, threads: [], truncated: false };
   const { threads, truncated } = await loadComments(env, discussion, path);
-  return { discussion, threads, truncated };
+  return { version: 0, discussion, threads, truncated };
 }
 
 async function createDiscussion(
@@ -753,48 +758,119 @@ async function handleOAuthCallback(request: Request, env: Env): Promise<Response
   });
 }
 
-function cacheRequest(request: Request, path: string): Request {
-  const url = new URL(request.url);
-  url.pathname = "/__cache/comments";
-  url.search = new URLSearchParams({ path }).toString();
-  return new Request(url.toString(), { method: "GET" });
+function commentsEtag(version: number): string {
+  return `"comments-${version}"`;
 }
 
-async function invalidateCommentCache(request: Request, path: string): Promise<void> {
-  await caches.default.delete(cacheRequest(request, path));
+function logD1Metric(details: Record<string, string | number | boolean>): void {
+  console.log(JSON.stringify({ message: "comments_d1_metric", ...details }));
+}
+
+export function scheduleGitHubMirror(
+  ctx: ExecutionContext,
+  env: Env,
+  resource: D1Resource,
+  operation: () => Promise<void>
+): void {
+  ctx.waitUntil(
+    operation().catch(async error => {
+      await markResourceMirrorFailed(env.ANNOTATIONS_DB, resource).catch(markError => {
+        console.error(
+          JSON.stringify({
+            message: "github_mirror_state_update_failed",
+            operation: resource.kind,
+            resourceId: resource.id,
+            articlePath: resource.articlePath,
+            error: markError instanceof Error ? markError.message : String(markError),
+          })
+        );
+      });
+      console.error(
+        JSON.stringify({
+          message: "github_mirror_failed",
+          operation: resource.kind,
+          resourceId: resource.id,
+          articlePath: resource.articlePath,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      );
+    })
+  );
+}
+
+async function ensureGitHubDiscussion(
+  env: Env,
+  path: string,
+  title: string
+): Promise<DiscussionSummary> {
+  const article = await getD1Article(env.ANNOTATIONS_DB, path);
+  if (article && !article.github_discussion_id.startsWith("pending:")) {
+    return {
+      id: article.github_discussion_id,
+      number: article.github_discussion_number,
+      title: article.title,
+      url: article.github_url,
+    };
+  }
+  const discussion = (await findDiscussion(env, path)) ?? (await createDiscussion(env, path, title));
+  await markArticleMirrored(env.ANNOTATIONS_DB, path, discussion);
+  return discussion;
+}
+
+async function mirrorCreatedResource(
+  env: Env,
+  resource: D1Resource,
+  articleTitle: string
+): Promise<void> {
+  const discussion = await ensureGitHubDiscussion(env, resource.articlePath, articleTitle);
+  let replyToId: string | undefined;
+  if (resource.kind === "reply") {
+    const parent = await getD1Resource(
+      env.ANNOTATIONS_DB,
+      resource.annotationId,
+      env.OWNER_LOGIN
+    );
+    if (!parent?.githubNodeId) throw new Error("github_parent_not_mirrored");
+    replyToId = parent.githubNodeId;
+  }
+  const comment = await addDiscussionComment(
+    env,
+    discussion.id,
+    resource.body,
+    replyToId
+  );
+  await markResourceMirrored(env.ANNOTATIONS_DB, resource, comment);
 }
 
 async function handleGetComments(
   request: Request,
-  env: Env,
-  ctx: ExecutionContext
+  env: Env
 ): Promise<Response> {
   const url = new URL(request.url);
   const path = normalizeArticlePath(url.searchParams.get("path") ?? "");
   if (!path) throw new HttpError(400, "Article path is invalid", "invalid_path");
 
-  const key = cacheRequest(request, path);
-  const cached = await caches.default.match(key);
-  if (cached) {
-    const response = new Response(cached.body, cached);
-    response.headers.delete("Access-Control-Allow-Origin");
-    for (const [name, value] of corsHeaders(request, env)) response.headers.set(name, value);
-    response.headers.set("X-Comments-Cache", "HIT");
-    return response;
+  const startedAt = performance.now();
+  const value = await getD1CommentList(env.ANNOTATIONS_DB, path);
+  const durationMs = Math.round((performance.now() - startedAt) * 10) / 10;
+  const etag = commentsEtag(value.version);
+  logD1Metric({
+    route: "/api/comments",
+    operation: "read",
+    status: 200,
+    d1DurationMs: durationMs,
+    threadCount: value.threads.length,
+    articleVersion: value.version,
+  });
+  if (request.headers.get("If-None-Match") === etag) {
+    return new Response(null, {
+      status: 304,
+      headers: { ...Object.fromEntries(corsHeaders(request, env)), ETag: etag },
+    });
   }
-
-  const value = await getCommentList(env, path);
   const response = jsonResponse(request, env, value, {
-    headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=60" },
+    headers: { "Cache-Control": "no-cache", ETag: etag },
   });
-  const cachedResponse = Response.json(value, {
-    headers: {
-      "Cache-Control": "public, max-age=30, stale-while-revalidate=60",
-      "Content-Type": "application/json; charset=utf-8",
-    },
-  });
-  ctx.waitUntil(caches.default.put(key, cachedResponse));
-  response.headers.set("X-Comments-Cache", "MISS");
   return response;
 }
 
@@ -810,77 +886,59 @@ async function handleCreateComment(
     throw new HttpError(400, "Comment input is invalid", "invalid_comment");
   }
 
-  let discussion = await findDiscussion(env, input.data.path);
-  if (!discussion) {
-    discussion = await createDiscussion(env, input.data.path, input.data.articleTitle);
-  }
-
-  let commentBody = input.data.body;
+  const author = {
+    login: env.OWNER_LOGIN,
+    avatarUrl: `https://github.com/${env.OWNER_LOGIN}.png`,
+    url: `https://github.com/${env.OWNER_LOGIN}`,
+  };
+  const startedAt = performance.now();
+  let result;
   if (input.data.replyToId) {
-    const parent = await getCommentResource(env, input.data.replyToId);
-    if (parent?.discussion.id !== discussion.id) {
-      throw new HttpError(400, "Reply target is invalid", "invalid_reply");
+    try {
+      result = await createD1Reply(env.ANNOTATIONS_DB, {
+        path: input.data.path,
+        annotationId: input.data.replyToId,
+        body: input.data.body,
+        author,
+        siteUrl: env.SITE_URL,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === "annotation_not_found") {
+        throw new HttpError(404, "Reply target was not found", "comment_not_found");
+      }
+      throw error;
     }
   } else {
     if (!input.data.anchor) {
       throw new HttpError(400, "Annotation anchor is required", "anchor_required");
     }
-    commentBody = buildAnnotationCommentBody(
+    const storedBody = buildAnnotationCommentBody(
       { version: 1, path: input.data.path, anchor: input.data.anchor },
       input.data.body
     );
+    result = await createD1Annotation(env.ANNOTATIONS_DB, {
+      path: input.data.path,
+      articleTitle: input.data.articleTitle,
+      body: storedBody,
+      anchor: input.data.anchor,
+      author,
+      siteUrl: env.SITE_URL,
+    });
   }
-
-  const comment = await addDiscussionComment(
-    env,
-    discussion.id,
-    commentBody,
-    input.data.replyToId
+  const id = "thread" in result ? result.thread.id : result.reply.id;
+  const resource = await getD1Resource(env.ANNOTATIONS_DB, id, env.OWNER_LOGIN);
+  if (!resource) throw new Error("created_resource_not_found");
+  scheduleGitHubMirror(ctx, env, resource, () =>
+    mirrorCreatedResource(env, resource, input.data.articleTitle)
   );
-  await invalidateCommentCache(request, input.data.path);
-  const article = {
-    path: input.data.path,
-    title: input.data.articleTitle,
-    discussion,
-  };
-  if (input.data.replyToId) {
-    scheduleShadowWrite(
-      ctx,
-      {
-        operation: "create_reply",
-        resourceId: comment.id,
-        articlePath: input.data.path,
-      },
-      () =>
-        shadowCreateReply(env.ANNOTATIONS_DB, {
-          article,
-          comment,
-          annotationId: input.data.replyToId!,
-          body: input.data.body,
-        })
-    );
-  } else {
-    scheduleShadowWrite(
-      ctx,
-      {
-        operation: "create_annotation",
-        resourceId: comment.id,
-        articlePath: input.data.path,
-      },
-      () =>
-        shadowCreateAnnotation(env.ANNOTATIONS_DB, {
-          article,
-          comment,
-          body: comment.body,
-          metadata: {
-            version: 1,
-            path: input.data.path,
-            anchor: input.data.anchor!,
-          },
-        })
-    );
-  }
-  return jsonResponse(request, env, { comment }, { status: 201 });
+  logD1Metric({
+    route: "/api/owner/comments",
+    operation: resource.kind === "annotation" ? "create_annotation" : "create_reply",
+    status: 201,
+    d1DurationMs: Math.round((performance.now() - startedAt) * 10) / 10,
+    articleVersion: result.version,
+  });
+  return jsonResponse(request, env, result, { status: 201 });
 }
 
 async function handleUpdateComment(
@@ -895,41 +953,33 @@ async function handleUpdateComment(
   if (!input.success) {
     throw new HttpError(400, "Comment input is invalid", "invalid_comment");
   }
-  const resource = await getCommentResource(env, id);
+  const resource = await getD1Resource(env.ANNOTATIONS_DB, id, env.OWNER_LOGIN);
   if (!resource) throw new HttpError(404, "Comment was not found", "comment_not_found");
-  const metadata = parseAnnotationMetadata(resource.body);
+  const metadata = annotationMetadata(resource);
   const body = metadata
     ? buildAnnotationCommentBody(metadata, input.data.body)
     : input.data.body;
-  const comment = await updateDiscussionComment(env, id, body);
-  const path = normalizeArticlePath(resource.discussion.title);
-  if (path) await invalidateCommentCache(request, path);
-  if (path) {
-    const article = {
-      path,
-      title: resource.discussion.title,
-      discussion: resource.discussion,
-    };
-    const operation = metadata ? "update_annotation" : "update_reply";
-    scheduleShadowWrite(
-      ctx,
-      { operation, resourceId: comment.id, articlePath: path },
-      () =>
-        metadata
-          ? shadowUpdateAnnotation(env.ANNOTATIONS_DB, {
-              article,
-              comment,
-              body: comment.body,
-              metadata,
-            })
-          : shadowUpdateReply(env.ANNOTATIONS_DB, {
-              article,
-              comment,
-              body: input.data.body,
-            })
-    );
+  const startedAt = performance.now();
+  const result = await updateD1Resource(
+    env.ANNOTATIONS_DB,
+    resource,
+    body,
+    env.OWNER_LOGIN
+  );
+  if (resource.githubNodeId) {
+    scheduleGitHubMirror(ctx, env, resource, async () => {
+      const comment = await updateDiscussionComment(env, resource.githubNodeId!, body);
+      await markResourceMirrored(env.ANNOTATIONS_DB, resource, comment);
+    });
   }
-  return jsonResponse(request, env, { comment });
+  logD1Metric({
+    route: "/api/owner/comments/:id",
+    operation: `update_${resource.kind}`,
+    status: 200,
+    d1DurationMs: Math.round((performance.now() - startedAt) * 10) / 10,
+    articleVersion: result.version,
+  });
+  return jsonResponse(request, env, { version: result.version });
 }
 
 async function handleDeleteComment(
@@ -940,40 +990,23 @@ async function handleDeleteComment(
 ): Promise<Response> {
   requireAllowedOrigin(request, env);
   await requireOwnerSession(request, env, true);
-  const resource = await getCommentResource(env, id);
-  await deleteDiscussionComment(env, id);
-  const path = normalizeArticlePath(resource?.discussion.title ?? "");
-  if (path) await invalidateCommentCache(request, path);
-  if (path && resource) {
-    const metadata = parseAnnotationMetadata(resource.body);
-    const deletedAt = new Date().toISOString();
-    const article = {
-      path,
-      title: resource.discussion.title,
-      discussion: resource.discussion,
-    };
-    scheduleShadowWrite(
-      ctx,
-      {
-        operation: metadata ? "delete_annotation" : "delete_reply",
-        resourceId: id,
-        articlePath: path,
-      },
-      () =>
-        metadata
-          ? shadowDeleteAnnotation(env.ANNOTATIONS_DB, {
-              article,
-              resourceId: id,
-              deletedAt,
-            })
-          : shadowDeleteReply(env.ANNOTATIONS_DB, {
-              article,
-              resourceId: id,
-              deletedAt,
-            })
+  const resource = await getD1Resource(env.ANNOTATIONS_DB, id, env.OWNER_LOGIN);
+  if (!resource) throw new HttpError(404, "Comment was not found", "comment_not_found");
+  const startedAt = performance.now();
+  const result = await deleteD1Resource(env.ANNOTATIONS_DB, resource);
+  if (resource.githubNodeId) {
+    scheduleGitHubMirror(ctx, env, resource, () =>
+      deleteDiscussionComment(env, resource.githubNodeId!)
     );
   }
-  return new Response(null, { status: 204, headers: corsHeaders(request, env) });
+  logD1Metric({
+    route: "/api/owner/comments/:id",
+    operation: `delete_${resource.kind}`,
+    status: 200,
+    d1DurationMs: Math.round((performance.now() - startedAt) * 10) / 10,
+    articleVersion: result.version,
+  });
+  return jsonResponse(request, env, result);
 }
 
 async function routeRequest(
@@ -995,7 +1028,7 @@ async function routeRequest(
     return handleOAuthCallback(request, env);
   }
   if (request.method === "GET" && url.pathname === "/api/comments") {
-    return handleGetComments(request, env, ctx);
+    return handleGetComments(request, env);
   }
   if (request.method === "GET" && url.pathname === "/api/owner/session") {
     try {
