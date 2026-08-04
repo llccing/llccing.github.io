@@ -135,6 +135,37 @@ describe("comments Worker", () => {
     });
   });
 
+  it("acknowledges an invalid Queue payload without retrying the batch", async () => {
+    const ack = vi.fn();
+    const retry = vi.fn();
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    await worker.queue!(
+      {
+        queue: "rowan-blog-ai-jobs",
+        messages: [
+          {
+            id: "queue-message-1",
+            timestamp: new Date(),
+            attempts: 1,
+            body: { jobId: "not-a-uuid" },
+            ack,
+            retry,
+          },
+        ],
+        ackAll: vi.fn(),
+        retryAll: vi.fn(),
+      } as never,
+      env as never,
+      ctx as never
+    );
+    expect(ack).toHaveBeenCalledOnce();
+    expect(retry).not.toHaveBeenCalled();
+    expect(JSON.parse(error.mock.calls[0][0] as string)).toMatchObject({
+      message: "comments_ai_invalid_message",
+      queueMessageId: "queue-message-1",
+    });
+  });
+
   it("reports a public read-only session without a browser error", async () => {
     const response = await worker.fetch(
       new Request("https://rowanliu.com/api/owner/session"),

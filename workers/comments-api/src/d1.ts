@@ -1,6 +1,7 @@
 import {
   parseAnnotationMetadata,
   type AnnotationAnchor,
+  type AnnotationAiJob,
   type AnnotationThread,
   type CommentAuthor,
   type CommentListResponse,
@@ -27,6 +28,7 @@ type CreateAnnotationInput = {
   anchor: AnnotationAnchor;
   author: AuthorInput;
   siteUrl: string;
+  aiJobId?: string;
 };
 
 type CreateReplyInput = {
@@ -81,6 +83,34 @@ type ReplyRow = {
   updated_at: string;
 };
 
+type AiJobRow = {
+  id: string;
+  annotation_id: string;
+  status: AnnotationAiJob["status"];
+  attempt_count: number;
+  provider: string | null;
+  model: string | null;
+  error_code: string | null;
+  reply_id: string | null;
+  created_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  updated_at: string | null;
+};
+
+export type AiJobMessage = {
+  jobId: string;
+  annotationId: string;
+  articlePath: string;
+};
+
+export type ClaimedAiJob = AiJobMessage & {
+  body: string;
+  articleTitle: string;
+  anchor: AnnotationAnchor;
+  attemptCount: number;
+};
+
 const annotationColumns = `
   id, article_path, author_login, author_avatar_url, author_url, body,
   github_url, block_id, heading_id, exact_text, prefix_text, suffix_text,
@@ -116,6 +146,19 @@ function replyFromRow(row: ReplyRow): CommentReply {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     author: authorFromRow(row),
+  };
+}
+
+function aiJobFromRow(row: AiJobRow): AnnotationAiJob {
+  return {
+    id: row.id,
+    status: row.status,
+    attemptCount: row.attempt_count,
+    provider: row.provider,
+    model: row.model,
+    errorCode: row.error_code,
+    replyId: row.reply_id,
+    updatedAt: row.updated_at ?? row.completed_at ?? row.started_at ?? row.created_at,
   };
 }
 
@@ -188,7 +231,7 @@ export async function getD1CommentList(
     return { version: 0, discussion: null, threads: [], truncated: false };
   }
 
-  const [annotationResult, replyResult] = await Promise.all([
+  const [annotationResult, replyResult, aiJobResult] = await Promise.all([
     db
       .prepare(
         `SELECT ${annotationColumns} FROM annotations
@@ -207,6 +250,15 @@ export async function getD1CommentList(
       )
       .bind(path)
       .all<ReplyRow>(),
+    db
+      .prepare(
+        `SELECT ai_jobs.* FROM ai_jobs
+        JOIN annotations ON annotations.id = ai_jobs.annotation_id
+        WHERE annotations.article_path = ? AND annotations.status = 'open'
+          AND annotations.deleted_at IS NULL`
+      )
+      .bind(path)
+      .all<AiJobRow>(),
   ]);
   const replies = new Map<string, CommentReply[]>();
   for (const row of replyResult.results) {
@@ -216,6 +268,9 @@ export async function getD1CommentList(
     ]);
   }
   const discussionIsMirrored = !article.github_discussion_id.startsWith("pending:");
+  const aiJobs = new Map(
+    aiJobResult.results.map(row => [row.annotation_id, aiJobFromRow(row)])
+  );
   return {
     version: article.version,
     discussion: discussionIsMirrored
@@ -226,9 +281,10 @@ export async function getD1CommentList(
           url: article.github_url,
         }
       : null,
-    threads: annotationResult.results.map(row =>
-      annotationFromRow(row, replies.get(row.id) ?? [])
-    ),
+    threads: annotationResult.results.map(row => ({
+      ...annotationFromRow(row, replies.get(row.id) ?? []),
+      ...(aiJobs.has(row.id) ? { aiJob: aiJobs.get(row.id) } : {}),
+    })),
     truncated: false,
   };
 }
@@ -240,7 +296,7 @@ export async function createD1Annotation(
   const id = crypto.randomUUID();
   const timestamp = new Date().toISOString();
   const placeholder = pendingValue(id);
-  await db.batch([
+  const statements = [
     insertArticle(db, input.path, input.articleTitle, input.siteUrl, timestamp),
     db
       .prepare(
@@ -268,8 +324,32 @@ export async function createD1Annotation(
         timestamp,
         timestamp
       ),
+    ...(input.aiJobId
+      ? [
+          db
+            .prepare(
+              `INSERT INTO ai_jobs (
+                id, annotation_id, status, attempt_count, created_at, updated_at
+              ) VALUES (?, ?, 'queued', 0, ?, ?)`
+            )
+            .bind(input.aiJobId, id, timestamp, timestamp),
+        ]
+      : []),
     incrementVersion(db, input.path, timestamp),
-  ]);
+  ];
+  await db.batch(statements);
+  const aiJob = input.aiJobId
+    ? {
+        id: input.aiJobId,
+        status: "queued" as const,
+        attemptCount: 0,
+        provider: null,
+        model: null,
+        errorCode: null,
+        replyId: null,
+        updatedAt: timestamp,
+      }
+    : undefined;
   return {
     version: await articleVersion(db, input.path),
     thread: {
@@ -282,6 +362,7 @@ export async function createD1Annotation(
       author: input.author,
       anchor: input.anchor,
       replies: [],
+      ...(aiJob ? { aiJob } : {}),
     },
   };
 }
@@ -332,6 +413,205 @@ export async function createD1Reply(
       createdAt: timestamp,
       updatedAt: timestamp,
       author: input.author,
+    },
+  };
+}
+
+export async function createD1AiJob(
+  db: D1Database,
+  message: Omit<AiJobMessage, "jobId">
+): Promise<AnnotationAiJob & { annotationId: string }> {
+  const id = crypto.randomUUID();
+  const timestamp = new Date().toISOString();
+  await db
+    .prepare(
+      `INSERT INTO ai_jobs (
+        id, annotation_id, status, attempt_count, created_at, updated_at
+      ) VALUES (?, ?, 'queued', 0, ?, ?)
+      ON CONFLICT(annotation_id) DO NOTHING`
+    )
+    .bind(id, message.annotationId, timestamp, timestamp)
+    .run();
+  const row = await db
+    .prepare("SELECT * FROM ai_jobs WHERE annotation_id = ?")
+    .bind(message.annotationId)
+    .first<AiJobRow>();
+  if (!row) throw new Error("ai_job_not_created");
+  return { ...aiJobFromRow(row), annotationId: row.annotation_id };
+}
+
+export async function getD1AiJob(
+  db: D1Database,
+  annotationId: string
+): Promise<(AnnotationAiJob & { annotationId: string; articlePath: string }) | null> {
+  const row = await db
+    .prepare(
+      `SELECT ai_jobs.*, annotations.article_path FROM ai_jobs
+      JOIN annotations ON annotations.id = ai_jobs.annotation_id
+      WHERE ai_jobs.annotation_id = ? AND annotations.status = 'open'
+        AND annotations.deleted_at IS NULL`
+    )
+    .bind(annotationId)
+    .first<AiJobRow & { article_path: string }>();
+  return row
+    ? { ...aiJobFromRow(row), annotationId: row.annotation_id, articlePath: row.article_path }
+    : null;
+}
+
+export async function retryD1AiJob(
+  db: D1Database,
+  annotationId: string
+): Promise<(AnnotationAiJob & { annotationId: string; articlePath: string; version: number }) | null> {
+  const job = await getD1AiJob(db, annotationId);
+  if (!job || job.status === "completed") return job ? { ...job, version: await articleVersion(db, job.articlePath) } : null;
+  const timestamp = new Date().toISOString();
+  await db.batch([
+    db
+      .prepare(
+        `UPDATE ai_jobs SET status = 'queued', error_code = NULL, updated_at = ?
+        WHERE annotation_id = ? AND status = 'failed'`
+      )
+      .bind(timestamp, annotationId),
+    incrementVersion(db, job.articlePath, timestamp),
+  ]);
+  const updated = await getD1AiJob(db, annotationId);
+  return updated
+    ? { ...updated, version: await articleVersion(db, updated.articlePath) }
+    : null;
+}
+
+export async function markD1AiJobFailed(
+  db: D1Database,
+  jobId: string,
+  articlePath: string,
+  errorCode: string
+): Promise<number> {
+  const timestamp = new Date().toISOString();
+  await db.batch([
+    db
+      .prepare(
+        `UPDATE ai_jobs SET status = 'failed', error_code = ?, updated_at = ?
+        WHERE id = ? AND status != 'completed'`
+      )
+      .bind(errorCode, timestamp, jobId),
+    incrementVersion(db, articlePath, timestamp),
+  ]);
+  return articleVersion(db, articlePath);
+}
+
+export async function claimD1AiJob(
+  db: D1Database,
+  message: AiJobMessage,
+  provider: string,
+  model: string
+): Promise<ClaimedAiJob | "completed" | null> {
+  const row = await db
+    .prepare(
+      `SELECT ai_jobs.*, annotations.body, annotations.block_id,
+        annotations.heading_id, annotations.exact_text, annotations.prefix_text,
+        annotations.suffix_text, annotations.view, annotations.article_path,
+        articles.title AS article_title
+      FROM ai_jobs
+      JOIN annotations ON annotations.id = ai_jobs.annotation_id
+      JOIN articles ON articles.path = annotations.article_path
+      WHERE ai_jobs.id = ? AND ai_jobs.annotation_id = ?
+        AND annotations.article_path = ? AND annotations.status = 'open'
+        AND annotations.deleted_at IS NULL`
+    )
+    .bind(message.jobId, message.annotationId, message.articlePath)
+    .first<AiJobRow & {
+      body: string;
+      block_id: string;
+      heading_id: string | null;
+      exact_text: string;
+      prefix_text: string;
+      suffix_text: string;
+      view: AnnotationAnchor["view"];
+      article_path: string;
+      article_title: string;
+    }>();
+  if (!row) return null;
+  if (row.status === "completed") return "completed";
+  const timestamp = new Date().toISOString();
+  const result = await db.batch([
+    db
+      .prepare(
+        `UPDATE ai_jobs SET status = 'answering', attempt_count = attempt_count + 1,
+          provider = ?, model = ?, error_code = NULL, started_at = ?, updated_at = ?
+        WHERE id = ? AND status != 'completed'`
+      )
+      .bind(provider, model, timestamp, timestamp, message.jobId),
+    incrementVersion(db, message.articlePath, timestamp),
+  ]);
+  if (result[0].meta.changes !== 1) return "completed";
+  return {
+    ...message,
+    body: row.body,
+    articleTitle: row.article_title,
+    anchor: {
+      blockId: row.block_id,
+      headingId: row.heading_id,
+      exact: row.exact_text,
+      prefix: row.prefix_text,
+      suffix: row.suffix_text,
+      view: row.view,
+    },
+    attemptCount: row.attempt_count + 1,
+  };
+}
+
+export async function completeD1AiJob(
+  db: D1Database,
+  job: ClaimedAiJob,
+  answer: string,
+  author: AuthorInput,
+  siteUrl: string
+): Promise<{ resource: D1Resource; version: number }> {
+  const id = `ai:${job.jobId}`;
+  const timestamp = new Date().toISOString();
+  const body = `<!-- rowan-ai-reply:v1 ${job.annotationId} -->\n\n${answer}`;
+  await db.batch([
+    db
+      .prepare(
+        `INSERT INTO replies (
+          id, annotation_id, author_login, author_avatar_url, author_url, body,
+          github_url, kind, github_node_id, created_at, updated_at,
+          github_mirror_state, ai_job_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'ai', ?, ?, ?, 'pending', ?)
+        ON CONFLICT DO NOTHING`
+      )
+      .bind(
+        id,
+        job.annotationId,
+        author.login,
+        author.avatarUrl,
+        author.url,
+        body,
+        `${siteUrl}${job.articlePath}#reply-${encodeURIComponent(id)}`,
+        pendingValue(id),
+        timestamp,
+        timestamp,
+        job.jobId
+      ),
+    db
+      .prepare(
+        `UPDATE ai_jobs SET status = 'completed', reply_id = ?, error_code = NULL,
+          completed_at = ?, updated_at = ? WHERE id = ?`
+      )
+      .bind(id, timestamp, timestamp, job.jobId),
+    incrementVersion(db, job.articlePath, timestamp),
+  ]);
+  return {
+    version: await articleVersion(db, job.articlePath),
+    resource: {
+      kind: "reply",
+      id,
+      articlePath: job.articlePath,
+      annotationId: job.annotationId,
+      body,
+      githubNodeId: null,
+      githubMirrorState: "pending",
+      anchor: null,
     },
   };
 }

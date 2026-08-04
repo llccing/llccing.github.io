@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createD1Annotation,
   createD1Reply,
+  completeD1AiJob,
   deleteD1Resource,
   getD1CommentList,
   updateD1Resource,
@@ -102,11 +103,33 @@ describe("D1 primary annotation storage", () => {
                 updated_at: "2026-08-04T00:00:00Z",
               },
             ]
-          : [],
+          : sql.includes("FROM ai_jobs")
+            ? [
+                {
+                  id: "job-1",
+                  annotation_id: "annotation-1",
+                  status: "answering",
+                  attempt_count: 1,
+                  provider: "workers-ai",
+                  model: "@cf/zai-org/glm-4.7-flash",
+                  error_code: null,
+                  reply_id: null,
+                  created_at: "2026-08-04T00:00:00Z",
+                  started_at: "2026-08-04T00:00:01Z",
+                  completed_at: null,
+                  updated_at: "2026-08-04T00:00:01Z",
+                },
+              ]
+            : [],
     });
     const result = await getD1CommentList(db, path);
     expect(result.version).toBe(7);
     expect(result.threads.map(thread => thread.id)).toEqual(["annotation-1"]);
+    expect(result.threads[0].aiJob).toMatchObject({
+      id: "job-1",
+      status: "answering",
+      attemptCount: 1,
+    });
     expect(
       statements.filter(item => item.sql.includes("FROM annotations"))[0].sql
     ).toContain("deleted_at IS NULL");
@@ -130,6 +153,7 @@ describe("D1 primary annotation storage", () => {
       anchor,
       author,
       siteUrl: "https://rowanliu.com",
+      aiJobId: "00000000-0000-4000-8000-000000000001",
     });
     await createD1Reply(db, {
       path,
@@ -141,6 +165,7 @@ describe("D1 primary annotation storage", () => {
     expect(batches).toHaveLength(2);
     expect(statements.some(item => item.sql.includes("INSERT INTO annotations"))).toBe(true);
     expect(statements.some(item => item.sql.includes("INSERT INTO replies"))).toBe(true);
+    expect(statements.some(item => item.sql.includes("INSERT INTO ai_jobs"))).toBe(true);
     expect(statements.filter(item => item.sql.includes("INSERT INTO annotations"))[0].sql).toContain(
       "'pending'"
     );
@@ -164,5 +189,31 @@ describe("D1 primary annotation storage", () => {
     await deleteD1Resource(db, annotation);
     expect(statements.some(item => item.sql.includes("status = 'deleted'"))).toBe(true);
     expect(statements.some(item => item.sql.includes("WHERE annotation_id = ?"))).toBe(true);
+  });
+
+  it("writes an AI reply idempotently and completes its job in one batch", async () => {
+    const { db, batches } = createDatabase({
+      first: sql => (sql.includes("SELECT version") ? { version: 10 } : null),
+    });
+    const result = await completeD1AiJob(
+      db,
+      {
+        jobId: "00000000-0000-4000-8000-000000000001",
+        annotationId: "annotation-1",
+        articlePath: path,
+        body: "@AI 什么是 CDN？",
+        articleTitle: "Example",
+        anchor,
+        attemptCount: 1,
+      },
+      "CDN 是内容分发网络。",
+      { ...author, login: "rowan-ai" },
+      "https://rowanliu.com"
+    );
+    expect(result.version).toBe(10);
+    expect(result.resource.id).toBe("ai:00000000-0000-4000-8000-000000000001");
+    expect(batches[0][0].sql).toContain("ON CONFLICT DO NOTHING");
+    expect(batches[0][1].sql).toContain("status = 'completed'");
+    expect(batches[0][2].sql).toContain("version = version + 1");
   });
 });
