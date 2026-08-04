@@ -1,6 +1,6 @@
 # Cloudflare-First Migration Phase 6 Report
 
-Status: Queue backend production verified; Pages UI release in progress
+Status: Complete; Queue AI and Pages UI production verified
 
 Last updated: 2026-08-04 (Asia/Shanghai)
 
@@ -18,9 +18,9 @@ the annotation and AI job are stored, while a Queue consumer performs inference
 and writes the reply back to D1.
 
 The production backend path completed its first end-to-end test in 6.022
-seconds, measured from the D1 job `created_at` timestamp to `completed_at`.
-The final Pages UI release and a post-merge production test remain required
-before this report can be marked complete.
+seconds. After PR #39 was merged, the final production UI test completed in
+3.615 seconds. Both durations are measured from the D1 job `created_at`
+timestamp to `completed_at`.
 
 ## Implemented Behavior
 
@@ -47,7 +47,8 @@ before this report can be marked complete.
 ## Cloudflare Resources
 
 - Worker: `rowan-blog-comments`
-- Phase 6 Worker version: `c5ad9157-92c1-45d4-8c32-55f4c4c1311c`
+- Initial Phase 6 Worker version: `c5ad9157-92c1-45d4-8c32-55f4c4c1311c`
+- Final Phase 6 Worker version: `7f7f8e51-4cb1-41c0-a2b6-f51ce639366e`
 - Phase 5 rollback Worker version: `4629153e-768f-4812-b25a-1fa43cbefcce`
 - D1: `rowan-blog-annotations`
 - D1 migration: `0003_queue_ai.sql`
@@ -132,7 +133,62 @@ The annotation and Workers AI reply mirrored to GitHub successfully. Because
 the test preceded the source merge, the old default-branch workflow did not yet
 contain the marker guard and also posted one GitHub-only reply. This temporary
 release-order window did not duplicate D1 or public API data. A post-merge test
-must confirm that the marker causes the legacy workflow job to be skipped.
+subsequently confirmed that the marker causes the legacy workflow job to be
+skipped.
+
+## Final Production UI Verification
+
+PR #39 was squash-merged to `main` as `86426cea`. Cloudflare Pages production
+deployment `7c315565-0f34-4a76-83e6-b7735a9390b8` published that source. A
+no-cache production read loaded `InlineComments.Cl3wkHZU.js`.
+
+Post-merge temporary annotation ID:
+`8aab2d57-d02c-4882-842b-ff9528b4059a`
+
+Post-merge AI job ID:
+`30b0e49a-c3a4-4b59-b501-71d62a150bab`
+
+Observed state:
+
+```text
+created_at:   2026-08-04T00:59:52.810Z
+started_at:   2026-08-04T00:59:55.520Z
+completed_at: 2026-08-04T00:59:56.425Z
+end-to-end:   3.615 seconds
+attempts:     1
+provider:     workers-ai
+model:        @cf/zai-org/glm-4.7-flash
+reply_id:     ai:30b0e49a-c3a4-4b59-b501-71d62a150bab
+```
+
+The owner UI showed `AI 已排队` immediately after save and then `AI 已回答`
+with the `@rowan-ai` reply. The D1 `started_at` timestamp confirms that the job
+passed through answering state between those visible states.
+
+At a 390 x 844 mobile viewport, the annotation panel, close control, original
+comment, AI reply, and status content rendered without overlap. The document
+reported `scrollWidth = 390` and `clientWidth = 390`, confirming no horizontal
+overflow.
+
+The GitHub annotation contained `rowan-ai-queue:v1`, had exactly one mirrored
+reply, and both Discussion comment workflow events were skipped on source
+`86426cea`. The legacy workflow did not generate a second answer.
+
+Both temporary Phase 6 annotations were deleted through the owner UI. Final
+cleanup verification returned:
+
+```text
+active annotations: 3
+active replies: 2
+temporary threads in public API: 0
+temporary GitHub Discussion comments: 0
+pending mirrors: 0
+failed mirrors: 0
+foreign_key_check: clean
+```
+
+The two `ai_jobs` rows remain as history attached to soft-deleted annotations.
+No production history was hard-deleted.
 
 ## Local Validation
 
@@ -148,17 +204,9 @@ must confirm that the marker causes the legacy workflow job to be skipped.
 
 ## Release Exit Criteria
 
-Before marking Phase 6 complete:
-
-1. Merge the Phase 6 source to `main` and wait for Cloudflare Pages production.
-2. Verify desktop and 390 x 844 mobile AI status UI without overlap.
-3. Create one post-merge temporary `@AI` annotation and observe queued,
-   answering, completed, and the rendered AI reply.
-4. Confirm the marker-triggered legacy workflow is skipped and GitHub receives
-   only the mirrored Workers AI reply.
-5. Delete all Phase 6 temporary annotations through the owner UI.
-6. Confirm production returns to 3 active annotations, 2 active replies, zero
-   pending/failed mirrors, and a clean foreign-key check.
+The source merge, Pages production deployment, owner UI status flow, Queue
+completion, idempotency check, marker skip, GitHub mirror, temporary-data
+cleanup, and final D1/API checks passed. Phase 6 is complete.
 
 ## Rollback
 

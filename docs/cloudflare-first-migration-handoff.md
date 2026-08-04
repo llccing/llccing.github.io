@@ -1,6 +1,6 @@
 # Cloudflare Migration Agent Handoff
 
-Status: Phase 6 backend verified; Pages UI release in progress
+Status: Phase 6 complete; production observation active
 
 Last verified: 2026-08-04 (Asia/Shanghai)
 
@@ -26,7 +26,7 @@ Detailed evidence is in
 - Cloudflare is registrar and authoritative DNS provider.
 - Worker routes are `rowanliu.com/api/*` and `rowanliu.com/auth/*`.
 - Worker `rowan-blog-comments` version
-  `c5ad9157-92c1-45d4-8c32-55f4c4c1311c` is deployed.
+  `7f7f8e51-4cb1-41c0-a2b6-f51ce639366e` is deployed.
 - `https://rowan-blog-comments.lcf33123.workers.dev` remains enabled.
 - D1 `rowan-blog-annotations`
   (`af86d172-7c99-4bb1-8512-80175a1bcbb7`, APAC) has migrations `0001` through
@@ -43,8 +43,11 @@ Detailed evidence is in
 - Queue `rowan-blog-ai-jobs` has one producer and one consumer binding.
 - Workers AI uses `@cf/zai-org/glm-4.7-flash` through the native `AI` binding.
 - The first production Queue job completed in 6.022 seconds with one attempt
-  and exactly one D1 reply.
-- The Pages production UI is still Phase 5 until this branch is merged.
+  and exactly one D1 reply. The post-merge job completed in 3.615 seconds.
+- PR #39 was squash-merged as `86426cea`; Pages production deployment
+  `7c315565-0f34-4a76-83e6-b7735a9390b8` serves the Phase 6 UI.
+- Production cleanup restored 3 active annotations and 2 active replies with
+  no pending or failed mirrors and clean foreign keys.
 
 ## Preserved Rollback Paths
 
@@ -77,20 +80,12 @@ Monitor a representative production sample before reporting a true p95. The
 release verification contains only a small set of end-to-end samples and must
 not be presented as a statistically meaningful D1 p95.
 
-## Remaining Phase 6 Release Work
+## Next Phase
 
-1. Commit and push `codex/cloudflare-pages-phase-6` and open a PR.
-2. Verify the Cloudflare Pages preview UI, then merge to `main`.
-3. Wait for Pages production and test desktop plus 390 x 844 mobile.
-4. Create one post-merge temporary `@AI` annotation and observe the UI through
-   queued, answering, and completed.
-5. Confirm the legacy workflow is skipped for the Queue marker.
-6. Delete both temporary Phase 6 annotations through the owner UI and confirm
-   3 active annotations, 2 replies, zero failed/pending mirrors, and clean
-   foreign keys.
-
-Do not add Durable Objects, WebSockets, DNS changes, Giscus changes, Discussion
-deletion, or GitHub Pages retirement as part of Phase 6.
+Phase 6 is complete. Continue production observation before separately
+authorizing Phase 7. Do not add Durable Objects, WebSockets, DNS changes,
+Giscus changes, Discussion deletion, or GitHub Pages retirement without that
+authorization.
 
 ## Validation Baseline
 
@@ -103,8 +98,9 @@ deletion, or GitHub Pages retirement as part of Phase 6.
 - Targeted Prettier: passed
 - `git diff --check`: passed
 - Remote migration `0003`: applied; foreign keys clean
-- Production Queue job: completed in 6.022 seconds, one attempt, one D1 reply
-- Temporary same-origin read: HTTP 200, 4 annotations, 3 replies
+- Production Queue jobs: completed in 6.022 and 3.615 seconds, one attempt and
+  one D1 reply each
+- Final same-origin read: HTTP 200, 3 annotations, 2 replies
 - GitHub mirroring: zero pending and zero failed resources
 
 ## Resume Checklist
@@ -113,4 +109,4 @@ deletion, or GitHub Pages retirement as part of Phase 6.
 2. Inspect `git status`, the active branch, and live Worker/Pages versions.
 3. Check recent `comments_d1_metric` and `github_mirror_failed` logs.
 4. Preserve all rollback infrastructure and ignored backup artifacts.
-5. Finish only the remaining Phase 6 release and cleanup steps above.
+5. Obtain explicit authorization before starting Phase 7.

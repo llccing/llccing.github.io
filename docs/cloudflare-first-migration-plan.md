@@ -1,6 +1,6 @@
 # Cloudflare-First Migration Plan
 
-Status: Phases 0 through 5 complete; Phase 6 release in progress
+Status: Phases 0 through 6 complete
 
 Last updated: 2026-08-04
 
@@ -27,9 +27,9 @@ Production domain: `https://rowanliu.com`
 - Phase 5 completed on 2026-08-04. D1 is authoritative, writes are optimistic,
   and GitHub Discussions are an asynchronous mirror. Evidence:
   `docs/cloudflare-first-migration-phase-5-report.md`.
-- Phase 6 Queue, D1, and Workers AI backend changes were deployed and
-  production verified on 2026-08-04. The Pages UI release and post-merge
-  cleanup are in progress. Evidence:
+- Phase 6 completed on 2026-08-04. Queue-based Workers AI replies, D1 job
+  states, retry controls, conditional polling, the legacy workflow marker, and
+  cleanup were production verified. Evidence:
   `docs/cloudflare-first-migration-phase-6-report.md`.
 - Phases 7 and 8 have not started.
 
