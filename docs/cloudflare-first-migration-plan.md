@@ -1,6 +1,6 @@
 # Cloudflare-First Migration Plan
 
-Status: Phases 0 through 4 complete; Phase 4 shadow-write observation active
+Status: Phases 0 through 5 complete; Phase 6 release in progress
 
 Last updated: 2026-08-04
 
@@ -24,7 +24,14 @@ Production domain: `https://rowanliu.com`
   `docs/cloudflare-first-migration-phase-4-report.md`.
 - Current operational state, DNS propagation notes, and next-agent instructions
   are recorded in `docs/cloudflare-first-migration-handoff.md`.
-- Phases 5 through 8 have not started.
+- Phase 5 completed on 2026-08-04. D1 is authoritative, writes are optimistic,
+  and GitHub Discussions are an asynchronous mirror. Evidence:
+  `docs/cloudflare-first-migration-phase-5-report.md`.
+- Phase 6 Queue, D1, and Workers AI backend changes were deployed and
+  production verified on 2026-08-04. The Pages UI release and post-merge
+  cleanup are in progress. Evidence:
+  `docs/cloudflare-first-migration-phase-6-report.md`.
+- Phases 7 and 8 have not started.
 
 ## 1. Purpose
 
@@ -711,10 +718,12 @@ Targets are acceptance goals, not assumed guarantees. Measure from production.
 
 ### AI rollback
 
-- Keep `.github/workflows/annotation-ai.yml` disabled, not deleted, during the
-  first Queue observation period.
-- Re-enable only after preventing both systems from responding to the same
-  annotation.
+- Keep `.github/workflows/annotation-ai.yml` active and retained during the
+  first Queue observation period. Site-created Queue annotations carry a marker
+  that makes the workflow skip them, while direct legacy GitHub annotations
+  remain compatible.
+- Roll the Worker back to the last Phase 5 version if Queue processing affects
+  API correctness. Do not delete Queue or D1 history during rollback.
 
 ## 15. Explicit Non-Goals
 

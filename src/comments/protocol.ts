@@ -1,5 +1,6 @@
 export const ANNOTATION_MARKER = "rowan-annotation:v1";
 export const AI_REPLY_MARKER = "rowan-ai-reply:v1";
+export const AI_QUEUE_MARKER = "rowan-ai-queue:v1";
 
 export const COMMENT_LIMITS = {
   body: 8_000,
@@ -40,6 +41,19 @@ export type CommentReply = {
   author: CommentAuthor;
 };
 
+export type AiJobStatus = "queued" | "answering" | "completed" | "failed";
+
+export type AnnotationAiJob = {
+  id: string;
+  status: AiJobStatus;
+  attemptCount: number;
+  provider: string | null;
+  model: string | null;
+  errorCode: string | null;
+  replyId: string | null;
+  updatedAt: string;
+};
+
 export type AnnotationThread = {
   id: string;
   url: string;
@@ -50,6 +64,7 @@ export type AnnotationThread = {
   author: CommentAuthor;
   anchor: AnnotationAnchor;
   replies: CommentReply[];
+  aiJob?: AnnotationAiJob;
 };
 
 export type CommentListResponse = {
@@ -68,6 +83,7 @@ export type CommentMutationResponse = {
   version: number;
   thread?: AnnotationThread;
   reply?: CommentReply & { annotationId: string };
+  aiJob?: AnnotationAiJob & { annotationId: string };
 };
 
 export type CreateCommentInput = {

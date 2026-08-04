@@ -2,7 +2,10 @@ import { SignJWT, jwtVerify } from "jose";
 import { z } from "zod";
 import {
   COMMENT_LIMITS,
+  AI_QUEUE_MARKER,
   buildAnnotationCommentBody,
+  extractAnnotationText,
+  extractSameSiteArticlePaths,
   isAnnotationAnchor,
   normalizeArticlePath,
   parseAnnotationMetadata,
@@ -13,16 +16,24 @@ import {
 } from "../../../src/comments/protocol";
 import {
   annotationMetadata,
+  claimD1AiJob,
+  completeD1AiJob,
+  createD1AiJob,
   createD1Annotation,
   createD1Reply,
   deleteD1Resource,
   getD1Article,
+  getD1AiJob,
   getD1CommentList,
   getD1Resource,
   markArticleMirrored,
+  markD1AiJobFailed,
   markResourceMirrored,
   markResourceMirrorFailed,
   updateD1Resource,
+  retryD1AiJob,
+  type AiJobMessage,
+  type ClaimedAiJob,
   type D1Resource,
 } from "./d1";
 
@@ -33,6 +44,10 @@ const SESSION_AUDIENCE = "rowan-comments-owner";
 const STATE_AUDIENCE = "rowan-comments-oauth-state";
 const SESSION_COOKIE = "__Host-rowan-comments-owner";
 const SESSION_MAX_AGE_SECONDS = 8 * 60 * 60;
+const AI_PROVIDER = "workers-ai";
+const AI_MODEL = "@cf/zai-org/glm-4.7-flash";
+const AI_CONTEXT_LIMIT = 12_000;
+const AI_LINKED_CONTEXT_LIMIT = 6_000;
 
 class HttpError extends Error {
   constructor(
@@ -121,6 +136,12 @@ const createCommentSchema = z.object({
 
 const updateCommentSchema = z.object({
   body: z.string().trim().min(1).max(COMMENT_LIMITS.body),
+});
+
+const aiJobMessageSchema = z.object({
+  jobId: z.string().uuid(),
+  annotationId: z.string().uuid(),
+  articlePath: z.string().refine(value => normalizeArticlePath(value) === value),
 });
 
 function allowedOrigins(env: Env): Set<string> {
@@ -836,10 +857,39 @@ async function mirrorCreatedResource(
   const comment = await addDiscussionComment(
     env,
     discussion.id,
-    resource.body,
+    resource.kind === "annotation"
+      ? `${resource.body}\n\n<!-- ${AI_QUEUE_MARKER} -->`
+      : resource.body,
     replyToId
   );
   await markResourceMirrored(env.ANNOTATIONS_DB, resource, comment);
+}
+
+async function enqueueAiJob(
+  env: Env,
+  message: AiJobMessage
+): Promise<void> {
+  try {
+    await env.AI_JOBS.send(message, { contentType: "json" });
+    console.log(
+      JSON.stringify({
+        message: "comments_ai_metric",
+        operation: "enqueue",
+        status: "queued",
+        jobId: message.jobId,
+        annotationId: message.annotationId,
+        articlePath: message.articlePath,
+      })
+    );
+  } catch (error) {
+    await markD1AiJobFailed(
+      env.ANNOTATIONS_DB,
+      message.jobId,
+      message.articlePath,
+      "enqueue_failed"
+    );
+    throw error;
+  }
 }
 
 async function handleGetComments(
@@ -916,6 +966,10 @@ async function handleCreateComment(
       { version: 1, path: input.data.path, anchor: input.data.anchor },
       input.data.body
     );
+    const annotationText = extractAnnotationText(storedBody);
+    const aiJobId = /@ai\b/i.test(annotationText)
+      ? crypto.randomUUID()
+      : undefined;
     result = await createD1Annotation(env.ANNOTATIONS_DB, {
       path: input.data.path,
       articleTitle: input.data.articleTitle,
@@ -923,7 +977,34 @@ async function handleCreateComment(
       anchor: input.data.anchor,
       author,
       siteUrl: env.SITE_URL,
+      aiJobId,
     });
+    if (result.thread.aiJob) {
+      const aiJob = result.thread.aiJob;
+      try {
+        await enqueueAiJob(env, {
+          jobId: aiJob.id,
+          annotationId: result.thread.id,
+          articlePath: input.data.path,
+        });
+      } catch (error) {
+        result.thread.aiJob = {
+          ...aiJob,
+          status: "failed",
+          errorCode: "enqueue_failed",
+          updatedAt: new Date().toISOString(),
+        };
+        console.error(
+          JSON.stringify({
+            message: "comments_ai_enqueue_failed",
+            jobId: aiJob.id,
+            annotationId: result.thread.id,
+            articlePath: input.data.path,
+            error: error instanceof Error ? error.message : String(error),
+          })
+        );
+      }
+    }
   }
   const id = "thread" in result ? result.thread.id : result.reply.id;
   const resource = await getD1Resource(env.ANNOTATIONS_DB, id, env.OWNER_LOGIN);
@@ -966,9 +1047,40 @@ async function handleUpdateComment(
     body,
     env.OWNER_LOGIN
   );
+  let aiJob;
+  if (
+    resource.kind === "annotation" &&
+    /@ai\b/i.test(extractAnnotationText(body)) &&
+    !(await getD1AiJob(env.ANNOTATIONS_DB, resource.id))
+  ) {
+    aiJob = await createD1AiJob(env.ANNOTATIONS_DB, {
+      annotationId: resource.id,
+      articlePath: resource.articlePath,
+    });
+    try {
+      await enqueueAiJob(env, {
+        jobId: aiJob.id,
+        annotationId: resource.id,
+        articlePath: resource.articlePath,
+      });
+    } catch {
+      aiJob = {
+        ...aiJob,
+        status: "failed" as const,
+        errorCode: "enqueue_failed",
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  }
   if (resource.githubNodeId) {
     scheduleGitHubMirror(ctx, env, resource, async () => {
-      const comment = await updateDiscussionComment(env, resource.githubNodeId!, body);
+      const githubBody =
+        resource.kind === "annotation" ? `${body}\n\n<!-- ${AI_QUEUE_MARKER} -->` : body;
+      const comment = await updateDiscussionComment(
+        env,
+        resource.githubNodeId!,
+        githubBody
+      );
       await markResourceMirrored(env.ANNOTATIONS_DB, resource, comment);
     });
   }
@@ -979,7 +1091,41 @@ async function handleUpdateComment(
     d1DurationMs: Math.round((performance.now() - startedAt) * 10) / 10,
     articleVersion: result.version,
   });
-  return jsonResponse(request, env, { version: result.version });
+  return jsonResponse(request, env, {
+    version: result.version,
+    ...(aiJob ? { aiJob } : {}),
+  });
+}
+
+async function handleRetryAiJob(
+  request: Request,
+  env: Env,
+  annotationId: string
+): Promise<Response> {
+  requireAllowedOrigin(request, env);
+  await requireOwnerSession(request, env, true);
+  const existing = await getD1AiJob(env.ANNOTATIONS_DB, annotationId);
+  if (!existing) throw new HttpError(404, "AI job was not found", "ai_job_not_found");
+  if (existing.status === "completed") {
+    return jsonResponse(request, env, {
+      version: await getD1Article(env.ANNOTATIONS_DB, existing.articlePath).then(
+        article => article?.version ?? 0
+      ),
+      aiJob: existing,
+    });
+  }
+  const job = await retryD1AiJob(env.ANNOTATIONS_DB, annotationId);
+  if (!job) throw new HttpError(404, "AI job was not found", "ai_job_not_found");
+  try {
+    await enqueueAiJob(env, {
+      jobId: job.id,
+      annotationId,
+      articlePath: job.articlePath,
+    });
+  } catch {
+    throw new HttpError(503, "AI job could not be queued", "ai_enqueue_failed");
+  }
+  return jsonResponse(request, env, { version: job.version, aiJob: job });
 }
 
 async function handleDeleteComment(
@@ -1068,6 +1214,12 @@ async function routeRequest(
   if (request.method === "POST" && url.pathname === "/api/owner/comments") {
     return handleCreateComment(request, env, ctx);
   }
+  const retryAiMatch = url.pathname.match(
+    /^\/api\/owner\/annotations\/([^/]+)\/ai\/retry$/
+  );
+  if (retryAiMatch && request.method === "POST") {
+    return handleRetryAiJob(request, env, decodeURIComponent(retryAiMatch[1]));
+  }
   const commentMatch = url.pathname.match(/^\/api\/owner\/comments\/([^/]+)$/);
   if (commentMatch && request.method === "PATCH") {
     return handleUpdateComment(
@@ -1086,6 +1238,183 @@ async function routeRequest(
     );
   }
   throw new HttpError(404, "Route was not found", "not_found");
+}
+
+function decodeHtmlText(value: string): string {
+  return value
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function loadArticleContext(env: Env, path: string, limit: number): Promise<string> {
+  const response = await fetch(`${env.SITE_URL}${path}`, {
+    headers: { Accept: "text/html", "User-Agent": "rowan-blog-ai-annotations" },
+  });
+  if (!response.ok || !response.body) return "";
+  let text = "";
+  const transformed = new HTMLRewriter()
+    .on("article h1, article h2, article h3, article p, article li", {
+      text(chunk) {
+        if (text.length < limit) text += `${chunk.text} `;
+      },
+    })
+    .transform(response);
+  const reader = transformed.body?.getReader();
+  if (!reader) return "";
+  let consumed = 0;
+  try {
+    while (consumed <= 128_000) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      consumed += value.byteLength;
+      if (text.length >= limit) {
+        await reader.cancel("article context collected");
+        break;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return decodeHtmlText(text).slice(0, limit);
+}
+
+async function answerAiJob(env: Env, job: ClaimedAiJob): Promise<string> {
+  const question = extractAnnotationText(job.body).replace(/@ai\b/gi, "").trim();
+  const linkedPaths = extractSameSiteArticlePaths(question)
+    .filter(path => path !== job.articlePath)
+    .slice(0, 3);
+  const [currentArticle, linkedArticles] = await Promise.all([
+    loadArticleContext(env, job.articlePath, AI_CONTEXT_LIMIT),
+    Promise.all(
+      linkedPaths.map(async path => ({
+        path,
+        text: await loadArticleContext(env, path, AI_LINKED_CONTEXT_LIMIT),
+      }))
+    ),
+  ]);
+  const references = linkedArticles
+    .filter(article => article.text)
+    .map(article => `\n\n关联文章 ${article.path}\n${article.text}`)
+    .join("");
+  const response = await env.AI.run(AI_MODEL, {
+    messages: [
+      {
+        role: "system",
+        content:
+          "你是 Rowan 博客里的文章批注助手。用中文直接回答作者的问题。优先依据给出的选中文字、上下文和文章正文；不确定时明确说明，不要编造文章没有提供的事实。回答简洁但完整，通常 2-5 段，可以使用 Markdown。",
+      },
+      {
+        role: "user",
+        content: `文章：${job.articleTitle} (${job.articlePath})\n锚点标题：${job.anchor.headingId ?? "无"}\n选中文字：${job.anchor.exact}\n选区前文：${job.anchor.prefix}\n选区后文：${job.anchor.suffix}\n作者问题：${question}\n\n文章正文：\n${currentArticle || "未能读取文章正文"}${references}`,
+      },
+    ],
+    max_completion_tokens: 700,
+    temperature: 0.2,
+    chat_template_kwargs: { enable_thinking: false },
+  });
+  const answer = response.choices[0]?.message.content?.trim() ?? "";
+  if (!answer) throw new Error("ai_empty_response");
+  return answer;
+}
+
+async function processAiMessage(
+  message: Message<unknown>,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<void> {
+  const parsed = aiJobMessageSchema.safeParse(message.body);
+  if (!parsed.success) {
+    console.error(
+      JSON.stringify({
+        message: "comments_ai_invalid_message",
+        queueMessageId: message.id,
+      })
+    );
+    message.ack();
+    return;
+  }
+  const startedAt = performance.now();
+  try {
+    const job = await claimD1AiJob(
+      env.ANNOTATIONS_DB,
+      parsed.data,
+      AI_PROVIDER,
+      AI_MODEL
+    );
+    if (!job || job === "completed") {
+      message.ack();
+      return;
+    }
+    const answer = await answerAiJob(env, job);
+    const completed = await completeD1AiJob(
+      env.ANNOTATIONS_DB,
+      job,
+      answer,
+      {
+        login: "rowan-ai",
+        avatarUrl: "https://github.com/github-actions.png",
+        url: env.SITE_URL,
+      },
+      env.SITE_URL
+    );
+    scheduleGitHubMirror(ctx, env, completed.resource, () =>
+      mirrorCreatedResource(env, completed.resource, job.articleTitle)
+    );
+    console.log(
+      JSON.stringify({
+        message: "comments_ai_metric",
+        operation: "complete",
+        status: "completed",
+        jobId: job.jobId,
+        annotationId: job.annotationId,
+        articlePath: job.articlePath,
+        provider: AI_PROVIDER,
+        model: AI_MODEL,
+        attemptCount: job.attemptCount,
+        durationMs: Math.round((performance.now() - startedAt) * 10) / 10,
+      })
+    );
+    message.ack();
+  } catch (error) {
+    await markD1AiJobFailed(
+      env.ANNOTATIONS_DB,
+      parsed.data.jobId,
+      parsed.data.articlePath,
+      error instanceof Error && error.message === "ai_empty_response"
+        ? "empty_response"
+        : "inference_failed"
+    ).catch(markError => {
+      console.error(
+        JSON.stringify({
+          message: "comments_ai_status_update_failed",
+          jobId: parsed.data.jobId,
+          error: markError instanceof Error ? markError.message : String(markError),
+        })
+      );
+    });
+    console.error(
+      JSON.stringify({
+        message: "comments_ai_metric",
+        operation: "process",
+        status: "failed",
+        jobId: parsed.data.jobId,
+        annotationId: parsed.data.annotationId,
+        articlePath: parsed.data.articlePath,
+        provider: AI_PROVIDER,
+        model: AI_MODEL,
+        attempt: message.attempts,
+        error: error instanceof Error ? error.message : String(error),
+      })
+    );
+    if (message.attempts >= 3) message.ack();
+    else message.retry({ delaySeconds: Math.min(15 * 2 ** message.attempts, 120) });
+  }
 }
 
 export default {
@@ -1112,6 +1441,15 @@ export default {
         })
       );
       return jsonResponse(request, env, { error: { code, message } }, { status });
+    }
+  },
+  async queue(
+    batch: MessageBatch<unknown>,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<void> {
+    for (const message of batch.messages) {
+      await processAiMessage(message, env, ctx);
     }
   },
 } satisfies ExportedHandler<Env>;

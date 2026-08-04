@@ -1,4 +1,7 @@
 import {
+  Bot,
+  CircleAlert,
+  CircleCheck,
   ExternalLink,
   Loader2,
   LogIn,
@@ -16,6 +19,7 @@ import {
   extractAnnotationText,
   stripAnnotationMarker,
   type AnnotationAnchor,
+  type AnnotationAiJob,
   type AnnotationThread,
   type CommentListResponse,
   type CommentMutationResponse,
@@ -142,6 +146,59 @@ function IconButton({
   );
 }
 
+function AiJobState({
+  job,
+  canRetry,
+  onRetry,
+}: {
+  job: AnnotationAiJob;
+  canRetry: boolean;
+  onRetry: () => void;
+}) {
+  if (job.status === "completed") {
+    return (
+      <div className="mt-3 flex min-h-8 items-center gap-2 text-xs opacity-70">
+        <CircleCheck aria-hidden="true" size={15} />
+        AI 已回答
+      </div>
+    );
+  }
+  if (job.status === "failed") {
+    return (
+      <div className="mt-3 flex min-h-8 items-center justify-between gap-3 text-xs text-red-600">
+        <span className="flex items-center gap-2">
+          <CircleAlert aria-hidden="true" size={15} />
+          AI 回答失败
+        </span>
+        {canRetry && (
+          <button
+            className="inline-flex h-8 items-center gap-1 rounded px-2 hover:bg-skin-card"
+            onClick={onRetry}
+            title="重新请求 AI 回答"
+            type="button"
+          >
+            <RotateCcw aria-hidden="true" size={14} />
+            重试
+          </button>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div
+      aria-live="polite"
+      className="mt-3 flex min-h-8 items-center gap-2 text-xs opacity-70"
+    >
+      {job.status === "answering" ? (
+        <Bot aria-hidden="true" size={15} />
+      ) : (
+        <Loader2 aria-hidden="true" className="animate-spin" size={15} />
+      )}
+      {job.status === "answering" ? "AI 正在回答" : "AI 已排队"}
+    </div>
+  );
+}
+
 export default function InlineComments({
   apiUrl,
   articlePath,
@@ -230,6 +287,17 @@ export default function InlineComments({
   useEffect(() => {
     void reload();
   }, [reload]);
+
+  const hasActiveAiJob = threads.some(
+    thread =>
+      thread.aiJob?.status === "queued" || thread.aiJob?.status === "answering"
+  );
+
+  useEffect(() => {
+    if (!hasActiveAiJob) return;
+    const timer = window.setTimeout(() => void reload(), 1500);
+    return () => window.clearTimeout(timer);
+  }, [hasActiveAiJob, reload, threads]);
 
   useEffect(() => {
     fetch(`${endpoint}/api/owner/session`, {
@@ -442,6 +510,18 @@ export default function InlineComments({
         )
       );
     } else if (next.anchor) {
+      const optimisticAiJob = /@ai\b/i.test(text)
+        ? {
+            id: temporaryId,
+            status: "queued" as const,
+            attemptCount: 0,
+            provider: null,
+            model: null,
+            errorCode: null,
+            replyId: null,
+            updatedAt: now,
+          }
+        : undefined;
       setThreads(current => [
         ...current,
         {
@@ -454,6 +534,7 @@ export default function InlineComments({
           author: localAuthor,
           anchor: next.anchor!,
           replies: [],
+          ...(optimisticAiJob ? { aiJob: optimisticAiJob } : {}),
         },
       ]);
     }
@@ -471,6 +552,15 @@ export default function InlineComments({
           }
         );
         versionRef.current = result.version;
+        if (result.aiJob) {
+          setThreads(current =>
+            current.map(thread =>
+              thread.id === next.editId
+                ? { ...thread, aiJob: result.aiJob }
+                : thread
+            )
+          );
+        }
       } else {
         const result = await request<CommentMutationResponse>(
           "/api/owner/comments",
@@ -547,6 +637,33 @@ export default function InlineComments({
         delete nextStates[id];
         return nextStates;
       });
+      setSaving(false);
+    }
+  }
+
+  async function retryAiJob(annotationId: string) {
+    if (saving) return;
+    setSaving(true);
+    setError("");
+    try {
+      const result = await request<CommentMutationResponse>(
+        `/api/owner/annotations/${encodeURIComponent(annotationId)}/ai/retry`,
+        { method: "POST" }
+      );
+      versionRef.current = result.version;
+      if (result.aiJob) {
+        setThreads(current =>
+          current.map(thread =>
+            thread.id === annotationId
+              ? { ...thread, aiJob: result.aiJob }
+              : thread
+          )
+        );
+      }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "AI 重试失败");
+      setRetryAction(() => () => void retryAiJob(annotationId));
+    } finally {
       setSaving(false);
     }
   }
@@ -739,6 +856,13 @@ export default function InlineComments({
                 ) : null}
               </div>
               <RichText text={extractAnnotationText(thread.bodyText)} />
+              {thread.aiJob && (
+                <AiJobState
+                  canRetry={Boolean(ownerSession && ownerMode && !saving)}
+                  job={thread.aiJob}
+                  onRetry={() => void retryAiJob(thread.id)}
+                />
+              )}
               {thread.replies.map(reply => (
                 <div
                   className={`ml-4 mt-3 border-l border-skin-line pl-3 ${syncStates[reply.id] ? "opacity-60" : ""}`}

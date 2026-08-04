@@ -18,6 +18,21 @@
       "migrations_dir": "migrations/comments-api"
     }
   ],
+  "ai": { "binding": "AI" },
+  "queues": {
+    "producers": [
+      { "binding": "AI_JOBS", "queue": "rowan-blog-ai-jobs" }
+    ],
+    "consumers": [
+      {
+        "queue": "rowan-blog-ai-jobs",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 3,
+        "retry_delay": 15
+      }
+    ]
+  },
   "vars": {
     "GITHUB_OWNER": "llccing",
     "GITHUB_REPO": "llccing.github.io",

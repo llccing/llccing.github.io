@@ -16,7 +16,8 @@ jobs:
   answer:
     if: >-
       github.event.comment.user.login == 'llccing' &&
-      contains(github.event.comment.body, '@ai')
+      contains(github.event.comment.body, '@ai') &&
+      !contains(github.event.comment.body, 'rowan-ai-queue:v1')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
