@@ -31,6 +31,7 @@ import {
   replaceOptimisticThread,
   updateOptimisticBody,
 } from "../comments/optimistic";
+import { startSequentialPolling } from "../comments/polling";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const ANNOTATION_MODE_KEY = "rowan-comments-annotation-mode";
@@ -295,9 +296,8 @@ export default function InlineComments({
 
   useEffect(() => {
     if (!hasActiveAiJob) return;
-    const timer = window.setTimeout(() => void reload(), 1500);
-    return () => window.clearTimeout(timer);
-  }, [hasActiveAiJob, reload, threads]);
+    return startSequentialPolling(reload, 1500);
+  }, [hasActiveAiJob, reload]);
 
   useEffect(() => {
     fetch(`${endpoint}/api/owner/session`, {
