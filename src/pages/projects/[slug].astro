@@ -1,0 +1,296 @@
+---
+import Footer from "@components/Footer.astro";
+import Header from "@components/Header.astro";
+import Layout from "@layouts/Layout.astro";
+import { projects, type Project } from "@data/projects";
+
+export function getStaticPaths() {
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props as { project: Project };
+---
+
+<Layout
+  title={`${project.title} · Projects · Rowan Liu`}
+  description={project.summary}
+>
+  <Header activeNav="projects" />
+  <main id="main-content" class={`case-page accent-${project.accent}`}>
+    <section class="case-hero">
+      <a class="back-link" href="/projects/">← All projects</a>
+      <div class="hero-meta">
+        <p>{project.kicker}</p>
+        <p>{project.statusLabel} / {project.year}</p>
+      </div>
+      <h1>{project.title}</h1>
+      <p class="lead">{project.summary}</p>
+      <ul class="tech-list" aria-label="Technologies">
+        {project.technologies.map(tech => <li>{tech}</li>)}
+      </ul>
+    </section>
+
+    <section class="case-body">
+      <aside>
+        <p class="aside-label">Project record</p>
+        <dl>
+          <div><dt>Status</dt><dd>{project.statusLabel}</dd></div>
+          <div><dt>Period</dt><dd>{project.year}</dd></div>
+          <div><dt>Source</dt><dd>Public</dd></div>
+        </dl>
+      </aside>
+
+      <div class="narrative">
+        <article>
+          <p class="section-number">01 / Overview</p>
+          <p class="large-copy">{project.overview}</p>
+        </article>
+        <article>
+          <p class="section-number">02 / The question</p>
+          <h2>What needed to be understood?</h2>
+          <p>{project.challenge}</p>
+        </article>
+        <article>
+          <p class="section-number">03 / The build</p>
+          <h2>How the project approached it</h2>
+          <ol>
+            {project.approach.map(item => <li>{item}</li>)}
+          </ol>
+        </article>
+        <article>
+          <p class="section-number">04 / Current state</p>
+          <h2>What remains</h2>
+          <p>{project.outcome}</p>
+        </article>
+        <article class="links-block">
+          <p class="section-number">Links</p>
+          <div>
+            {
+              project.links.map(link => (
+                <a href={link.href} target="_blank" rel="noreferrer">
+                  {link.label} <span aria-hidden="true">↗</span>
+                </a>
+              ))
+            }
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .case-page {
+    --case-line: rgb(var(--color-text-base) / 0.18);
+    --case-muted: rgb(var(--color-text-base) / 0.68);
+  }
+
+  .accent-cyan {
+    --accent: #00a7b5;
+  }
+  .accent-green {
+    --accent: #43a047;
+  }
+  .accent-red {
+    --accent: #e5484d;
+  }
+  .accent-yellow {
+    --accent: #d99a00;
+  }
+  .accent-blue {
+    --accent: #3976d5;
+  }
+
+  .case-hero,
+  .case-body {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding-inline: 1rem;
+  }
+
+  .case-hero {
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+    border-bottom: 1px solid var(--case-line);
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 4rem;
+    color: var(--case-muted);
+    font-size: 0.8rem;
+    text-decoration: none;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    color: var(--case-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .hero-meta p {
+    margin: 0;
+  }
+
+  h1 {
+    max-width: 14ch;
+    margin: 1.5rem 0;
+    color: var(--accent);
+    font-size: clamp(2.75rem, 8vw, 6.5rem);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: 0;
+  }
+
+  .lead {
+    max-width: 50rem;
+    margin: 0;
+    font-size: clamp(1.1rem, 2vw, 1.45rem);
+    line-height: 1.55;
+  }
+
+  .tech-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tech-list li {
+    border: 1px solid var(--case-line);
+    padding: 0.35rem 0.55rem;
+    font-size: 0.72rem;
+  }
+
+  .case-body {
+    display: grid;
+    gap: 3rem;
+    padding-top: 4rem;
+    padding-bottom: 5rem;
+  }
+
+  aside {
+    align-self: start;
+  }
+
+  .aside-label,
+  .section-number {
+    margin: 0 0 1rem;
+    color: var(--case-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--case-line);
+    font-size: 0.78rem;
+  }
+
+  dt {
+    color: var(--case-muted);
+  }
+  dd {
+    margin: 0;
+    text-align: right;
+  }
+
+  .narrative article {
+    padding: 0 0 4rem;
+  }
+
+  .narrative article + article {
+    padding-top: 4rem;
+    border-top: 1px solid var(--case-line);
+  }
+
+  .narrative h2 {
+    max-width: 20ch;
+    margin: 0 0 1.25rem;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.15;
+  }
+
+  .narrative p:not(.section-number),
+  .narrative li {
+    color: var(--case-muted);
+    line-height: 1.8;
+  }
+
+  .narrative .large-copy {
+    color: rgb(var(--color-text-base));
+    font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+    line-height: 1.55;
+  }
+
+  .narrative ol {
+    margin: 2rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: approach;
+  }
+
+  .narrative li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--case-line);
+    counter-increment: approach;
+  }
+
+  .narrative li::before {
+    color: var(--accent);
+    content: counter(approach, decimal-leading-zero);
+  }
+
+  .links-block div {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .links-block a {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-top: 1px solid var(--case-line);
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media (min-width: 640px) {
+    .case-hero,
+    .case-body {
+      padding-inline: 2rem;
+    }
+
+    .case-body {
+      grid-template-columns: minmax(12rem, 0.45fr) minmax(0, 1.55fr);
+      gap: 5rem;
+    }
+
+    aside {
+      position: sticky;
+      top: 2rem;
+    }
+  }
+</style>
