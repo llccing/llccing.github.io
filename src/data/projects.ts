@@ -95,6 +95,40 @@ export const projects: Project[] = [
     ],
   },
   {
+    slug: "magic-literacy-garden",
+    title: "Magic Literacy Garden",
+    kicker: "Family-centered Chinese literacy",
+    summary:
+      "A private-source learning product that helps families turn character practice into short, guided sessions with a shared progress loop.",
+    status: "active",
+    statusLabel: "Live prototype",
+    year: "2026",
+    featured: true,
+    accent: "green",
+    image: "/assets/projects/magic-literacy-garden.png",
+    imageAlt:
+      "Magic Literacy Garden parent email login screen on words.rowanliu.com",
+    technologies: ["Vue", "TypeScript", "Cloudflare", "D1", "Azure Speech"],
+    overview:
+      "Magic Literacy Garden is a family learning product for Chinese character practice. Parents manage the learning set and children move through focused practice, review and a small garden progress loop without needing separate child accounts.",
+    challenge:
+      "A literacy tool for young children needs more structure than an open-ended AI tutor. It must keep sessions short, make progress legible to parents and use audio and rewards without turning practice into a noisy interface.",
+    approach: [
+      "Designed separate parent, child and administrator paths around one family account model.",
+      "Built guided learning and review flows with retry and delayed-repeat feedback.",
+      "Connected Azure Speech audio with a browser fallback so character prompts remain usable across devices.",
+      "Deployed the frontend and API independently on Cloudflare Pages, Workers and D1.",
+    ],
+    outcome:
+      "The product is live as a private-source prototype at words.rowanliu.com. The current work is product validation: improving the learning loop and finding a practical path to reach families before expanding the feature set.",
+    links: [
+      {
+        label: "Visit product",
+        href: "https://words.rowanliu.com",
+      },
+    ],
+  },
+  {
     slug: "lingualeap",
     title: "LinguaLeap",
     kicker: "Language learning exploration",
@@ -164,7 +198,7 @@ export const projects: Project[] = [
     status: "archived",
     statusLabel: "Archived",
     year: "2025–2026",
-    featured: true,
+    featured: false,
     accent: "yellow",
     image: "/assets/projects/otree-tools.png",
     imageAlt: "Original oTree service site banner",

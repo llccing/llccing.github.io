@@ -1,9 +1,9 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
-import Main from "@layouts/Main.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
 import Pagination from "@components/Pagination.astro";
 import Card from "@components/Card";
 import { SITE } from "@config";
@@ -64,70 +64,92 @@ const tagOptions = showFilters
   title={`${collection === "short-stories" ? "Short Stories" : "Posts"} | ${SITE.title}`}
 >
   <Header activeNav={collection === "short-stories" ? undefined : "posts"} />
-  <Main
-    pageTitle={collection === "short-stories" ? "Short Stories" : "Posts"}
-    pageDesc={collection === "short-stories"
-      ? "All the short stories I've written."
-      : "All the articles I've posted."}
-  >
-    {
-      showFilters && (
-        <div class="filter-bar" data-post-filter-root>
-          {/* Directory pills */}
-          <div class="filter-row">
-            <span class="filter-label">目录</span>
-            <div class="dir-pills">
-              <button class="dir-pill is-active" data-dir-btn="">
-                全部
-              </button>
-              {dirOptions.map(d => (
-                <button class="dir-pill" data-dir-btn={d}>
-                  {d}
+  <Breadcrumbs />
+  <main id="main-content" class="posts-page">
+    <section class="posts-intro">
+      <p class="eyebrow">
+        {
+          collection === "short-stories"
+            ? "Fiction / archive"
+            : "Writing / archive"
+        }
+      </p>
+      <div class="intro-grid">
+        <h1>{collection === "short-stories" ? "Short Stories" : "Posts"}</h1>
+        <p>
+          {
+            collection === "short-stories"
+              ? "A complete archive of the short fiction published here."
+              : "Long-form notes on software, AI, research and the practical work of building systems."
+          }
+        </p>
+      </div>
+    </section>
+
+    <section class="archive-section" aria-labelledby="archive-title">
+      <div class="section-heading">
+        <h2 id="archive-title">Full archive</h2>
+        <span>{renderPosts.length.toString().padStart(2, "0")}</span>
+      </div>
+      {
+        showFilters && (
+          <div class="filter-bar" data-post-filter-root>
+            {/* Directory pills */}
+            <div class="filter-row">
+              <span class="filter-label">目录</span>
+              <div class="dir-pills">
+                <button class="dir-pill is-active" data-dir-btn="">
+                  全部
                 </button>
-              ))}
+                {dirOptions.map(d => (
+                  <button class="dir-pill" data-dir-btn={d}>
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tag select + status */}
+            <div class="filter-row">
+              <span class="filter-label">标签</span>
+              <select class="tag-select" data-filter-tag>
+                <option value="">全部标签</option>
+                {tagOptions.map(t => (
+                  <option value={t}>{t}</option>
+                ))}
+              </select>
+              <span class="filter-meta">
+                <span data-filter-summary>{renderPosts.length} 篇</span>
+                <button class="clear-btn is-hidden" data-filter-clear>
+                  × 清除
+                </button>
+              </span>
             </div>
           </div>
-
-          {/* Tag select + status */}
-          <div class="filter-row">
-            <span class="filter-label">标签</span>
-            <select class="tag-select" data-filter-tag>
-              <option value="">全部标签</option>
-              {tagOptions.map(t => (
-                <option value={t}>{t}</option>
-              ))}
-            </select>
-            <span class="filter-meta">
-              <span data-filter-summary>{renderPosts.length} 篇</span>
-              <button class="clear-btn is-hidden" data-filter-clear>
-                × 清除
-              </button>
-            </span>
-          </div>
-        </div>
-      )
-    }
-
-    <ul>
-      {
-        renderPosts.map(({ data, slug, id }) => {
-          const directory = getDirectoryKey(id);
-          const tags = data.tags.map(t => t.trim().toLowerCase()).join("|");
-          return (
-            <Card
-              href={`${basePath}/${slug}/`}
-              frontmatter={data}
-              itemClassName="post-item"
-              itemData={{
-                "data-post-dir": directory,
-                "data-post-tags": tags,
-              }}
-            />
-          );
-        })
+        )
       }
-    </ul>
-  </Main>
+
+      <ul class="post-list">
+        {
+          renderPosts.map(({ data, slug, id }) => {
+            const directory = getDirectoryKey(id);
+            const tags = data.tags.map(t => t.trim().toLowerCase()).join("|");
+            return (
+              <Card
+                href={`${basePath}/${slug}/`}
+                frontmatter={data}
+                itemClassName="post-item"
+                itemData={{
+                  "data-post-dir": directory,
+                  "data-post-tags": tags,
+                }}
+              />
+            );
+          })
+        }
+      </ul>
+    </section>
+  </main>
 
   {
     showPagination && (
@@ -144,9 +166,96 @@ const tagOptions = showFilters
 </Layout>
 
 <style>
+  .posts-page {
+    --editorial-line: rgb(var(--color-text-base) / 0.18);
+    --editorial-muted: rgb(var(--color-text-base) / 0.68);
+    width: 100%;
+    overflow-x: clip;
+    padding-bottom: 4rem;
+  }
+
+  :global(html),
+  :global(body) {
+    overflow-x: clip;
+  }
+
+  .posts-intro,
+  .archive-section {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding-inline: 1rem;
+  }
+
+  .posts-intro {
+    padding-top: 3.5rem;
+    padding-bottom: 4rem;
+    border-bottom: 1px solid var(--editorial-line);
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--editorial-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .intro-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .intro-grid h1 {
+    margin: 0;
+    font-size: clamp(2.75rem, 7vw, 5.5rem);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: 0;
+  }
+
+  .intro-grid > p {
+    max-width: 36rem;
+    margin: 0;
+    align-self: end;
+    color: var(--editorial-muted);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .archive-section {
+    padding-top: 4rem;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--editorial-line);
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .section-heading span {
+    color: var(--editorial-muted);
+    font-size: 0.75rem;
+  }
+
+  .post-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
   /* ── Filter bar ──────────────────────────────────────── */
   .filter-bar {
-    @apply mb-8 flex flex-col gap-3 border-b border-skin-line pb-6;
+    @apply flex flex-col gap-3 border-b border-skin-line py-5;
   }
   .filter-row {
     @apply flex flex-wrap items-center gap-x-3 gap-y-2;
@@ -194,6 +303,17 @@ const tagOptions = showFilters
   /* Hidden post items — Card.tsx renders the <li>, so needs :global() to escape Astro scoping */
   :global(.post-item.is-hidden) {
     display: none;
+  }
+
+  @media (min-width: 640px) {
+    .posts-intro,
+    .archive-section {
+      padding-inline: 2rem;
+    }
+
+    .intro-grid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
+    }
   }
 </style>
 

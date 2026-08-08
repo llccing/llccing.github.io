@@ -3,149 +3,256 @@ import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import LinkButton from "@components/LinkButton.astro";
-import Hr from "@components/Hr.astro";
 import Card from "@components/Card";
-import Socials from "@components/Socials.astro";
 import getSortedPosts from "@utils/getSortedPosts";
-import { SOCIALS } from "@config";
 
 const posts = await getCollection("blog");
-
 const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
-
-const socialCount = SOCIALS.filter(social => social.active).length;
+const recentPosts = sortedPosts
+  .filter(({ data }) => !data.featured)
+  .slice(0, 4);
 ---
 
-<Layout>
+<Layout
+  title="Rowan Liu · Writing, systems and experiments"
+  description="Notes on software, AI, research and the systems Rowan Liu builds around them."
+>
   <Header />
-  <main id="main-content">
-    <section id="hero">
-      <h1>I'm a Coder</h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="rss-link"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rss-icon"
-          ><path
-            d="M19 20.001C19 11.729 12.271 5 4 5v2c7.168 0 13 5.832 13 13.001h2z"
-          ></path><path
-            d="M12 20.001h2C14 14.486 9.514 10 4 10v2c4.411 0 8 3.589 8 8.001z"
-          ></path><circle cx="6" cy="18" r="2"></circle>
-        </svg>
-        <span class="sr-only">RSS Feed</span>
-      </a>
-
-      <p>
-        Talk is cheap, show me the code. 
-      </p>
-      {
-        // only display if at least one social link is enabled
-        socialCount > 0 && (
-          <div class="social-wrapper">
-            <div class="social-links">Social Links:</div>
-            <Socials />
-          </div>
-        )
-      }
+  <main id="main-content" class="home-page">
+    <section class="home-intro">
+      <p class="eyebrow">Writing / systems / experiments</p>
+      <div class="intro-grid">
+        <h1>Notes from building things that have to work.</h1>
+        <div class="intro-copy">
+          <p>
+            I write about software, AI and the practical decisions behind
+            products in progress. The archive stays close to the work: what
+            shipped, what changed and what I learned when an idea met reality.
+          </p>
+          <nav aria-label="Primary home links">
+            <a href="/projects/"
+              >Explore projects <span aria-hidden="true">↗</span></a
+            >
+            <a href="/rss.xml"
+              >Follow via RSS <span aria-hidden="true">↗</span></a
+            >
+          </nav>
+        </div>
+      </div>
     </section>
-
-    <Hr />
 
     {
       featuredPosts.length > 0 && (
-        <>
-          <section id="featured">
-            <h2>Featured</h2>
-            <ul>
-              {featuredPosts.map(({ data, slug }) => (
-                <Card
-                  href={`/posts/${slug}/`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
-            </ul>
-          </section>
-          {recentPosts.length > 0 && <Hr />}
-        </>
-      )
-    }
-
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts">
-          <h2>Recent Posts</h2>
-          <ul>
-            {recentPosts.map(
-              ({ data, slug }, index) =>
-                index < 4 && (
-                  <Card
-                    href={`/posts/${slug}/`}
-                    frontmatter={data}
-                    secHeading={false}
-                  />
-                )
-            )}
+        <section class="writing-section" aria-labelledby="featured-title">
+          <div class="section-heading">
+            <h2 id="featured-title">Featured writing</h2>
+            <span>{featuredPosts.length.toString().padStart(2, "0")}</span>
+          </div>
+          <ul class="post-list">
+            {featuredPosts.map(({ data, slug }) => (
+              <Card
+                href={`/posts/${slug}/`}
+                frontmatter={data}
+                secHeading={false}
+              />
+            ))}
           </ul>
         </section>
       )
     }
 
-    <div class="all-posts-btn-wrapper">
-      <LinkButton href="/posts/">
-        All Posts
-        <svg xmlns="http://www.w3.org/2000/svg"
-          ><path
-            d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"
-          ></path>
-        </svg>
-      </LinkButton>
-    </div>
-  </main>
+    {
+      recentPosts.length > 0 && (
+        <section class="writing-section" aria-labelledby="recent-title">
+          <div class="section-heading">
+            <h2 id="recent-title">Latest notes</h2>
+            <span>{recentPosts.length.toString().padStart(2, "0")}</span>
+          </div>
+          <ul class="post-list">
+            {recentPosts.map(({ data, slug }) => (
+              <Card
+                href={`/posts/${slug}/`}
+                frontmatter={data}
+                secHeading={false}
+              />
+            ))}
+          </ul>
+          <a class="section-link" href="/posts/">
+            Browse the full archive <span aria-hidden="true">↗</span>
+          </a>
+        </section>
+      )
+    }
 
+    <section class="work-note" aria-labelledby="work-title">
+      <div>
+        <p class="eyebrow">Selected work</p>
+        <h2 id="work-title">The projects behind the notes.</h2>
+      </div>
+      <p>
+        Products, developer tools and experiments, including the honest
+        archives. Each case study records the question, the implementation and
+        where the work stands now.
+      </p>
+      <a href="/projects/">View projects <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
   <Footer />
 </Layout>
 
 <style>
-  /* ===== Hero Section ===== */
-  #hero {
-    @apply pb-6 pt-8;
-  }
-  #hero h1 {
-    @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
-  }
-  #hero .rss-link {
-    @apply mb-6;
-  }
-  #hero .rss-icon {
-    @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
-  }
-  #hero p {
-    @apply my-2;
-  }
-  .social-wrapper {
-    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
-  }
-  .social-links {
-    @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
+  .home-page {
+    --editorial-line: rgb(var(--color-text-base) / 0.18);
+    --editorial-muted: rgb(var(--color-text-base) / 0.68);
+    padding-bottom: 4rem;
   }
 
-  /* ===== Featured & Recent Posts Sections ===== */
-  #featured,
-  #recent-posts {
-    @apply pb-6 pt-12;
+  .home-intro,
+  .writing-section,
+  .work-note {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding-inline: 1rem;
   }
-  #featured h2,
-  #recent-posts h2 {
-    @apply text-2xl font-semibold tracking-wide;
+
+  .home-intro {
+    padding-top: 3.75rem;
+    padding-bottom: 3.5rem;
+    border-bottom: 1px solid var(--editorial-line);
   }
-  .all-posts-btn-wrapper {
-    @apply my-8 text-center;
+
+  .eyebrow {
+    margin: 0;
+    color: var(--editorial-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .intro-grid {
+    display: grid;
+    gap: 2rem;
+    margin-top: 1.25rem;
+  }
+
+  .intro-grid h1 {
+    max-width: 16ch;
+    margin: 0;
+    font-size: clamp(2.5rem, 6.5vw, 4.75rem);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: 0;
+  }
+
+  .intro-copy {
+    align-self: end;
+  }
+
+  .intro-copy > p {
+    max-width: 36rem;
+    margin: 0;
+    color: var(--editorial-muted);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .intro-copy nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .intro-copy a,
+  .section-link,
+  .work-note > a {
+    border-bottom: 1px solid currentColor;
+    color: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .writing-section {
+    padding-top: 4rem;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--editorial-line);
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .section-heading span {
+    color: var(--editorial-muted);
+    font-size: 0.75rem;
+  }
+
+  .post-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .section-link {
+    display: inline-block;
+    margin-top: 2rem;
+  }
+
+  .work-note {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 5rem;
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem;
+    border-top: 1px solid var(--editorial-line);
+    border-bottom: 1px solid var(--editorial-line);
+  }
+
+  .work-note h2 {
+    max-width: 16ch;
+    margin: 0.65rem 0 0;
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  .work-note > p {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--editorial-muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .work-note > a {
+    width: max-content;
+    align-self: end;
+  }
+
+  @media (min-width: 640px) {
+    .home-intro,
+    .writing-section,
+    .work-note {
+      padding-inline: 2rem;
+    }
+
+    .intro-grid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
+    }
+
+    .work-note {
+      grid-template-columns: minmax(14rem, 0.75fr) minmax(0, 1.1fr) auto;
+      align-items: start;
+    }
   }
 </style>
