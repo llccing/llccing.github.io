@@ -1,0 +1,23 @@
+# Build output and local caches
+node_modules/
+dist/
+.astro/
+.jampack/
+.wrangler/
+coverage/
+output/
+artifacts/
+
+# Published content is intentionally documented by its schemas and routes,
+# not by reading every article or generated digest.
+src/content/blog/**
+src/content/short-stories/**
+src/content/originals/**
+src/content/digest/**
+
+# Generated platform typings are implementation noise for the project map.
+worker-configuration.d.ts
+
+# Local and machine-specific files
+.env*
+.DS_Store
