@@ -1,6 +1,12 @@
 ---
 const gaMeasurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const shouldLoadAnalytics = import.meta.env.PROD && gaMeasurementId;
+const gaScript = `
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { window.dataLayer.push(arguments); }
+  gtag("js", new Date());
+  gtag("config", ${JSON.stringify(gaMeasurementId)});
+`;
 ---
 
 {
@@ -11,11 +17,7 @@ const shouldLoadAnalytics = import.meta.env.PROD && gaMeasurementId;
         async
         src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
       />
-      <script is:inline define:vars={{ gaMeasurementId }}>
-        window.dataLayer = window.dataLayer || []; const gtag = (...args) =>
-        window.dataLayer.push(args); gtag("js", new Date()); gtag("config",
-        gaMeasurementId);
-      </script>
+      <script is:inline set:html={gaScript} />
     </>
   )
 }
