@@ -1,9 +1,9 @@
 ---
-pubDatetime: 2026-07-26T21:30:00+08:00
+pubDatetime: 2026-08-18T20:00:00+08:00
 title: AI 写业务代码，我写约束
 slug: ai-writes-code-i-write-constraints
 featured: false
-draft: true
+draft: false
 tags:
   - ai
   - workflow

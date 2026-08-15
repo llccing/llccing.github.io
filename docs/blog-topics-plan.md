@@ -24,10 +24,10 @@
 
 | # | 标题 | 素材来源 | 状态 |
 |---|------|--------|------|
-| 10 | AI 写业务代码，我写约束 | `AGENTS.md` | 📝 草稿待 review |
+| 10 | AI 写业务代码，我写约束 | `AGENTS.md` | ✅ 已排期 2026-08-18 |
 | 11 | 多 Agent 评审推翻了我的产品决策 | `docs/product/multi-agent-review-2026-07-20.md` | 可动笔 |
 | 12 | 给 AI 划红线：儿童教育内容哪些不能让模型生成 | `learning-quality-gates.md` | 可动笔 |
-| 13 | 一个 Agent 翻译了 25 篇 Angular 文章 | 本仓库 `blog-translator.agent.md` | 📝 草稿待 review |
+| 13 | 一个 Agent 翻译了 25 篇 Angular 文章 | 本仓库 `blog-translator.agent.md` | ✅ 2026-08-15 |
 | 14 | AI 全程开发的项目，我不了解它，怎么办 | [ai-project-comprehension.md](./ai-project-comprehension.md) 的执行过程 | 待前置完成 |
 | 15 | 我的 AI 开发环境：多模型切换与 Skill 实践 | [ai-workflow-practice.md](./ai-workflow-practice.md) | 待整理 |
 | 16 | 儿童识字产品的跨天保持实验 | `opportunity-backlog.md` P1 | 待实验 |

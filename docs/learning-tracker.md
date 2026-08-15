@@ -140,10 +140,10 @@ B 的每个阶段都有对应文章，见下方选题 10-12、14、16。原则�
 
 | # | 选题 | 线 | 素材来源 | 状态 |
 | --- | --- | --- | --- | --- |
-| 10 | AI 写业务代码，我写约束 | C | 识字园 `AGENTS.md` 逐条讲 | 可动笔 |
+| 10 | AI 写业务代码，我写约束 | C | 识字园 `AGENTS.md` 逐条讲 | ✅ 已排期 2026-08-18 |
 | 11 | 多 Agent 评审推翻了我的产品决策 | B/C | `multi-agent-review-2026-07-20.md` | 可动笔 |
 | 12 | 给 AI 划红线：儿童教育内容哪些不能让模型生成 | B/C | `learning-quality-gates.md` | 可动笔 |
-| 13 | 一个 Agent 翻译了 25 篇 Angular 文章 | A/C | 本仓库 `blog-translator.agent.md` | 可动笔 |
+| 13 | 一个 Agent 翻译了 25 篇 Angular 文章 | A/C | 本仓库 `blog-translator.agent.md` | ✅ 2026-08-15 |
 | 14 | AI 全程开发的项目，我不了解它，怎么办 | B | B1 的完整过程 | 待 B1 |
 | 15 | 我的 AI 开发环境：多模型切换与 Skill 实践 | C | 见 [ai-workflow-practice.md](./ai-workflow-practice.md) | 待整理 |
 | 16 | 儿童识字产品的跨天保持实验 | B | B2 结果 | 待 B2 |
@@ -159,3 +159,4 @@ B 的每个阶段都有对应文章，见下方选题 10-12、14、16。原则�
 - 2026-07-26 — 建立本追踪文档。核对识字园实际状态，修正「待上线」误判；确认 A / B / C 三条线与预算。
 - 2026-07-26 — 按重新梳理的三点重构：A 补「如何体现深入」，B 补落到项目里的动作，C 从零扩展为完整一节 + `ai-workflow-practice.md`。
 - 2026-07-26 — C 线首个成果：`blog-publish-check` skill + `scripts/check-content.mjs`。顺带修掉 3 处 `pubDatetime` 格式 bug，并发现 3 项既有技术债（记在 `plan-2026-h2.md`）。执行顺序见 `plan-2026-h2.md`。
+- 2026-08-15 — 选题 13 发布（修正 13/16/来源构成后上线）；选题 10 排期 2026-08-18，避免与 Hermes 文同日挤首页。

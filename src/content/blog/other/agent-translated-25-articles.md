@@ -1,9 +1,9 @@
 ---
-pubDatetime: 2026-07-26T20:00:00+08:00
+pubDatetime: 2026-08-15T19:50:00+08:00
 title: 我用一个 Agent 翻译了 25 篇 Angular 文章
 slug: agent-translated-25-articles
 featured: false
-draft: true
+draft: false
 tags:
   - ai
   - tooling
@@ -11,9 +11,9 @@ tags:
 description: 不是「我让 AI 帮我翻译了一篇文章」，而是把翻译这件重复劳动拆成一个可复用的 agent，然后批量交付 25 篇。这篇讲 agent 怎么设计、状态怎么管、质量在哪里掉链子，以及为什么这条流水线现在已经该停了。
 ---
 
-我的博客里有 25 篇 Angular 译文，来自 [Matthieu Riegler](https://riegler.fr/blog) 和 [Minko Gechev](https://blog.mgechev.com) 的博客。它们不是一篇一篇手动翻出来的，是一个 agent 批量产出的。
+我的博客里这批译文一共 25 篇原文对照：23 篇来自 [Matthieu Riegler](https://riegler.fr/blog)，另有 [Minko Gechev](https://blog.mgechev.com) 和 [Jake Archibald](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/) 各一篇。它们不是一篇一篇手动翻出来的，是一个 agent 批量产出的。
 
-其中 14 篇的发布时间戳落在 2026-05-30 的 14:20 到 14:35 之间——15 分钟，14 篇。这个数字不是效率炫耀，它只是说明了一件事：当你把重复劳动固化成流程之后，产出速度就不再由你的耐心决定了。
+其中 13 篇的发布时间戳落在 2026-05-30 的 14:20 到 14:35 之间——15 分钟挤进 13 篇，当天一共 19 篇。这个数字不是效率炫耀，它只是说明了一件事：当你把重复劳动固化成流程之后，产出速度就不再由你的耐心决定了。
 
 这篇文章讲的不是「怎么让 AI 翻译得更好」，而是把一件重复的事变成工程问题的过程，包括它在哪里翻了车。
 
@@ -65,7 +65,7 @@ src/content/originals/<slug>.md         # 英文原文
 
 热链源站的图片是技术博客的常见坑：源站改版、防盗链、域名过期，你的文章就变成一堆碎图。
 
-这一条执行得很彻底。我检查了整个 `src/content/blog/frontend/angular/` 目录，仍有热链的只有两篇——`angular-change-detection` 和 `translate-angular-interceptors`，**都是这条流水线之前的老文章**。25 篇里图片全部本地化，`public/blog-images/` 下现在有 17 个目录。
+这一条执行得很彻底。我检查了整个 `src/content/blog/frontend/angular/` 目录，仍有热链的只有两篇——`angular-change-detection` 和 `translate-angular-interceptors`，**都是这条流水线之前的老文章**。流水线产出的图片都落在本地，`public/blog-images/` 下现在有 16 个目录。
 
 ### 默认 draft: true
 
@@ -187,7 +187,7 @@ tracker 里最后一篇是 2025-04-05 的 `input-output`，之后 riegler.fr 就
 
 这反而是个好的时间点。翻译是理解别人的输出，做得再工整也是二手的。中文圈几乎没人做 PR / commit 级别的 Angular 机制解析，而我手上有一样别人没有的东西——一个真实的 Angular + Node BFF 生产项目。「这个新特性在我们的生产环境里能不能用、为什么不能用」，这种内容不可替代。
 
-所以下一步是从「译」转到「写」。这个 agent 完成了它的使命，可以退休了。
+所以下一步是从「译」转到「写」。8 月我先把家庭服务器这一组写完了，Angular 的月度跟踪从本周开始记。这个 agent 完成了它的使命，可以退休了。
 
 ## 如果你也想做类似的事
 
