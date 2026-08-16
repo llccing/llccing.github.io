@@ -1,5 +1,6 @@
 ---
 title: "第三步：给家庭服务器装上会自己长大的 AI 助理"
+slug: self-hosted-hermes-agent-telegram-assistant
 pubDatetime: 2026-08-15T14:45:00+08:00
 description: 前两篇把一台旧 Mac 变成了远程主机、跑起了全套服务，这篇是第三步：出门在外时，怎么用 Telegram 指挥这台服务器干活。拆解 Hermes Agent 的选型、出站轮询架构、以及国内网络环境下三个真实的坑。
 tags: ["Self-hosted", "AI Agent", "Hermes", "Telegram", "Docker"]
@@ -22,13 +23,13 @@ draft: false
 
 2026 年这个赛道有两个代表性选手，恰好代表了两种设计哲学：
 
-| 维度 | OpenClaw | Hermes Agent（Nous Research） |
-|---|---|---|
-| 定位 | 执行派：稳定、生态大 | 进化派：自学、记忆深 |
-| 内置记忆 | 无，需手动维护 | 三层记忆（SQLite + 用户画像） |
-| 技能生态 | ClawHub 5.2 万+ | 40+ 开箱，用完自动沉淀 |
-| 资源占用 | 官方要求 ≥2GB 内存 | 实测 RSS ~164MB |
-| 风险 | 供应链 RCE 前科 + 市场泄凭据 | pre-1.0，较耗 token |
+| 维度     | OpenClaw                     | Hermes Agent（Nous Research） |
+| -------- | ---------------------------- | ----------------------------- |
+| 定位     | 执行派：稳定、生态大         | 进化派：自学、记忆深          |
+| 内置记忆 | 无，需手动维护               | 三层记忆（SQLite + 用户画像） |
+| 技能生态 | ClawHub 5.2 万+              | 40+ 开箱，用完自动沉淀        |
+| 资源占用 | 官方要求 ≥2GB 内存           | 实测 RSS ~164MB               |
+| 风险     | 供应链 RCE 前科 + 市场泄凭据 | pre-1.0，较耗 token           |
 
 我的需求是"还没想好用途、希望越用越懂我"的个人助理——这正中 Hermes 的定位。而且 OpenClaw 还没部署，零迁移成本，自然选后者。
 
@@ -81,7 +82,7 @@ model:
   provider: "custom"
   base_url: "https://www.hi-code.cc/v1"
   default: "grok-4.6"
-  api_key: "sk-..."   # 放这里，不放 .env
+  api_key: "sk-..." # 放这里，不放 .env
 ```
 
 > 顺带发现：CLI 的 `-z` 单次模式强制走 auto 探测，会报 "No LLM provider configured"；但 gateway（Telegram 实际路径）和交互 `chat` 模式都正常读 config。别被测试命令误导。
