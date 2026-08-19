@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterAndCap, parseRssText } from "../src/fetch";
+import { filterAndCap, mergePreservedItems, parseRssText } from "../src/fetch";
 import type { DigestItem } from "../src/types";
 
 function item(overrides: Partial<DigestItem> = {}): DigestItem {
@@ -51,5 +51,25 @@ describe("digest worker RSS parsing", () => {
 
     expect(parseRssText(feed).rss.channel.item.title).toBe("Entity-heavy post");
     expect(parseRssText(feed).rss.channel.item.link).toBe("https://example.com/entity-heavy");
+  });
+});
+
+describe("digest force regeneration", () => {
+  it("keeps sources missing from the current feed and appends new sources", () => {
+    const angular = item({
+      id: "angular-old",
+      url: "https://example.com/angular-old",
+      domain: "angular",
+    });
+    const fresh = item({ id: "ai-new", url: "https://example.com/ai-new" });
+
+    expect(mergePreservedItems([angular], [fresh])).toEqual([angular, fresh]);
+  });
+
+  it("prefers the preserved record when a source appears again", () => {
+    const preserved = item({ title: "Published title" });
+    const fetched = item({ title: "Changed feed title" });
+
+    expect(mergePreservedItems([preserved], [fetched])).toEqual([preserved]);
   });
 });

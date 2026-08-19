@@ -18,7 +18,7 @@ import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { SOURCES, DOMAIN_LABELS } from "./sources.mjs";
 import { fetchAll } from "./fetch.mjs";
-import { loadSeenUrls, filterNew, applyCaps, DIGEST_DIR } from "./state.mjs";
+import { loadSeenUrls, loadDigestItems, filterNew, applyCaps, DIGEST_DIR } from "./state.mjs";
 import { summarize, renderSources } from "./summarize.mjs";
 import { runWorkerDigest } from "./worker-client.mjs";
 
@@ -110,6 +110,7 @@ async function main() {
   const dateStr = beijingToday();
   const [year, month, day] = dateStr.split("-");
   const outPath = join(DIGEST_DIR, year, month, `${day}.md`);
+  const preservedItems = FORCE ? loadDigestItems(outPath) : [];
 
   console.log(`Digest for ${dateStr} (Asia/Shanghai)`);
 
@@ -128,6 +129,7 @@ async function main() {
     workerResult = await runWorkerDigest({
       date: dateStr,
       seenUrls: [...seen],
+      preservedItems,
       runKey: runKey || undefined,
     });
   }
@@ -141,24 +143,25 @@ async function main() {
 
   console.log(`Fetched ${fetched.length} items from ${SOURCES.length - failures.length}/${SOURCES.length} sources`);
 
-  if (fetched.length === 0) {
+  if (fetched.length === 0 && preservedItems.length === 0) {
     console.log("No items fetched from any source. Nothing to do.");
     return;
   }
 
   const candidates = workerResult ? fetched : filterNew(fetched, seen);
   const fresh = workerResult ? fetched : applyCaps(candidates);
+  const merged = workerResult ? fetched : [...preservedItems, ...fresh];
 
   console.log(
-    `New: ${candidates.length} (after dedup against ${seen.size} cited URLs) → ${fresh.length} kept after caps`
+    `Preserved: ${preservedItems.length}; new: ${candidates.length} → ${fresh.length} kept after caps`
   );
 
-  if (fresh.length === 0) {
+  if (merged.length === 0) {
     console.log("No new items since the last digest. No file written.");
     return;
   }
 
-  const itemsByDomain = groupByDomain(fresh);
+  const itemsByDomain = groupByDomain(merged);
   console.log(
     `New items by domain: ${[...itemsByDomain]
       .map(([d, items]) => `${d}=${items.length}`)
@@ -178,7 +181,7 @@ async function main() {
   }
 
   const { body, indexed } = workerResult
-    ? { body: workerResult.body, indexed: fresh }
+    ? { body: workerResult.body, indexed: merged }
     : OFFLINE
     ? composeWithoutModel(itemsByDomain)
     : await summarize(itemsByDomain, dateStr);

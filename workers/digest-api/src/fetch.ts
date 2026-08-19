@@ -139,3 +139,12 @@ export function filterAndCap(items: DigestItem[], seenUrls: string[]): DigestIte
   });
   return Object.keys(DOMAIN_LABELS).flatMap(domain => kept.filter(item => item.domain === domain));
 }
+
+export function mergePreservedItems(preserved: DigestItem[], fresh: DigestItem[]): DigestItem[] {
+  const seen = new Set<string>();
+  return [...preserved, ...fresh].filter(item => {
+    if (!item.url || seen.has(item.url)) return false;
+    seen.add(item.url);
+    return true;
+  });
+}

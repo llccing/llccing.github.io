@@ -5,12 +5,12 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function runWorkerDigest({ date, seenUrls, runKey }) {
+export async function runWorkerDigest({ date, seenUrls, preservedItems, runKey }) {
   const baseUrl = process.env.DIGEST_WORKER_URL?.replace(/\/$/, "");
   const token = process.env.DIGEST_TRIGGER_TOKEN;
   if (!baseUrl || !token) throw new Error("DIGEST_WORKER_URL and DIGEST_TRIGGER_TOKEN are required");
   const headers = { authorization: `Bearer ${token}`, "content-type": "application/json" };
-  const start = await fetch(`${baseUrl}/jobs`, { method: "POST", headers, body: JSON.stringify({ date, seenUrls, runKey }) });
+  const start = await fetch(`${baseUrl}/jobs`, { method: "POST", headers, body: JSON.stringify({ date, seenUrls, preservedItems, runKey }) });
   const startPayload = await start.json();
   if (!start.ok && start.status !== 409) throw new Error(`Digest Worker start failed: HTTP ${start.status}`);
   const id = startPayload.id || `digest-${date}${runKey ? `-${runKey}` : ""}`;

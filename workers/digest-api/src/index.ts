@@ -1,6 +1,6 @@
 import { WorkflowEntrypoint } from "cloudflare:workers";
 import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
-import { fetchOneSource, filterAndCap } from "./fetch";
+import { fetchOneSource, filterAndCap, mergePreservedItems } from "./fetch";
 import { ModelError, summarize } from "./model";
 import { SOURCES } from "./sources";
 import type { DigestJobPayload, DigestJobResult, DigestItem } from "./types";
@@ -51,7 +51,11 @@ export class DigestWorkflow extends WorkflowEntrypoint<DigestEnv, DigestJobPaylo
       }
     }
     if (failures.length > 3) throw new Error(`Too many sources failed (${failures.length}/${SOURCES.length})`);
-    const fetched = { items: filterAndCap(allItems, event.payload.seenUrls), failures };
+    const fresh = filterAndCap(allItems, event.payload.seenUrls);
+    const fetched = {
+      items: mergePreservedItems(event.payload.preservedItems ?? [], fresh),
+      failures,
+    };
 
     if (!fetched.items.length) {
       return { date: event.payload.date, items: [], failures: fetched.failures, body: "", provider: "primary", model: this.env.DIGEST_PRIMARY_MODEL };

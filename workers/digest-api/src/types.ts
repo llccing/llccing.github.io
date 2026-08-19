@@ -31,6 +31,7 @@ export type SourceFailure = { id: string; message: string; status?: number };
 export type DigestJobPayload = {
   date: string;
   seenUrls: string[];
+  preservedItems?: DigestItem[];
   runKey?: string;
 };
 

@@ -66,6 +66,43 @@ export function loadSeenUrls(digestDir) {
   return seen;
 }
 
+/** Read structured source records from one existing digest entry. */
+export function loadDigestItems(filePath) {
+  if (!safeStat(filePath)) return [];
+  return parseDigestItems(readFileSync(filePath, "utf8"));
+}
+
+export function parseDigestItems(raw) {
+  const text = raw.replace(/\r\n/g, "\n");
+  const end = text.indexOf("\n---", 3);
+  if (!text.startsWith("---\n") || end === -1) return [];
+  const block = text.slice(4, end);
+  const items = [];
+  const pattern = /\s*- title: (.+)\n\s+url: (.+)\n\s+domain: (.+)\n\s+label: (.+)(?:\n\s+publishedAt: (.+))?/g;
+  for (const match of block.matchAll(pattern)) {
+    try {
+      const title = JSON.parse(match[1]);
+      const url = JSON.parse(match[2]);
+      const domain = JSON.parse(match[3]);
+      const sourceLabel = JSON.parse(match[4]);
+      items.push({
+        id: url,
+        url,
+        rawName: title,
+        title,
+        publishedAt: match[5] ?? null,
+        summary: "",
+        sourceId: sourceLabel,
+        sourceLabel,
+        domain,
+      });
+    } catch {
+      // Ignore malformed individual records; content validation covers the file.
+    }
+  }
+  return items;
+}
+
 /**
  * Drop items already cited, duplicated inside this batch, or published outside
  * their source's lookback window. Items with an unparseable date are kept: the
