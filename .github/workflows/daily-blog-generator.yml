@@ -49,6 +49,11 @@ jobs:
 
       - name: Generate digest
         env:
+          # Keep local generation as the rollback default until the Worker has
+          # been deployed and a canary run has passed.
+          DIGEST_BACKEND: ${{ secrets.DIGEST_BACKEND || 'local' }}
+          DIGEST_WORKER_URL: ${{ secrets.DIGEST_WORKER_URL }}
+          DIGEST_TRIGGER_TOKEN: ${{ secrets.DIGEST_TRIGGER_TOKEN }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
           AI_MODEL: ${{ secrets.AI_MODEL }}

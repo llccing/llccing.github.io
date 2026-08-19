@@ -1,0 +1,24 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "rowan-blog-digest",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "workflows": [
+    {
+      "name": "rowan-blog-digest",
+      "binding": "DIGEST_WORKFLOW",
+      "class_name": "DigestWorkflow"
+    }
+  ],
+  "vars": {
+    "DIGEST_PRIMARY_MODEL": "grok-4.6",
+    "DIGEST_FALLBACK_MODEL": "gpt-5.6-sol"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

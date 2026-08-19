@@ -20,10 +20,12 @@ import { SOURCES, DOMAIN_LABELS } from "./sources.mjs";
 import { fetchAll } from "./fetch.mjs";
 import { loadSeenUrls, filterNew, applyCaps, DIGEST_DIR } from "./state.mjs";
 import { summarize, renderSources } from "./summarize.mjs";
+import { runWorkerDigest } from "./worker-client.mjs";
 
 const DRY_RUN = process.argv.includes("--dry-run");
 const FORCE = process.argv.includes("--force");
 const OFFLINE = process.argv.includes("--offline");
+const WORKER = process.env.DIGEST_BACKEND === "worker";
 
 /** Today in Asia/Shanghai, the timezone the whole site is configured for. */
 function beijingToday() {
@@ -117,7 +119,20 @@ async function main() {
     return;
   }
 
-  const { items: fetched, failures } = await fetchAll(SOURCES);
+  const seen = loadSeenUrls(DIGEST_DIR);
+  let workerResult;
+  if (WORKER) {
+    const runKey = [process.env.GITHUB_RUN_ID, process.env.GITHUB_RUN_ATTEMPT]
+      .filter(Boolean)
+      .join("-");
+    workerResult = await runWorkerDigest({
+      date: dateStr,
+      seenUrls: [...seen],
+      runKey: runKey || undefined,
+    });
+  }
+
+  const { items: fetched, failures } = workerResult || (await fetchAll(SOURCES));
 
   // A rotted feed URL should be visible, not silently narrow the digest.
   for (const failure of failures) {
@@ -131,9 +146,8 @@ async function main() {
     return;
   }
 
-  const seen = loadSeenUrls(DIGEST_DIR);
-  const candidates = filterNew(fetched, seen);
-  const fresh = applyCaps(candidates);
+  const candidates = workerResult ? fetched : filterNew(fetched, seen);
+  const fresh = workerResult ? fetched : applyCaps(candidates);
 
   console.log(
     `New: ${candidates.length} (after dedup against ${seen.size} cited URLs) → ${fresh.length} kept after caps`
@@ -163,10 +177,16 @@ async function main() {
     return;
   }
 
-  const { body, indexed } = OFFLINE
+  const { body, indexed } = workerResult
+    ? { body: workerResult.body, indexed: fresh }
+    : OFFLINE
     ? composeWithoutModel(itemsByDomain)
     : await summarize(itemsByDomain, dateStr);
-  const model = OFFLINE ? "offline (no model)" : process.env.AI_MODEL || "gpt-4o";
+  const model = workerResult
+    ? `${workerResult.provider}/${workerResult.model}`
+    : OFFLINE
+      ? "offline (no model)"
+      : process.env.AI_MODEL || "gpt-4o";
 
   const content =
     buildFrontmatter({ dateStr, itemsByDomain, indexed, model }) +

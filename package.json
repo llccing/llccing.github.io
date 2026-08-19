@@ -18,7 +18,7 @@
     "prepare": "husky install",
     "lint": "eslint .",
     "test": "vitest run",
-    "check:worker": "tsc --noEmit -p workers/comments-api/tsconfig.json && wrangler deploy --dry-run",
+    "check:worker": "tsc --noEmit -p workers/comments-api/tsconfig.json && tsc --noEmit -p workers/digest-api/tsconfig.json && wrangler deploy --dry-run && wrangler deploy --dry-run --config workers/digest-api/wrangler.jsonc",
     "comments:export": "node scripts/comments/export-annotations.mjs",
     "comments:d1:import": "tsx scripts/comments/import-annotations-to-d1.ts",
     "comments:d1:reconcile": "tsx scripts/comments/reconcile-annotations-d1.ts",
