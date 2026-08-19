@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterAndCap } from "../src/fetch";
+import { filterAndCap, parseRssText } from "../src/fetch";
 import type { DigestItem } from "../src/types";
 
 function item(overrides: Partial<DigestItem> = {}): DigestItem {
@@ -41,5 +41,15 @@ describe("digest worker filtering", () => {
     }));
 
     expect(filterAndCap(items, [])).toHaveLength(3);
+  });
+});
+
+describe("digest worker RSS parsing", () => {
+  it("parses Simon Willison-style feeds with more than 1000 entities", () => {
+    const entities = "&nbsp;".repeat(1_200);
+    const feed = `<rss version="2.0"><channel><item><title>Entity-heavy post</title><link>https://example.com/entity-heavy</link><description>${entities}</description></item></channel></rss>`;
+
+    expect(parseRssText(feed).rss.channel.item.title).toBe("Entity-heavy post");
+    expect(parseRssText(feed).rss.channel.item.link).toBe("https://example.com/entity-heavy");
   });
 });

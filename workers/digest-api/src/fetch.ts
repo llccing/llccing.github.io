@@ -5,7 +5,13 @@ import type { DigestItem, DigestSource, SourceFailure } from "./types";
 const TIMEOUT_MS = 20_000;
 const USER_AGENT = "rowanliu-blog-digest-worker";
 const PRERELEASE_TAG = /-(rc|beta|alpha|next|canary|nightly|dev|pre)[.\d-]*$/i;
-const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
+const parser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: "@_",
+  // Feeds can contain large HTML fragments with thousands of entities. They
+  // are discarded by truncate() and must not be expanded by the XML parser.
+  processEntities: false,
+});
 
 function truncate(text: unknown, limit = 1200): string {
   if (typeof text !== "string") return "";
@@ -76,11 +82,15 @@ async function fetchSource(source: DigestSource, githubToken: string): Promise<D
       summary: truncate(release.body), isPrerelease: Boolean(release.prerelease) || PRERELEASE_TAG.test(release.tag_name || ""),
     }));
   } else {
-    const parsed = parser.parse(await fetchText(source.url!, {}));
+    const parsed = parseRssText(await fetchText(source.url!, {}));
     const entries = parsed?.rss?.channel?.item ?? parsed?.feed?.entry ?? [];
     items = asArray(entries).map(entry => normalizeRssItem(entry)).filter(item => item.url);
   }
   return items.filter(item => passesFilters(item, source)).map(item => ({ ...item, sourceId: source.id, sourceLabel: source.label, domain: source.domain, maxPerRun: source.maxPerRun, lookbackDays: source.lookbackDays }));
+}
+
+export function parseRssText(text: string): Record<string, any> {
+  return parser.parse(text) as Record<string, any>;
 }
 
 async function parallelLimit<T>(values: T[], limit: number, operation: (value: T) => Promise<void>): Promise<void> {
