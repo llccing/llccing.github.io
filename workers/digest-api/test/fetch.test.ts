@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { filterAndCap, mergePreservedItems, parseRssText } from "../src/fetch";
+import {
+  filterAndCap,
+  mergePreservedItems,
+  parseRetryAfter,
+  parseRssText,
+} from "../src/fetch";
 import type { DigestItem } from "../src/types";
 
 function item(overrides: Partial<DigestItem> = {}): DigestItem {
@@ -71,5 +76,21 @@ describe("digest force regeneration", () => {
     const fetched = item({ title: "Changed feed title" });
 
     expect(mergePreservedItems([preserved], [fetched])).toEqual([preserved]);
+  });
+});
+
+describe("digest source retries", () => {
+  it("parses Retry-After seconds", () => {
+    expect(parseRetryAfter("45")).toBe(45_000);
+  });
+
+  it("parses Retry-After HTTP dates", () => {
+    expect(
+      parseRetryAfter("Thu, 20 Aug 2026 02:01:00 GMT", Date.parse("2026-08-20T02:00:00Z"))
+    ).toBe(60_000);
+  });
+
+  it("ignores invalid Retry-After values", () => {
+    expect(parseRetryAfter("later")).toBeUndefined();
   });
 });

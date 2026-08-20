@@ -26,8 +26,21 @@ function asArray<T>(value: T | T[] | null | undefined): T[] {
 
 async function fetchText(url: string, headers: Record<string, string>): Promise<string> {
   const response = await fetch(url, { headers: { "user-agent": USER_AGENT, ...headers }, signal: AbortSignal.timeout(TIMEOUT_MS) });
-  if (!response.ok) throw Object.assign(new Error(`HTTP ${response.status} ${response.statusText}`), { status: response.status });
+  if (!response.ok) {
+    throw Object.assign(new Error(`HTTP ${response.status} ${response.statusText}`), {
+      status: response.status,
+      retryAfterMs: parseRetryAfter(response.headers.get("retry-after")),
+    });
+  }
   return response.text();
+}
+
+export function parseRetryAfter(value: string | null, now = Date.now()): number | undefined {
+  if (!value) return undefined;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? Math.max(timestamp - now, 0) : undefined;
 }
 
 function isRetryable(error: unknown): boolean {
@@ -41,7 +54,12 @@ async function withRetries<T>(operation: () => Promise<T>): Promise<T> {
     try { return await operation(); } catch (error) {
       lastError = error;
       if (attempt === 2 || !isRetryable(error)) throw error;
-      await new Promise(resolve => setTimeout(resolve, [2000, 10000][attempt]));
+      const retryAfterMs =
+        typeof error === "object" && error && "retryAfterMs" in error
+          ? Number(error.retryAfterMs)
+          : 0;
+      const delay = Math.min(Math.max(retryAfterMs || 0, [10_000, 30_000][attempt]), 90_000);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
   throw lastError;

@@ -30,7 +30,7 @@ export class DigestWorkflow extends WorkflowEntrypoint<DigestEnv, DigestJobPaylo
     for (const source of SOURCES) {
       const result = await step.do(
         `fetch ${source.id}`,
-        { timeout: "2 minutes" },
+        { timeout: "4 minutes" },
         async () => {
           try {
             return {
