@@ -9,6 +9,10 @@ on:
   # Manual trigger for testing. --force lets a re-run overwrite today's entry.
   workflow_dispatch:
     inputs:
+      date:
+        description: "Date to generate (YYYY-MM-DD); defaults to today in Shanghai"
+        required: false
+        type: string
       force:
         description: "Overwrite today's entry if it already exists"
         required: false
@@ -31,7 +35,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.BLOG_PAT }}
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -59,8 +62,17 @@ jobs:
           AI_MODEL: ${{ secrets.AI_MODEL }}
           # Lifts the anonymous GitHub API rate limit while fetching releases.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIGEST_DATE: ${{ inputs.date }}
+          DIGEST_FORCE: ${{ inputs.force }}
         run: |
-          node scripts/digest/generate.mjs ${{ github.event.inputs.force == 'true' && '--force' || '' }}
+          args=()
+          if [[ -n "$DIGEST_DATE" ]]; then
+            args+=(--date "$DIGEST_DATE")
+          fi
+          if [[ "$DIGEST_FORCE" == "true" ]]; then
+            args+=(--force)
+          fi
+          node scripts/digest/generate.mjs "${args[@]}"
 
       # No digest file means there was nothing new today. That is a normal
       # outcome, not a failure: skip validation and commit rather than error.

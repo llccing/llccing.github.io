@@ -4,9 +4,17 @@ on:
   push:
     branches:
       - main
+  # Commits pushed with GITHUB_TOKEN do not emit another push workflow. Run
+  # deployment explicitly after the digest workflow completes successfully.
+  workflow_run:
+    workflows:
+      - Daily Tech Digest
+    types:
+      - completed
 
 jobs:
   build-and-deploy:
+    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:

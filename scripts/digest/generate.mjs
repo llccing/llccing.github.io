@@ -10,6 +10,7 @@
  *   node scripts/digest/generate.mjs              # full run, needs AI_API_KEY
  *   node scripts/digest/generate.mjs --dry-run    # fetch + dedupe only, no model call
  *   node scripts/digest/generate.mjs --force      # overwrite today's entry
+ *   node scripts/digest/generate.mjs --date 2026-08-28 # backfill a specific date
  *
  * Env: AI_API_KEY, AI_BASE_URL, AI_MODEL, GITHUB_TOKEN (optional, raises rate limit)
  */
@@ -26,6 +27,20 @@ const DRY_RUN = process.argv.includes("--dry-run");
 const FORCE = process.argv.includes("--force");
 const OFFLINE = process.argv.includes("--offline");
 const WORKER = process.env.DIGEST_BACKEND === "worker";
+
+function requestedDate() {
+  const index = process.argv.indexOf("--date");
+  if (index === -1) return null;
+  const value = process.argv[index + 1];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value ?? "")) {
+    throw new Error("--date must be followed by a date in YYYY-MM-DD format");
+  }
+  const parsed = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) {
+    throw new Error(`Invalid calendar date: ${value}`);
+  }
+  return value;
+}
 
 /** Today in Asia/Shanghai, the timezone the whole site is configured for. */
 function beijingToday() {
@@ -107,7 +122,7 @@ function composeWithoutModel(itemsByDomain) {
 }
 
 async function main() {
-  const dateStr = beijingToday();
+  const dateStr = requestedDate() || beijingToday();
   const [year, month, day] = dateStr.split("-");
   const outPath = join(DIGEST_DIR, year, month, `${day}.md`);
   const preservedItems = FORCE ? loadDigestItems(outPath) : [];
