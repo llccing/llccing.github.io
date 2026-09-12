@@ -3,16 +3,16 @@
     "name": "Rowan Liu",
     "chineseName": "刘春峰",
     "birthday": "1992.01.10",
-    "headline": "Angular-focused Full-stack Engineer",
+    "headline": "Full-Stack Software Engineer",
     "tagline": "I turn complex enterprise workflows into reliable customer-facing products: modern Angular, Node.js BFF, production troubleshooting, and AI-assisted delivery.",
     "location": "Shanghai, China",
     "email": "lcf33123@163.com",
     "phone": "15542461419",
     "website": "https://rowanliu.com",
-    "targetRole": "Full-stack Developer / Angular + Node.js Engineer",
-    "summary": "10 years across Vue, Angular, React-adjacent frontend systems and backend integration. Currently building Cathay Pacific customer-facing online check-in with Angular and Node.js BFF in an English agile team.",
+    "targetRole": "Full-Stack Software Engineer / Angular + Node.js Engineer",
+    "summary": "10 years of front-end and full-stack development experience specializing in Angular, Vue, Node.js and complex customer-facing systems. Currently building Cathay Pacific's customer-facing online check-in with Angular and Node.js BFF in an English agile team.",
     "education": "B.S. Computer Science and Technology, Heilongjiang Bayi Agricultural University · 2012.09 — 2016.06",
-    "languages": ["English: workable / CET-4", "Chinese: native"]
+    "languages": ["English: CET-4 / able to use English as a working language", "Chinese: native"]
   },
   "design": {
     "direction": "Tech Minimalism",
@@ -35,12 +35,42 @@
     }
   },
   "metrics": [
-    { "value": "10y", "label": "Frontend / full-stack delivery" },
+    { "value": "10y", "label": "Front-end / full-stack delivery" },
     { "value": "80+", "label": "Enterprise pages rebuilt at JD IDC" },
-    { "value": "100k", "label": "Lines migrated in Vue rewrite" },
+    { "value": "100k", "label": "Lines migrated in Vue rebuild" },
     { "value": "2w", "label": "Sprint cadence in English agile team" }
   ],
   "skills": {
+    "frontend": [
+      "Angular",
+      "Vue",
+      "TypeScript",
+      "RxJS",
+      "Tailwind CSS"
+    ],
+    "fullstack": [
+      "Node.js",
+      "NestJS",
+      "Spring Boot",
+      "TypeORM",
+      "BFF",
+      "API",
+      "Auth / SSO"
+    ],
+    "engineeringAndAi": [
+      "Unit testing",
+      "Code Review",
+      "Architecture upgrade",
+      "AI-assisted coding",
+      "AI-assisted test generation",
+      "AI-assisted troubleshooting"
+    ],
+    "learningAndCollaboration": [
+      "Angular new features",
+      "AWS SAA certified",
+      "English collaboration",
+      "Mentoring"
+    ],
     "primary": [
       "Angular",
       "TypeScript",
@@ -69,15 +99,15 @@
     ],
     "miniPrograms": ["Uniapp", "MPX", "WeChat Mini Program"],
     "workflow": [
+      "Unit testing",
+      "Code Review",
+      "Architecture upgrade",
       "English Agile collaboration",
       "Sprint planning / review / retro",
-      "Story grooming",
-      "UAT / regression support",
-      "Code Review",
-      "GitHub Copilot",
-      "Claude",
-      "Figma MCP",
-      "AI-agent code review"
+      "AI-assisted coding / test generation",
+      "AI-assisted code review",
+      "Mentoring",
+      "AWS SAA certified"
     ]
   },
   "featuredSystems": [
@@ -88,12 +118,12 @@
     },
     {
       "name": "JD IDC infrastructure platform",
-      "summary": "Vue.js rewrite from 0 to 1 for an IDC operations platform, covering 80+ pages and roughly 100k lines of frontend code.",
+      "summary": "Vue.js rebuild from 0 to 1 for the IDC operations platform, covering 80+ pages and 100,000 lines of frontend code.",
       "tags": ["Vue.js", "Scaffold", "Analytics", "Enterprise platform"]
     },
     {
       "name": "iCluster Web",
-      "summary": "Angular + Tailwind + Spring Boot product work with design prototyping, Keycloak encapsulation and Angular 13 → 15 upgrade planning.",
+      "summary": "Angular + Tailwind + Spring Boot product delivery with design prototyping, Keycloak encapsulation and the Angular 13 → 15 upgrade.",
       "tags": ["Angular", "Tailwind", "Spring Boot", "Keycloak"]
     }
   ],
@@ -101,21 +131,20 @@
     {
       "id": "accenture-cathay-checkin",
       "type": "work",
-      "company": "Accenture China",
-      "role": "Full-stack / Senior Frontend Engineer",
+      "company": "Accenture (China) Co., Ltd. / 埃森哲（中国）有限公司",
+      "role": "Full-Stack Software Engineer",
       "period": "2024.10 — Present",
       "location": "Shanghai",
       "summary": "Building Cathay Pacific's customer-facing online check-in system with Angular + Node.js BFF under an English agile workflow.",
       "accent": "sky",
       "icon": "terminal",
       "details": [
-        "Develop modern Angular frontend modules for passenger-facing online check-in flows.",
-        "Contribute to Node.js BFF API composition and data filtering between frontend flows and backend services.",
-        "Integrate Scandit-based document scanning for passports, Hong Kong/Macau permits, China residence permits and visas.",
-        "Troubleshoot production issues with analytics and Kibana signals, connecting user behavior to system-level root causes.",
-        "Work in a two-week Sprint cadence across Planning, Review and Retrospective; join Refinement / Story Grooming to clarify backlog scope.",
-        "Support UAT and regression testing while preserving buffer for urgent production or requirement changes.",
-        "Use GitHub Copilot, Claude and AI-agent review patterns to accelerate delivery while keeping human review discipline."
+        "Contributed to Cathay Pacific's customer-facing online check-in system, owning Angular responsive pages, workflow optimization and production issue fixes.",
+        "Developed Node.js BFF aggregation APIs for back-end data composition, filtering and adaptation, reducing front-end processing complexity.",
+        "Drove the Angular 12-to-20 upgrade, adopting Signals and Standalone Components, and built a Scandit component for scanning multiple identity documents.",
+        "Used instrumentation and Kibana to identify identity-recognition issues and drive solutions; participated in English meetings, cross-team collaboration and two-week Sprint delivery.",
+        "Earned the AWS Certified Solutions Architect – Associate (AWS SAA) certification, with a foundation in cloud architecture design and service selection.",
+        "Packaged and reused engineering practices such as unit testing and Code Review, and introduced the official Angular guidance to help the team develop with current Angular syntax and best practices."
       ],
       "tech": [
         "Angular",
@@ -124,28 +153,28 @@
         "BFF",
         "Scandit",
         "Kibana",
-        "Analytics",
-        "Agile",
-        "Copilot",
-        "Claude"
+        "Signals",
+        "Standalone Components",
+        "AWS SAA",
+        "Agile"
       ],
       "impact": "A heavy enterprise travel workflow presented as clear, resilient customer-facing interactions."
     },
     {
       "id": "linkstec-icluster",
       "type": "work",
-      "company": "Linkstec / 凌翔创意软件",
-      "role": "Full-stack Engineer",
+      "company": "Rocket Software (Beijing) Co., Ltd., Dalian Branch / 凌翔创意软件（北京）有限公司大连分公司",
+      "role": "Full-Stack Software Engineer",
       "period": "2022.04 — 2024.09",
       "location": "Dalian",
       "summary": "Led iCluster Web product development across Angular, Tailwind CSS and Spring Boot, including product prototyping and Angular upgrade work.",
       "accent": "lavender",
       "icon": "code",
       "details": [
-        "Led iCluster Web development with Angular, Tailwind CSS and Spring Boot.",
-        "Learned the JHipster toolchain and encapsulated Keycloak-related capabilities in Spring Boot to improve usability.",
-        "Analyzed requirements and used Figma to design product improvement prototypes.",
-        "Researched and planned an Angular upgrade from 13 to 15, including risk assessment, performance and developer-experience improvements."
+        "Led development of the iCluster Web product, delivering front-end and back-end functionality with Angular, Tailwind CSS and Spring Boot.",
+        "Packaged Keycloak authentication capabilities with JHipster and Spring Boot, simplifying integration and use across business systems.",
+        "Used Figma to turn requirements into product prototypes, supporting feature reviews and iteration decisions.",
+        "Planned and implemented the Angular 13-to-15 upgrade, including risk assessment, dependency adaptation and performance optimization."
       ],
       "tech": [
         "Angular",
@@ -161,18 +190,18 @@
     {
       "id": "inno-abp-astrazeneca",
       "type": "work",
-      "company": "Inno Research / 大连英诺瑞新科技",
-      "role": "Full-stack Engineer",
+      "company": "Dalian Innocellence Technology Co., Ltd. / 大连英诺瑞新科技有限公司",
+      "role": "Full-Stack Software Engineer",
       "period": "2020.07 — 2022.04",
       "location": "Dalian",
       "summary": "Built Angular/NestJS business systems, dynamic forms, ABP-based component libraries and AstraZeneca clinic mini-program / PC features.",
       "accent": "mint",
       "icon": "blocks",
       "details": [
-        "Developed dynamic form features with Angular, NG-ZORRO, RxJS, NestJS and TypeORM.",
-        "Built mini-program and PC-side clinic project features for AstraZeneca with Uniapp and reusable common components.",
-        "Encapsulated business component libraries and frontend layout components based on ABP projects to improve reuse.",
-        "Handled effort estimation, task assignment, Code Review and mentoring for junior engineers."
+        "Developed dynamic form functionality with Angular, NG-ZORRO, RxJS, NestJS and TypeORM.",
+        "Built a mini program and PC application for AstraZeneca clinic projects, using uni-app to consolidate foundational code and shared components.",
+        "Packaged business component libraries and frontend layout components based on ABP projects to improve reuse.",
+        "Responsible for effort estimation, task allocation, code reviews and mentoring new team members."
       ],
       "tech": [
         "Angular",
@@ -189,17 +218,17 @@
     {
       "id": "didi-driver-h5",
       "type": "work",
-      "company": "DiDi / 北京嘀嘀无限科技",
-      "role": "Senior Frontend Engineer",
+      "company": "Beijing Didi Infinity Technology Development Co., Ltd. / 北京嘀嘀无限科技发展有限公司",
+      "role": "Senior Front-End Software Engineer",
       "period": "2019.11 — 2020.07",
       "location": "Beijing",
-      "summary": "Delivered C-side H5 and mini-program activity pages for drivers, with strong design fidelity and fast framework learning.",
+      "summary": "Delivered driver-side H5 and mini-program promotional pages, with strong design fidelity and fast framework learning.",
       "accent": "peach",
       "icon": "code",
       "details": [
-        "Developed C-side H5 pages for driver daily activities and collaborated closely with designers to reach 99% design fidelity.",
-        "Researched Vue CLI upgrade paths for shared team plugins compatible with @vue/cli 4.",
-        "Quickly learned the MPX framework and delivered WeChat mini-program features on schedule."
+        "Developed driver-side promotional H5 pages and worked with the design team to achieve approximately 99% design fidelity and interaction accuracy.",
+        "Upgraded the team's Vue CLI shared plugins for @vue/cli 4 compatibility.",
+        "Learned the MPX framework and delivered WeChat mini programs on schedule."
       ],
       "tech": [
         "Vue",
@@ -214,18 +243,18 @@
     {
       "id": "jd-idc-platform",
       "type": "work",
-      "company": "JD / 北京京东尚科信息技术",
-      "role": "Frontend Engineer",
+      "company": "Beijing JD Shangke Information Technology Co., Ltd. / 北京京东尚科信息技术有限公司",
+      "role": "Front-End Software Engineer",
       "period": "2017.09 — 2019.11",
       "location": "Beijing",
       "summary": "Rebuilt the IDC infrastructure platform with Vue.js from 0 to 1: 80+ pages, around 100k lines, scaffolding and analytics.",
       "accent": "sky",
       "icon": "terminal",
       "details": [
-        "Learned and used Vue.js to rebuild the IDC infrastructure platform from 0 to 1, covering 80+ pages and roughly 100k lines of code.",
-        "Developed work-order business modules with advanced Vue patterns to decouple code and support team collaboration.",
-        "Created the idc-cli scaffold for work-order templates to improve development efficiency.",
-        "Introduced analytics collection for pages and specified positions, giving PMs data support for feature usage analysis."
+        "Rebuilt the IDC infrastructure platform from the ground up with Vue.js, covering 100,000 lines of code and more than 80 pages.",
+        "Developed the work-order module with advanced Vue patterns to decouple code and support team collaboration.",
+        "Developed the idc-cli scaffolding, added instrumentation for pages and specified positions.",
+        "Continuously upgraded project dependencies to improve collaboration and maintenance efficiency."
       ],
       "tech": [
         "Vue.js",
@@ -240,16 +269,16 @@
     {
       "id": "botu-foundation",
       "type": "work",
-      "company": "Botu / 北京博图纵横科技",
-      "role": "Frontend Engineer",
+      "company": "Beijing Botu Zongheng Technology Co., Ltd. / 北京博图纵横科技有限责任公司",
+      "role": "Front-End Software Engineer",
       "period": "2016.02 — 2017.08",
       "location": "Beijing",
       "summary": "Built frontend foundations with RequireJS, Bootstrap, jQuery, HTML/CSS and Gulp/browser-sync tooling.",
       "accent": "lavender",
       "icon": "blocks",
       "details": [
-        "Set up project frontend structure with RequireJS, Bootstrap, jQuery, HTML and CSS3.",
-        "Introduced Gulp and browser-sync tooling to improve development efficiency."
+        "Built project frameworks with RequireJS, Bootstrap, jQuery, HTML and CSS3.",
+        "Introduced Gulp and browser-sync to improve development efficiency."
       ],
       "tech": [
         "RequireJS",
@@ -264,21 +293,19 @@
     }
   ],
   "personalLab": {
-    "name": "Magic Literacy Garden",
-    "role": "Personal product / full-stack exploration",
-    "summary": "A child literacy and character-recognition product idea designed around a real first user: Julianna.",
+    "name": "Personal Projects & Writing",
+    "role": "Side projects / technical writing",
+    "summary": "Side projects and a long-running technical blog that keep engineering skills sharp outside of work.",
     "details": [
-      "Explore product loops for children learning characters through friendly, repeatable interactions.",
-      "Use Julianna as the initial user group to keep the product grounded in real behavior instead of abstract features.",
-      "Potentially combine frontend play patterns, progress tracking, speech/recognition and AI-assisted content generation.",
-      "Positioned as a warm personal product that also demonstrates full-stack product ownership."
+      "Maintains a personal technical blog covering frontend architecture, framework upgrades and engineering practice.",
+      "Builds small full-stack side projects to explore product thinking end to end.",
+      "Actively uses AI tooling to assist coding, test generation and code review."
     ],
     "tech": [
       "Product thinking",
-      "Frontend UX",
-      "Learning loops",
-      "AI-assisted content",
-      "Family-first testing"
+      "Front-end UX",
+      "Technical writing",
+      "AI-assisted delivery"
     ]
   },
   "projects": [
@@ -303,14 +330,14 @@
   "zh": {
     "profile": {
       "tagline": "在复杂企业工作流与真实用户产品之间建立连接：现代 Angular、Node.js BFF、生产排障与 AI 辅助交付。",
-      "summary": "10 年 Vue、Angular 及相关前端与后端集成经验。当前在埃森哲以 Angular + Node.js BFF 构建国泰航空在线值机系统，全程英文敏捷协作。",
+      "summary": "10 年前端及全栈开发经验，专注 Angular、Vue、Node.js 及复杂 C 端业务系统，具备英文会议与跨团队敏捷协作经验。当前在埃森哲以 Angular + Node.js BFF 构建国泰航空在线值机系统。",
       "targetRole": "全栈开发工程师 / Angular + Node.js",
       "education": "计算机科学与技术学士，黑龙江八一农垦大学 · 2012.09 — 2016.06"
     },
     "metrics": [
       { "value": "10年", "label": "前端 / 全栈交付" },
       { "value": "80+", "label": "京东 IDC 重建页面数" },
-      { "value": "100k", "label": "Vue 重写迁移行数" },
+      { "value": "10万行", "label": "Vue 重写迁移行数" },
       { "value": "2周", "label": "英文敏捷迭代周期" }
     ],
     "featuredSystems": [
@@ -330,86 +357,84 @@
     "experiences": [
       {
         "id": "accenture-cathay-checkin",
-        "role": "全栈 / 高级前端工程师",
+        "role": "全栈开发工程师",
         "summary": "以 Angular + Node.js BFF，在英文敏捷团队中构建国泰航空面向用户的在线值机系统。",
         "details": [
-          "开发面向旅客的在线值机前端模块（现代 Angular 实现）。",
-          "参与 Node.js BFF 的 API 聚合与数据过滤，衔接前端流程与后端服务。",
-          "集成基于 Scandit 的证件扫描功能，支持护照、港澳通行证、中国居留许可及签证识别。",
-          "通过数据分析平台与 Kibana 排查生产问题，将用户行为关联至系统级根因。",
-          "以两周为一个 Sprint 节奏参与计划、评审与回顾会议，加入 Refinement/Story Grooming 明确 Backlog 范围。",
-          "提供 UAT 与回归测试支持，同时为紧急生产问题或需求变更预留缓冲空间。",
-          "借助 GitHub Copilot、Claude 及 AI Agent 代码审查模式提速交付，并保持人工审查规范。"
+          "参与国泰航空 C 端线上值机系统开发，负责 Angular 响应式页面、流程优化及线上问题修复。",
+          "开发 Node.js BFF 聚合接口，完成后端数据组合、过滤与适配，降低前端处理复杂度。",
+          "推进 Angular 12 至 20 技术升级，应用 Signal、Standalone Component 等模式，并封装 Scandit 多证件扫描组件。",
+          "通过埋点和 Kibana 定位证件识别异常并推动方案落地；参与英文会议、跨团队协作及两周 Sprint 交付。",
+          "取得 AWS Certified Solutions Architect – Associate（AWS SAA）认证，具备云架构设计和服务选型基础。",
+          "在项目中封装并复用单元测试、Code Review 等工程实践 Skill，并引入 Angular 官方 Skill，辅助团队按照最新 Angular 语法和最佳实践开发。"
         ],
         "impact": "将繁重的企业旅行工作流呈现为清晰、稳健的面向用户交互体验。"
       },
       {
         "id": "linkstec-icluster",
-        "role": "全栈工程师",
+        "role": "全栈开发工程师",
         "summary": "主导 Angular + Tailwind CSS + Spring Boot 的 iCluster Web 产品研发，含产品原型设计与 Angular 升级工作。",
         "details": [
-          "主导 iCluster Web 开发，技术栈为 Angular、Tailwind CSS 与 Spring Boot。",
-          "学习 JHipster 工具链，在 Spring Boot 中封装 Keycloak 相关能力，提升可用性。",
-          "分析需求并使用 Figma 设计产品改进原型。",
-          "研究并规划 Angular 从 13 到 15 的升级方案，含风险评估、性能提升与开发体验改进。"
+          "主导 iCluster Web 产品开发，使用 Angular、Tailwind CSS 与 Spring Boot 完成前后端功能交付。",
+          "基于 JHipster 与 Spring Boot 封装 Keycloak 认证能力，简化业务系统接入与使用。",
+          "使用 Figma 将需求转化为产品原型，支持功能评审和迭代决策。",
+          "制定并实施 Angular 13 至 15 升级方案，完成风险评估、依赖适配及性能优化。"
         ],
         "impact": "面向产品的全栈工作：从需求与原型，到框架升级与后端集成。"
       },
       {
         "id": "inno-abp-astrazeneca",
-        "role": "全栈工程师",
+        "role": "全栈开发工程师",
         "summary": "构建 Angular/NestJS 业务系统、动态表单、基于 ABP 的组件库及阿斯利康诊所小程序/PC 端功能。",
         "details": [
           "基于 Angular、NG-ZORRO、RxJS、NestJS 与 TypeORM 开发动态表单功能。",
-          "使用 Uniapp 及可复用通用组件，为阿斯利康开发诊所项目的小程序与 PC 端功能。",
-          "基于 ABP 项目封装业务组件库与前端布局组件，提升代码复用率。",
-          "负责工期估算、任务分配、代码审查及初级工程师指导。"
+          "为阿斯利康诊所项目开发小程序与 PC 端，使用 uni-app 沉淀基础代码和公共组件。",
+          "基于 ABP 封装业务组件库和布局组件。",
+          "负责工作量评估、任务分配、代码审查及新人指导。"
         ],
         "impact": "将实际交付与组件复用、工期估算、团队工程支持有机结合。"
       },
       {
         "id": "didi-driver-h5",
-        "role": "高级前端工程师",
+        "role": "高级前端开发工程师",
         "summary": "交付面向司机的 C 端 H5 及小程序活动页面，高度还原设计稿，快速上手新框架。",
         "details": [
-          "开发司机日常活动的 C 端 H5 页面，与设计师紧密协作，UI 还原度达 99%。",
-          "研究适配 @vue/cli 4 的团队共享插件的 Vue CLI 升级路径。",
-          "快速掌握 MPX 框架，按期交付微信小程序功能。"
+          "负责司机端活动 H5 页面开发，与设计团队协作完成约 99% 设计还原度和交互实现。",
+          "升级团队 Vue CLI 公共插件以兼容 @vue/cli 4。",
+          "使用 MPX 完成微信小程序开发与交付。"
         ],
         "impact": "面向消费者的高速前端交付：高度还原设计稿，快速适应新内部框架。"
       },
       {
         "id": "jd-idc-platform",
-        "role": "前端工程师",
-        "summary": "以 Vue.js 从 0 到 1 重写 IDC 基础设施平台：80+ 页面，约 10 万行代码，自建脚手架与数据分析。",
+        "role": "前端开发工程师",
+        "summary": "以 Vue.js 从 0 到 1 重构 IDC 基础设施平台：80+ 页面，10 万行代码，自建脚手架与数据埋点。",
         "details": [
-          "学习并应用 Vue.js 从 0 到 1 重写 IDC 基础设施平台，覆盖 80+ 页面、约 10 万行代码。",
-          "以高级 Vue 模式开发工单业务模块，解耦代码，支持团队协作。",
-          "创建 idc-cli 脚手架以生成工单模板，提升开发效率。",
-          "引入页面与关键位置的数据埋点，为产品经理提供功能使用分析的数据支撑。"
+          "使用 Vue.js 从 0 到 1 重构 IDC 基础设施平台，覆盖 10 万行代码及 80 余个页面。",
+          "开发工单模块，以高级 Vue 模式解耦代码，支持团队协作。",
+          "开发 idc-cli 脚手架，引入埋点并持续升级项目依赖。",
+          "持续升级项目依赖，提升协作和维护效率。"
         ],
         "impact": "体现规模、全局意识与平台思维的基础性企业重写项目。"
       },
       {
         "id": "botu-foundation",
-        "role": "前端工程师",
-        "summary": "以 RequireJS、Bootstrap、jQuery、HTML/CSS 及 Gulp/browser-sync 工具链构建前端基础工程。",
+        "role": "前端开发工程师",
+        "summary": "以 RequireJS、Bootstrap、jQuery、HTML/CSS 及 Gulp/browser-sync 工具链搭建项目框架。",
         "details": [
-          "使用 RequireJS、Bootstrap、jQuery、HTML 与 CSS3 搭建项目前端结构。",
-          "引入 Gulp 与 browser-sync 工具链，提升开发效率。"
+          "使用 RequireJS、Bootstrap、jQuery、HTML 与 CSS3 搭建项目框架。",
+          "引入 Gulp 和 browser-sync 提升开发效率。"
         ],
         "impact": "通过动手实践的框架搭建与工作流自动化，奠定坚实的前端基础。"
       }
     ],
     "personalLab": {
-      "name": "Magic Literacy Garden（魔法识字园）",
-      "role": "个人产品 / 全栈探索",
-      "summary": "一个面向儿童识字与汉字认知的产品构想，以真实的第一位用户——Julianna——为设计原点。",
+      "name": "个人项目与技术写作",
+      "role": "业余项目 / 技术写作",
+      "summary": "在工作之外，通过业余项目与长期技术博客保持工程手感。",
       "details": [
-        "探索儿童通过友好、可重复交互学习汉字的产品闭环。",
-        "以 Julianna 为初始用户，让产品根植于真实行为，而非抽象功能。",
-        "可能结合前端互动模式、学习进度追踪、语音/图像识别与 AI 辅助内容生成。",
-        "定位为温暖的个人产品，同时体现完整的全栈产品所有权。"
+        "维护个人技术博客，内容覆盖前端架构、框架升级与工程实践。",
+        "构建小型全栈项目，端到端探索产品思维。",
+        "积极使用 AI 工具辅助编码、测试生成与代码审查。"
       ]
     },
     "ui": {
