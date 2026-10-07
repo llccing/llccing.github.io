@@ -1,5 +1,6 @@
 ---
 title: "Integrating with Third-Party Widget Injection: A Guide to Inter-Widget Communication"
+slug: third-party-widget-communication
 pubDatetime: 2026-08-07T10:00:00+08:00
 description: "Learn how third-party scripts inject UI widgets into your web app and discover practical patterns for communicating between third-party widgets and your own components."
 author: Rowan Liu
