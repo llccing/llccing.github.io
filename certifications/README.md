@@ -8,7 +8,7 @@
 
 ```
 certifications/aws/
-├── CPE/                          # AWS Certified AI Practitioner (AIF-C01)
+├── AIF-C01/                          # AWS Certified AI Practitioner (AIF-C01)
 │   ├── 01Features/               # 15 个 AWS AI 服务速查（Bedrock / SageMaker / Comprehend ...）
 │   ├── 02Terms/                  # 22 个关键术语（Hallucination / RLHF / XGBoost ...）
 │   ├── 03TrickQuestions/         # 44 道易错/真题解析
@@ -20,11 +20,13 @@ certifications/aws/
     └── README.md
 ```
 
+
+
 ## 备考优先级（当前目标：先考 AIF-C01）
 
-1. **CPE/02Terms** — 术语是理解题目的基础，先过一遍
-2. **CPE/01Features** — 每个 AI 服务的定位与差异（Bedrock vs SageMaker 是高频考点）
-3. **CPE/03TrickQuestions** — 44 道题带着看，暴露薄弱点
+1. **AIF/02Terms** — 术语是理解题目的基础，先过一遍
+2. **AIF/01Features** — 每个 AI 服务的定位与差异（Bedrock vs SageMaker 是高频考点）
+3. **AIF/03TrickQuestions** — 44 道题带着看，暴露薄弱点
 4. 配套动手实验见仓库根目录 `experiments/aif-c01/`
 
 ## 迁移说明
