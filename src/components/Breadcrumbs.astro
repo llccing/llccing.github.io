@@ -11,62 +11,87 @@ const breadcrumbList = currentUrlPath.split("/").slice(1);
 breadcrumbList[0] === "posts" &&
   breadcrumbList.splice(0, 2, `Posts (page ${breadcrumbList[1] || 1})`);
 
-// if breadcrumb is Home > Tags > [tag] > [page] <etc>
-// replace [tag] > [page] with [tag] (page number)
-breadcrumbList[0] === "tags" &&
-  !isNaN(Number(breadcrumbList[2])) &&
-  breadcrumbList.splice(
-    1,
-    3,
-    `${breadcrumbList[1]} ${
-      Number(breadcrumbList[2]) === 1 ? "" : "(page " + breadcrumbList[2] + ")"
-    }`
-  );
+const isHome = breadcrumbList.length === 0;
 ---
 
-<nav class="breadcrumb" aria-label="breadcrumb">
-  <ul>
-    <li>
-      <a href="/">Home</a>
-      <span aria-hidden="true">&raquo;</span>
-    </li>
-    {
-      breadcrumbList.map((breadcrumb, index) =>
-        index + 1 === breadcrumbList.length ? (
-          <li>
-            <span
-              class={`${index > 0 ? "lowercase" : "capitalize"}`}
-              aria-current="page"
-            >
-              {/* make the last part lowercase in Home > Tags > some-tag */}
-              {decodeURIComponent(breadcrumb)}
-            </span>
-          </li>
-        ) : (
-          <li>
-            <a href={`/${breadcrumb}/`}>{breadcrumb}</a>
-            <span aria-hidden="true">&raquo;</span>
-          </li>
-        )
-      )
-    }
-  </ul>
-</nav>
+{
+  !isHome && (
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <ol>
+        <li>
+          <a href="/">首页</a>
+          <span class="crumb-sep" aria-hidden="true">
+            /
+          </span>
+        </li>
+        {breadcrumbList.map((breadcrumb, index) =>
+          index + 1 === breadcrumbList.length ? (
+            <li>
+              <span aria-current="page">{decodeURIComponent(breadcrumb)}</span>
+            </li>
+          ) : (
+            <li>
+              <a href={`/${breadcrumb}/`}>{breadcrumb}</a>
+              <span class="crumb-sep" aria-hidden="true">
+                /
+              </span>
+            </li>
+          )
+        )}
+      </ol>
+    </nav>
+  )
+}
 
 <style>
   .breadcrumb {
-    @apply mx-auto mb-1 mt-8 w-full max-w-3xl px-4;
+    width: 100%;
+    max-width: var(--measure-wide);
+    margin: 0 auto;
+    padding: 1.25rem var(--gutter) 0;
   }
-  .breadcrumb ul li {
-    @apply inline;
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
-  .breadcrumb ul li a {
-    @apply capitalize opacity-70;
+
+  .breadcrumb li {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
   }
-  .breadcrumb ul li span {
-    @apply opacity-70;
+
+  .breadcrumb a {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: var(--step-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
   }
-  .breadcrumb ul li:not(:last-child) a {
-    @apply hover:opacity-100;
+  .breadcrumb a:hover {
+    color: var(--accent);
+  }
+
+  .breadcrumb [aria-current="page"] {
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--step-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .crumb-sep {
+    color: var(--faint);
+    font-size: var(--step-eyebrow);
   }
 </style>

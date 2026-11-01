@@ -6,60 +6,72 @@ export interface Props {
   href?: string;
   frontmatter: CollectionEntry<"blog">["data"];
   secHeading?: boolean;
+  featured?: boolean;
+  headingLevel?: 2 | 3 | 4 | 5;
   itemClassName?: string;
   itemData?: Record<string, string>;
 }
 
+/**
+ * 视觉与 Card.astro 完全一致 —— 两者共用 editorial.css 里的 .doc-row 实现。
+ * 这里保留 React 版本只是因为 Search.tsx 是客户端 island。
+ */
 export default function Card({
   href,
   frontmatter,
   secHeading = true,
+  featured = false,
+  headingLevel,
   itemClassName = "",
   itemData = {},
 }: Props) {
   const { title, pubDatetime, modDatetime, description, tags } = frontmatter;
-  const displayDate = new Date(
+
+  const display = new Date(
     modDatetime && modDatetime > pubDatetime ? modDatetime : pubDatetime
-  ).toLocaleDateString(LOCALE.langTag, {
-    year: "numeric",
+  );
+
+  const year = display.toLocaleDateString(LOCALE.langTag, { year: "numeric" });
+  const monthDay = display.toLocaleDateString(LOCALE.langTag, {
     month: "short",
     day: "2-digit",
   });
 
-  const headerProps = {
-    style: { viewTransitionName: slugifyStr(title) },
-    className: "text-xl font-semibold leading-tight sm:text-2xl",
-  };
+  const level = headingLevel ?? (featured || secHeading ? 2 : 3);
+  const HeadingTag = `h${level}` as "h2" | "h3" | "h4" | "h5";
 
   return (
     <li
-      className={`group border-b border-skin-line ${itemClassName}`.trim()}
+      className={["doc-row", featured ? "doc-row--featured" : "", itemClassName]
+        .filter(Boolean)
+        .join(" ")}
       {...itemData}
     >
-      <a
-        href={href}
-        className="relative block px-1 py-6 text-skin-base no-underline sm:grid sm:grid-cols-[10rem_minmax(0,1fr)_4rem] sm:gap-6 sm:px-0 sm:py-7"
-      >
-        <div className="mb-3 flex items-center justify-between pr-8 text-xs font-semibold uppercase opacity-60 sm:mb-0 sm:block sm:pr-0">
-          <time dateTime={new Date(pubDatetime).toISOString()}>
-            {displayDate}
+      <a href={href} className="doc-row__link">
+        <span className="doc-row__date">
+          <time
+            dateTime={new Date(pubDatetime).toISOString()}
+            className="doc-row__year"
+          >
+            {year}
           </time>
-          <span className="sm:mt-2 sm:block">{tags[0] ?? "Note"}</span>
-        </div>
-        <div>
-          {secHeading ? (
-            <h2 {...headerProps}>{title}</h2>
-          ) : (
-            <h3 {...headerProps}>{title}</h3>
-          )}
-          <p className="mb-0 mt-3 max-w-3xl text-sm leading-7 opacity-70">
-            {description}
-          </p>
-        </div>
-        <span
-          aria-hidden="true"
-          className="absolute right-1 top-6 text-lg transition-transform group-hover:translate-x-1 sm:static sm:justify-self-end"
-        >
+          <span className="doc-row__day">{monthDay}</span>
+        </span>
+
+        <span className="doc-row__body">
+          <span className="doc-row__tags">
+            {(tags[0] ?? "note").trim().toLowerCase()}
+          </span>
+          <HeadingTag
+            className="doc-row__title"
+            style={{ viewTransitionName: slugifyStr(title) }}
+          >
+            {title}
+          </HeadingTag>
+          {description && <p className="doc-row__desc">{description}</p>}
+        </span>
+
+        <span className="doc-row__go" aria-hidden="true">
           ↗
         </span>
       </a>

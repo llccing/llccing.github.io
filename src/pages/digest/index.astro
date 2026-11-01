@@ -41,39 +41,48 @@ const archive = groupByMonth(entries);
   >
     {
       entries.length === 0 ? (
-        <p class="empty">
+        <p class="micro">
           还没有简报。运行 <code>pnpm digest</code> 生成第一条。
         </p>
       ) : (
         <>
-          <section>
-            <div class="section-head">
+          <section class="subsection">
+            <div class="subhead">
               <h2>最新 · {digestDate(latest!)}</h2>
-              <a href={digestPath(latest!)}>查看全文 →</a>
+              <a class="subhead__action" href={digestPath(latest!)}>
+                查看全文 →
+              </a>
             </div>
-            <p class="counts">
+            <p class="micro">
               {latest!.data.itemCount} 条 · 由 {latest!.data.generatedBy} 生成
             </p>
             {latestGroups.map(group => (
               <div class="domain-block">
-                <h3>
-                  {group.label}
-                  <span class="badge">{group.sources.length}</span>
-                </h3>
+                <div class="subhead">
+                  <h3>
+                    {group.label}
+                    <span class="badge">{group.sources.length}</span>
+                  </h3>
+                </div>
                 <DigestSourceList sources={group.sources} />
               </div>
             ))}
           </section>
 
-          <section>
-            <h2>本周</h2>
-            <p class="counts">
+          <section class="subsection">
+            <div class="subhead">
+              <h2>本周</h2>
+            </div>
+            <p class="micro">
               {week.length} 天 · {weekSources.length} 条引用
             </p>
-            <ul class="strip">
+            <ul class="chip-row">
               {weekCounts.map(({ domain, label, count }) => (
-                <li class={count === 0 ? "muted" : ""}>
-                  <a href={`/digest/domain/${domain}/`}>
+                <li>
+                  <a
+                    class={count === 0 ? "chip is-empty" : "chip"}
+                    href={`/digest/domain/${domain}/`}
+                  >
                     {label} <span class="badge">{count}</span>
                   </a>
                 </li>
@@ -81,19 +90,25 @@ const archive = groupByMonth(entries);
             </ul>
           </section>
 
-          <section>
-            <h2>本月</h2>
-            <p class="counts">
+          <section class="subsection">
+            <div class="subhead">
+              <h2>本月</h2>
+            </div>
+            <p class="micro">
               {month.length} 天 · {monthSources.length} 条引用
             </p>
           </section>
 
-          <section>
-            <h2>归档</h2>
+          <section class="subsection">
+            <div class="subhead">
+              <h2>归档</h2>
+            </div>
             {archive.map(({ month: label, entries: monthEntries }) => (
               <div class="archive-month">
-                <h3>{label}</h3>
-                <ul class="days">
+                <div class="subhead">
+                  <h3>{label}</h3>
+                </div>
+                <ul class="day-grid">
                   {monthEntries.map(entry => (
                     <li>
                       <a href={digestPath(entry)}>
@@ -113,49 +128,10 @@ const archive = groupByMonth(entries);
 </Layout>
 
 <style>
-  section {
-    @apply mb-10;
-  }
-  .section-head {
-    @apply flex flex-wrap items-baseline justify-between gap-2;
-  }
-  .section-head a {
-    @apply text-sm underline decoration-dashed underline-offset-4 hover:text-skin-accent;
-  }
-  h2 {
-    @apply text-xl font-semibold;
-  }
-  h3 {
-    @apply mt-4 flex items-center gap-2 text-lg font-medium;
-  }
-  .counts {
-    @apply !my-1 text-sm not-italic opacity-70;
-  }
-  .badge {
-    @apply rounded bg-skin-card px-1.5 py-0.5 text-xs font-normal opacity-80;
-  }
-  .strip {
-    @apply mt-2 flex flex-wrap gap-2;
-  }
-  .strip li a {
-    @apply flex items-center gap-1.5 rounded border border-skin-line px-3 py-1.5 text-sm hover:border-skin-accent hover:text-skin-accent;
-  }
-  .strip li.muted {
-    @apply opacity-40;
-  }
   .domain-block {
-    @apply mt-3;
+    margin-top: 1.75rem;
   }
   .archive-month {
-    @apply mt-3;
-  }
-  .days {
-    @apply mt-1 flex flex-wrap gap-1.5;
-  }
-  .days a {
-    @apply inline-block rounded border border-skin-line px-2 py-1 font-mono text-xs hover:border-skin-accent hover:text-skin-accent;
-  }
-  .empty code {
-    @apply rounded bg-skin-card px-1.5 py-0.5 text-sm;
+    margin-top: 1.75rem;
   }
 </style>

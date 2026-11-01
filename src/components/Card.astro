@@ -1,0 +1,73 @@
+---
+import { slugifyStr } from "@utils/slugify";
+import type { CollectionEntry } from "astro:content";
+import { LOCALE } from "@config";
+
+export interface Props {
+  href?: string;
+  frontmatter: CollectionEntry<"blog">["data"];
+  secHeading?: boolean;
+  /** true = featured 大卡（首页 / 归档重点位） */
+  featured?: boolean;
+  /** 显式指定标题级别，用于年份分组等更深的信息层级 */
+  headingLevel?: 2 | 3 | 4 | 5;
+  itemClassName?: string;
+  itemData?: Record<string, string>;
+}
+
+const {
+  href,
+  frontmatter,
+  secHeading = true,
+  featured = false,
+  headingLevel,
+  itemClassName = "",
+  itemData = {},
+} = Astro.props;
+
+const { title, pubDatetime, modDatetime, description, tags } = frontmatter;
+
+const iso = new Date(pubDatetime).toISOString();
+const display = new Date(
+  modDatetime && modDatetime > pubDatetime ? modDatetime : pubDatetime
+);
+
+const year = display.toLocaleDateString(LOCALE.langTag, { year: "numeric" });
+const monthDay = display.toLocaleDateString(LOCALE.langTag, {
+  month: "short",
+  day: "2-digit",
+});
+
+const HeadingTag = `h${headingLevel ?? (featured || secHeading ? 2 : 3)}` as
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5";
+---
+
+<li
+  class:list={["doc-row", itemClassName, { "doc-row--featured": featured }]}
+  {...itemData}
+>
+  <a href={href} class="doc-row__link">
+    <span class="doc-row__date">
+      <time datetime={iso} class="doc-row__year">{year}</time>
+      <span class="doc-row__day">{monthDay}</span>
+    </span>
+
+    <span class="doc-row__body">
+      <span class="doc-row__tags">
+        {(tags[0] ?? "note").trim().toLowerCase()}
+      </span>
+      <HeadingTag
+        class="doc-row__title"
+        style={{ viewTransitionName: slugifyStr(title) }}
+      >
+        {title}
+      </HeadingTag>
+      {description && <p class="doc-row__desc">{description}</p>}
+    </span>
+
+    <span class="doc-row__go" aria-hidden="true">↗</span>
+  </a>
+</li>

@@ -3,13 +3,15 @@ import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Tag from "@components/Tag.astro";
-import Datetime from "@components/Datetime";
-import { type CollectionEntry, getEntry } from "astro:content";
+import MetaRow from "@components/MetaRow.astro";
+import Toc from "@components/Toc.astro";
+import { type CollectionEntry, getCollection, getEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
 import Comments from "@components/Comments";
 import InlineComments from "@components/InlineComments";
-import { SITE } from "@config";
+import { LOCALE, SITE } from "@config";
+import getSortedPosts from "@utils/getSortedPosts";
 
 export interface Props {
   post: CollectionEntry<"blog"> | CollectionEntry<"short-stories">;
@@ -30,9 +32,72 @@ const {
 
 const { Content, headings, remarkPluginFrontmatter } = await post.render();
 const minutesRead = remarkPluginFrontmatter?.minutesRead;
-const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 const commentsApiUrl = import.meta.env.PUBLIC_COMMENTS_API_URL;
 const inlineCommentsEnabled = import.meta.env.PUBLIC_INLINE_COMMENTS === "true";
+
+/* ── 档案元数据：编号 / 领域 / 篇幅 / 证据来源数 ───────────── */
+const isBlog = post.collection === "blog";
+
+const DOMAIN_LABELS: Record<string, string> = {
+  frontend: "前端工程",
+  life: "生活记录",
+  other: "杂记",
+  ai: "AI",
+  backend: "后端工程",
+};
+
+const domainKey = post.id.includes("/")
+  ? post.id.split("/").slice(0, -1).join("/")
+  : "other";
+const domainLabel = DOMAIN_LABELS[domainKey] ?? domainKey;
+
+let docNo = "---";
+let totalNo = 0;
+if (isBlog) {
+  const allPosts = getSortedPosts(await getCollection("blog"));
+  totalNo = allPosts.length;
+  const idx = allPosts.findIndex(p => p.slug === post.slug);
+  if (idx >= 0) docNo = String(totalNo - idx).padStart(3, "0");
+}
+
+// 证据块与外链都从原始正文统计 —— 这是「一手证据」文章的骨架强度
+const body =
+  typeof (post as { body?: string }).body === "string"
+    ? (post as { body?: string }).body!
+    : "";
+const evidenceCount = (body.match(/is-evidence/g) ?? []).length;
+const citationCount = new Set(body.match(/https?:\/\/[^\s)"'）」』\]]+/g) ?? [])
+  .size;
+
+const shortDate = (d: Date) =>
+  d.toLocaleDateString(LOCALE.langTag, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+const railMeta = [
+  { label: "编号", value: isBlog ? `No.${docNo}` : "NO." },
+  { label: "领域", value: domainLabel },
+  { label: "发布于", value: shortDate(new Date(pubDatetime)) },
+  ...(modDatetime && modDatetime > pubDatetime
+    ? [{ label: "更新于", value: shortDate(new Date(modDatetime)) }]
+    : []),
+  { label: "篇幅", value: minutesRead ?? "—" },
+  { label: "域外引用", value: `${citationCount}` },
+  ...(evidenceCount > 0
+    ? [{ label: "反例举证", value: `${evidenceCount}` }]
+    : []),
+];
+
+const inlineMeta: typeof railMeta = [
+  { label: "归档", value: isBlog ? `No.${docNo} / ${totalNo}` : "NO." },
+  { label: "更新", value: shortDate(new Date(modDatetime ?? pubDatetime)) },
+  { label: "篇幅", value: minutesRead ?? "—" },
+  ...(evidenceCount > 0
+    ? [{ label: "举证", value: `${evidenceCount} 处` }]
+    : []),
+];
 
 // Translation support
 const isTranslation =
@@ -67,195 +132,286 @@ const layoutProps = {
 <Layout {...layoutProps}>
   <Header />
 
-  <!-- <div class="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill">
-    <div class="progress-bar h-1 w-0 bg-skin-accent" id="myBar"></div>
-  </div> -->
-
-  <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
-    <button
-      class="focus-outline mb-2 mt-8 flex hover:opacity-75"
-      onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-        ></path>
-      </svg><span>Go back</span>
-    </button>
+  <div
+    class="mx-auto w-full"
+    style="max-width: var(--measure-wide); padding-inline: var(--gutter)"
+  >
+    <a class="doc-back focus-outline" href="/posts/">
+      <span aria-hidden="true">←</span> 返回归档
+    </a>
   </div>
-  <main id="main-content">
-    <h1 transition:name={slugifyStr(title)} class="post-title">{title}</h1>
-    <Datetime
-      pubDatetime={pubDatetime}
-      modDatetime={modDatetime}
-      size="lg"
-      className="my-2"
-      readingTime={minutesRead}
-    />
-    {
-      isTranslation && OriginalContent ? (
-        <>
-          <div class="translation-controls mx-auto mt-4 flex max-w-3xl items-center gap-1 rounded-lg bg-skin-card bg-opacity-60 p-1">
-            <button class="toggle-btn active" data-view="translated">
-              译文
-            </button>
-            <button class="toggle-btn" data-view="original">
-              原文
-            </button>
-            <button class="toggle-btn" data-view="comparison">
-              对照
-            </button>
-          </div>
-          <div id="translation-container" class="mt-8">
-            <article
-              id="article-original"
-              role="article"
-              class="prose mx-auto max-w-3xl"
-              hidden
-            >
-              <OriginalContent />
-            </article>
-            <article
-              id="article-translated"
-              role="article"
-              class="prose mx-auto max-w-3xl"
-            >
-              {tocHeadings.length >= 3 && (
-                <details class="toc" open>
-                  <summary class="cursor-pointer font-bold">目录</summary>
-                  <ul class="mt-2">
-                    {tocHeadings.map(h => (
-                      <li style={`margin-left: ${(h.depth - 2) * 1}rem`}>
-                        <a href={`#${h.slug}`}>{h.text}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
+
+  <main id="main-content" class="dossier">
+    <header class="dossier__head">
+      <p class="eyebrow dossier__eyebrow">
+        {domainLabel} · {isBlog ? `No.${docNo}` : "存档"}
+      </p>
+      <h1 transition:name={slugifyStr(title)} class="dossier__title">
+        {title}
+      </h1>
+      {description && <p class="dossier__lede">{description}</p>}
+      <MetaRow items={inlineMeta} orientation="inline" />
+    </header>
+
+    <div class="dossier__grid">
+      <aside class="dossier__rail" aria-label="文档信息">
+        <MetaRow items={railMeta} orientation="stack" />
+        <Toc headings={headings} />
+      </aside>
+
+      <div class="dossier__content">
+        {
+          isTranslation && OriginalContent ? (
+            <>
+              <div
+                class="translation-controls"
+                role="group"
+                aria-label="译文切换"
+              >
+                <button class="pill is-active" data-view="translated">
+                  译文
+                </button>
+                <button class="pill" data-view="original">
+                  原文
+                </button>
+                <button class="pill" data-view="comparison">
+                  对照
+                </button>
+              </div>
+              <div id="translation-container">
+                <article
+                  id="article-original"
+                  role="article"
+                  class="prose"
+                  hidden
+                >
+                  <OriginalContent />
+                </article>
+                <article id="article-translated" role="article" class="prose">
+                  <Content />
+                </article>
+              </div>
+            </>
+          ) : (
+            <article id="article" role="article" class="prose">
               <Content />
             </article>
-          </div>
-        </>
-      ) : (
-        <article
-          id="article"
-          role="article"
-          class="prose mx-auto mt-8 max-w-3xl"
-        >
-          {tocHeadings.length >= 3 && (
-            <details class="toc" open>
-              <summary class="cursor-pointer font-bold">目录</summary>
-              <ul class="mt-2">
-                {tocHeadings.map(h => (
-                  <li style={`margin-left: ${(h.depth - 2) * 1}rem`}>
-                    <a href={`#${h.slug}`}>{h.text}</a>
-                  </li>
+          )
+        }
+
+        {
+          tags.length > 0 && (
+            <div class="dossier__tags">
+              <p class="eyebrow">标签</p>
+              <ul class="tag-list">
+                {tags.map(t => (
+                  <Tag tag={slugifyStr(t)} />
                 ))}
               </ul>
-            </details>
-          )}
-          <Content />
-        </article>
-      )
-    }
+            </div>
+          )
+        }
 
-    {
-      inlineCommentsEnabled && (
-        <InlineComments
-          apiUrl={commentsApiUrl ?? ""}
-          articlePath={Astro.url.pathname}
-          articleTitle={title}
-          client:only="react"
-        />
-      )
-    }
+        <div class="dossier__actions">
+          <ShareLinks />
+          <button id="back-to-top" class="btn" type="button">
+            <span aria-hidden="true">↑</span> 回到顶部
+          </button>
+        </div>
 
-    <ul class="my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-    </ul>
-
-    <div
-      class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
-    >
-      <button
-        id="back-to-top"
-        class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
-          <path
-            d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-          ></path>
-        </svg>
-        <span>Back to Top</span>
-      </button>
-
-      <ShareLinks />
+        {
+          inlineCommentsEnabled && (
+            <InlineComments
+              apiUrl={commentsApiUrl ?? ""}
+              articlePath={Astro.url.pathname}
+              articleTitle={title}
+              client:only="react"
+            />
+          )
+        }
+      </div>
     </div>
-
-    <Comments client:only="react" />
   </main>
+
   <Footer />
+  <Comments client:only="react" />
 </Layout>
 
 <style>
-  main {
-    @apply mx-auto w-full max-w-3xl px-4 pb-12;
-    transition: max-width 0.3s ease;
+  .doc-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 2rem 0 0;
+    padding: 0.4rem 0.75rem 0.4rem 0;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: var(--step-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
   }
-  main.comparison-active {
-    max-width: 90rem;
+  .doc-back:hover {
+    color: var(--accent);
   }
-  .post-title {
-    @apply text-2xl font-semibold text-skin-accent;
+
+  .dossier {
+    width: 100%;
+    max-width: var(--measure-wide);
+    margin: 0 auto;
+    padding: 0 var(--gutter) 5rem;
   }
-  .toggle-btn {
-    @apply flex-1 cursor-pointer rounded-md px-3 py-1.5 text-center text-sm font-medium text-skin-base transition-colors;
+
+  /* ── 文档头 ───────────────────────────────────────────── */
+  .dossier__head {
+    padding: 2.5rem 0 2.5rem;
+    border-bottom: 2px solid var(--ink);
   }
-  .toggle-btn.active {
-    @apply bg-skin-accent text-skin-inverted;
+
+  .dossier__eyebrow {
+    color: var(--accent);
   }
-  .toggle-btn:not(.active):hover {
-    @apply bg-skin-card-muted;
+
+  .dossier__title {
+    margin: 0.75rem 0 0;
+    max-width: 20ch;
+    font-size: var(--step-h1);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: -0.02em;
   }
-  #translation-container.comparison-mode {
+
+  .dossier__lede {
+    margin: 1.25rem 0 0;
+    max-width: 46em;
+    color: var(--muted);
+    font-size: var(--step-lede);
+    line-height: 1.72;
+  }
+
+  .dossier__head :global(.meta-row) {
+    margin-top: 1.5rem;
+  }
+
+  /* ── 栅格：宽屏双栏 ───────────────────────────────────── */
+  .dossier__grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    gap: 0;
   }
-  @media (max-width: 640px) {
-    #translation-container.comparison-mode {
-      grid-template-columns: 1fr;
+
+  @media (min-width: 1200px) {
+    .dossier__grid {
+      grid-template-columns: 15rem minmax(0, var(--measure-post));
+      gap: 4rem;
+      justify-content: start;
     }
   }
-  #translation-container.comparison-mode article {
+
+  .dossier__rail {
+    padding: 2.5rem 0 0;
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+  }
+
+  /* 窄屏：目录限高可滚动，不要吞掉整屏 */
+  .dossier__rail :global(.toc) {
+    max-height: 40vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  @media (min-width: 1200px) {
+    .dossier__rail {
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+      padding-bottom: 2rem;
+    }
+    .dossier__rail :global(.toc) {
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
+  .dossier__content {
+    min-width: 0;
+    padding-top: 2.5rem;
+  }
+
+  @media (min-width: 1200px) {
+    .dossier__content {
+      padding-top: 2.5rem;
+    }
+  }
+
+  .dossier__content :global(.prose) {
     max-width: none;
+  }
+
+  /* ── 译文切换 ─────────────────────────────────────────── */
+  .translation-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: var(--hairline);
+  }
+
+  #translation-container.comparison-mode {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  @media (min-width: 1024px) {
+    #translation-container.comparison-mode {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ── 标签区 ───────────────────────────────────────────── */
+  .dossier__tags {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: var(--hairline);
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* ── 操作区 ───────────────────────────────────────────── */
+  .dossier__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: var(--hairline);
   }
 </style>
 
 <script is:inline>
-  /** Create a progress indicator
-   *  at the top */
+  /** 顶部阅读进度 */
   function createProgressBar() {
-    // Create the main container div
-    const progressContainer = document.createElement("div");
-    progressContainer.className =
-      "progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";
-
-    // Create the progress bar div
-    const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar h-1 w-0 bg-skin-accent";
-    progressBar.id = "myBar";
-
-    // Append the progress bar to the progress container
-    progressContainer.appendChild(progressBar);
-
-    // Append the progress container to the document body or any other desired parent element
-    document.body.appendChild(progressContainer);
+    const container = document.createElement("div");
+    container.className = "fixed left-0 top-0 z-20 h-0.5 w-full";
+    const bar = document.createElement("div");
+    bar.className = "h-0.5 w-0 bg-accent";
+    bar.id = "myBar";
+    container.appendChild(bar);
+    document.body.appendChild(container);
   }
   createProgressBar();
 
-  /** Update the progress bar
-   *  when user scrolls */
   function updateScrollProgress() {
     const winScroll =
       document.body.scrollTop || document.documentElement.scrollTop;
@@ -263,136 +419,117 @@ const layoutProps = {
       document.documentElement.scrollHeight -
       document.documentElement.clientHeight;
     const scrolled = (winScroll / height) * 100;
-    if (document) {
-      const myBar = document.getElementById("myBar");
-      if (myBar) {
-        myBar.style.width = scrolled + "%";
-      }
-    }
+    const myBar = document.getElementById("myBar");
+    if (myBar) myBar.style.width = scrolled + "%";
   }
   document.addEventListener("scroll", updateScrollProgress);
 
-  /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
+  /** 标题锚点 */
   function addHeadingLinks() {
-    let headings = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));
-    for (let heading of headings) {
+    const headings = Array.from(
+      document.querySelectorAll(".prose h2, .prose h3, .prose h4")
+    );
+    for (const heading of headings) {
+      if (!heading.id) continue;
       heading.classList.add("group");
-      let link = document.createElement("a");
+      const link = document.createElement("a");
       link.innerText = "#";
-      link.className = "heading-link hidden group-hover:inline-block ml-2";
+      link.className = "heading-link";
       link.href = "#" + heading.id;
-      link.ariaHidden = "true";
+      link.setAttribute("aria-hidden", "true");
       heading.appendChild(link);
     }
   }
   addHeadingLinks();
 
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
+  /** 代码块复制 */
   function attachCopyButtons() {
-    let copyButtonLabel = "Copy";
-    let codeBlocks = Array.from(document.querySelectorAll("pre"));
+    const label = "Copy";
+    const codeBlocks = Array.from(document.querySelectorAll("pre"));
 
-    for (let codeBlock of codeBlocks) {
-      let wrapper = document.createElement("div");
+    for (const block of codeBlocks) {
+      const wrapper = document.createElement("div");
       wrapper.style.position = "relative";
 
-      let copyButton = document.createElement("button");
-      copyButton.className =
-        "copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium";
-      copyButton.innerHTML = copyButtonLabel;
-      codeBlock.setAttribute("tabindex", "0");
-      codeBlock.appendChild(copyButton);
+      const btn = document.createElement("button");
+      btn.className = "copy-code";
+      btn.type = "button";
+      btn.innerHTML = label;
+      block.setAttribute("tabindex", "0");
+      block.appendChild(btn);
 
-      // wrap codebock with relative parent element
-      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
-      wrapper.appendChild(codeBlock);
+      block?.parentNode?.insertBefore(wrapper, block);
+      wrapper.appendChild(block);
 
-      copyButton.addEventListener("click", async () => {
-        await copyCode(codeBlock, copyButton);
+      btn.addEventListener("click", async () => {
+        const code = block.querySelector("code");
+        const text = code?.textContent ?? "";
+        await navigator.clipboard.writeText(text);
+        btn.innerText = "Copied";
+        setTimeout(() => {
+          btn.innerText = label;
+        }, 700);
       });
-    }
-
-    async function copyCode(block, button) {
-      let code = block.querySelector("code");
-      let text = code?.innerText;
-
-      await navigator.clipboard.writeText(text ?? "");
-
-      // visual feedback that task is completed
-      button.innerText = "Copied";
-
-      setTimeout(() => {
-        button.innerText = copyButtonLabel;
-      }, 700);
     }
   }
   attachCopyButtons();
 
-  /** Scrolls the document to the top when
-   * the "Back to Top" button is clicked. */
-  function backToTop() {
-    document.querySelector("#back-to-top")?.addEventListener("click", () => {
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    });
-  }
-  backToTop();
+  /** 回到顶部 */
+  document.querySelector("#back-to-top")?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
-  /** Translation view toggle */
+  /** 译文切换 */
   function initTranslationToggle() {
-    var controls = document.querySelector(".translation-controls");
+    const controls = document.querySelector(".translation-controls");
     if (!controls) return;
 
-    var buttons = controls.querySelectorAll(".toggle-btn");
-    var container = document.getElementById("translation-container");
-    var translated = document.getElementById("article-translated");
-    var original = document.getElementById("article-original");
-    var main = document.getElementById("main-content");
+    const buttons = Array.from(
+      controls.querySelectorAll<HTMLButtonElement>(".pill")
+    );
+    const container = document.getElementById("translation-container");
+    const translated = document.getElementById("article-translated");
+    const original = document.getElementById("article-original");
 
     function switchView(view) {
-      buttons.forEach(function (b) {
-        b.classList.remove("active");
+      buttons.forEach(b => b.classList.remove("is-active"));
+      const activeBtn = controls.querySelector(`[data-view="${view}"]`);
+      activeBtn?.classList.add("is-active");
+      activeBtn?.setAttribute("aria-pressed", "true");
+      buttons.forEach(b => {
+        if (b !== activeBtn) b.setAttribute("aria-pressed", "false");
       });
-      var activeBtn = controls.querySelector('[data-view="' + view + '"]');
-      if (activeBtn) activeBtn.classList.add("active");
 
-      container.classList.remove("comparison-mode");
-      main.classList.remove("comparison-active");
+      container?.classList.remove("comparison-mode");
 
       if (view === "translated") {
-        translated.hidden = false;
-        original.hidden = true;
+        if (translated) translated.hidden = false;
+        if (original) original.hidden = true;
       } else if (view === "original") {
-        translated.hidden = true;
-        original.hidden = false;
+        if (translated) translated.hidden = true;
+        if (original) original.hidden = false;
       } else {
-        translated.hidden = false;
-        original.hidden = false;
-        container.classList.add("comparison-mode");
-        main.classList.add("comparison-active");
+        if (translated) translated.hidden = false;
+        if (original) original.hidden = false;
+        container?.classList.add("comparison-mode");
       }
 
       try {
         sessionStorage.setItem("translation-view-mode", view);
       } catch (e) {
-        // Storage can be unavailable in private browsing modes.
+        /* storage unavailable */
       }
     }
 
-    buttons.forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        switchView(btn.dataset.view);
-      });
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => switchView(btn.dataset.view ?? ""));
     });
 
-    // Restore saved mode
     try {
-      var saved = sessionStorage.getItem("translation-view-mode");
+      const saved = sessionStorage.getItem("translation-view-mode");
       if (saved && saved !== "translated") switchView(saved);
     } catch (e) {
-      // Keep the default view when storage is unavailable.
+      /* keep default */
     }
   }
   initTranslationToggle();

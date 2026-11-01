@@ -1,0 +1,87 @@
+---
+export interface MetaItem {
+  label: string;
+  value: string;
+  href?: string;
+}
+
+export interface Props {
+  items: MetaItem[];
+  /** 竖排（文章侧栏）还是横排（列表项） */
+  orientation?: "stack" | "inline";
+  class?: string;
+}
+
+const { items, orientation = "stack", class: className = "" } = Astro.props;
+
+const Tag = orientation === "inline" ? "span" : "div";
+---
+
+<dl class:list={["meta-row", `meta-row--${orientation}`, className]}>
+  {
+    items.map(item => (
+      <Tag class="meta-row__item">
+        <dt class="meta-row__label">{item.label}</dt>
+        <dd class="meta-row__value">
+          {item.href ? <a href={item.href}>{item.value}</a> : item.value}
+        </dd>
+      </Tag>
+    ))
+  }
+</dl>
+
+<style>
+  .meta-row {
+    margin: 0;
+    font-family: var(--font-mono);
+  }
+
+  .meta-row__label {
+    margin: 0;
+    color: var(--faint);
+    font-size: var(--step-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .meta-row__value {
+    margin: 0.15rem 0 0;
+    color: var(--ink);
+    font-size: var(--step-meta);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+  }
+
+  .meta-row__value a:hover {
+    color: var(--accent);
+  }
+
+  /* ── 竖排：档案侧栏 ─────────────────────────────────── */
+  .meta-row--stack {
+    display: grid;
+    gap: 1rem;
+  }
+  .meta-row--stack .meta-row__item {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--line);
+  }
+  .meta-row--stack .meta-row__item:first-child {
+    border-left-color: var(--accent);
+  }
+
+  /* ── 横排：列表内联 ─────────────────────────────────── */
+  .meta-row--inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+  }
+  .meta-row--inline .meta-row__item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+  .meta-row--inline .meta-row__value {
+    margin: 0;
+  }
+</style>

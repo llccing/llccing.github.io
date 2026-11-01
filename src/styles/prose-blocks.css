@@ -1,0 +1,328 @@
+/* ==========================================================================
+   Prose content blocks — 为「一手证据 + 判断」这类内容发明的视觉语法。
+   这些类在 .prose 内部必须能压过 @tailwindcss/typography 的默认样式，
+   因此本文件不加 @layer（unlayered 规则优先于任何 @layer 内的规则）。
+
+   作者用法（普通 Markdown 里直接写 HTML 块即可，无需改任何构建配置）：
+     <aside class="callout" data-label="裁决"> … </aside>
+     <aside class="callout is-evidence" data-label="反面证据"> … </aside>
+     <div class="terms"> <dl> … </dl> </div>
+     <figure class="bilingual"> … </figure>
+     <ul class="checklist"> … </ul>
+   ========================================================================== */
+
+/* 表格：宽屏铺满，窄屏才横向滚动 */
+.prose table {
+  display: table;
+  width: 100%;
+  overflow-x: visible;
+}
+@media (max-width: 768px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* ── 通用：块级槽  ─────────────────────────────────────────── */
+.prose aside,
+.prose .block {
+  position: relative;
+  margin: 2.25rem 0;
+  padding: 1.25rem 1.5rem 1.25rem 1.5rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  font-size: var(--step-body);
+  line-height: var(--lh-body);
+}
+
+.prose aside > :first-child,
+.prose .block > :first-child {
+  margin-top: 0;
+}
+.prose aside > :last-child,
+.prose .block > :last-child {
+  margin-bottom: 0;
+}
+
+/* 块标签：绝对定位在左上角，等宽 + 大字距 = 档案批注感 */
+.prose aside[data-label]::before,
+.prose .block[data-label]::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--step-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ── 1. 朱批裁决块 callout ─────────────────────────────────── */
+.prose aside.callout {
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+}
+.prose aside.callout strong {
+  color: var(--accent);
+}
+
+/* ── 2. 反面证据 evidence（冷调、下沉面，与朱批拉开距离）───── */
+.prose aside.is-evidence {
+  border-left-color: var(--muted);
+  background: var(--sunken);
+}
+.prose aside.is-evidence[data-label]::before {
+  color: var(--muted);
+}
+
+/* ── 3. 要点 keypoint（描边空心，最轻的一档）───────────────── */
+.prose aside.keypoint {
+  border-left-color: var(--ink);
+  background: transparent;
+}
+.prose aside.keypoint[data-label]::before {
+  color: var(--ink);
+}
+
+/* ── 4. 术语定义格 terms ───────────────────────────────────── */
+.prose .terms {
+  margin: 2.25rem 0;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+}
+.prose .terms dl {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .prose .terms dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.prose .terms .term {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.prose .terms .term:nth-child(odd) {
+  background: var(--sunken);
+}
+@media (min-width: 768px) {
+  .prose .terms .term {
+    border-bottom: 0;
+    border-right: 1px solid var(--line);
+  }
+  .prose .terms .term:nth-child(3n) {
+    border-right: 0;
+  }
+  .prose .terms .term:nth-child(n + 4) {
+    border-top: 1px solid var(--line);
+  }
+  .prose .terms .term:nth-child(odd) {
+    background: transparent;
+  }
+}
+.prose .terms dt {
+  margin: 0 0 0.35rem;
+  color: var(--accent);
+  font-size: var(--step-meta);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.prose .terms dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--step-meta);
+  line-height: 1.7;
+}
+
+/* ── 5. 中英对照 bilingual ─────────────────────────────────── */
+.prose figure.bilingual {
+  margin: 2.25rem 0;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.prose figure.bilingual blockquote {
+  margin: 0;
+  padding: 0 0 0.9rem;
+  border: 0;
+  border-bottom: 1px dashed var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--step-meta);
+  font-style: italic; /* 此处是英文原文，斜体成立 */
+  font-family: var(--font-sans);
+  line-height: 1.7;
+}
+.prose figure.bilingual .zh {
+  margin: 0.9rem 0 0;
+}
+.prose figure.bilingual figcaption {
+  margin-top: 0.9rem;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── 6. 行动清单 checklist ─────────────────────────────────── */
+.prose ul.checklist {
+  margin: 2rem 0;
+  padding: 0;
+  list-style: none;
+}
+.prose ul.checklist li {
+  position: relative;
+  padding-left: 2rem;
+  margin: 0.85rem 0;
+}
+.prose ul.checklist li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* ── 7. 尺度数据 scale ─────────────────────────────────────── */
+.prose .scale {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1px;
+  margin: 2.25rem 0;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+.prose .scale > div {
+  padding: 1rem 1.1rem;
+  background: var(--surface);
+}
+.prose .scale dt,
+.prose .scale .label {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+  font-size: var(--step-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.prose .scale dd,
+.prose .scale .value {
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.prose .scale .unit {
+  margin-left: 0.25rem;
+  color: var(--muted);
+  font-size: var(--step-meta);
+  font-weight: 500;
+}
+
+/* ── 8. 导语首段 lede ──────────────────────────────────────── */
+.prose .lede,
+.prose p.lede {
+  margin-bottom: 2rem;
+  color: var(--ink);
+  font-size: var(--step-lede);
+  line-height: 1.72;
+}
+
+/* ── 9. 边注 pullnote（宽屏浮出右侧）───────────────────────── */
+.prose .pullnote {
+  margin: 1.75rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+  font-size: var(--step-meta);
+  line-height: 1.7;
+}
+@media (min-width: 1200px) {
+  .prose .pullnote {
+    float: right;
+    clear: right;
+    width: 15rem;
+    margin: 0.25rem -17rem 1.5rem 2rem;
+    padding-left: 0.75rem;
+  }
+}
+
+/* ── 10. 档案元信息条 docnote ──────────────────────────────── */
+.prose .docnote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 2.5rem 0 0;
+  padding: 1rem 1.25rem;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: var(--step-meta);
+}
+.prose .docnote b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ── 代码块内的复制按钮（原为 .copy-code，缺焦点态）────────── */
+.prose .copy-code {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  background: var(--canvas);
+  color: var(--ink);
+  font-size: var(--step-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.prose .copy-code:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.prose .copy-code:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── 标题锚点链接 ──────────────────────────────────────────── */
+.prose .heading-link {
+  margin-left: 0.4rem;
+  color: var(--line);
+  font-weight: 400;
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+.prose .heading-link:hover {
+  color: var(--accent);
+}
+
+/* ── 分隔：三点心 ──────────────────────────────────────────── */
+.prose .dinkus {
+  margin: 3rem 0;
+  border: 0;
+  color: var(--faint);
+  font-size: 1rem;
+  letter-spacing: 1em;
+  text-align: center;
+}
+.prose .dinkus::before {
+  content: "· · ·";
+}

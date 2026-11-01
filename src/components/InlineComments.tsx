@@ -109,7 +109,7 @@ function RichText({ text }: { text: string }) {
           !/^https?:\/\/(?:www\.)?rowanliu\.com/i.test(part);
         return (
           <a
-            className="underline decoration-dashed underline-offset-4 hover:text-skin-accent"
+            className="underline decoration-dashed underline-offset-4 hover:text-accent"
             href={part}
             key={index}
             rel={external ? "noreferrer" : undefined}
@@ -137,7 +137,7 @@ function IconButton({
   return (
     <button
       aria-label={label}
-      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded border border-skin-line bg-skin-fill transition-colors hover:border-skin-accent hover:text-skin-accent ${danger ? "hover:!border-red-600 hover:!text-red-600" : ""}`}
+      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-control border border-line bg-canvas transition-colors hover:border-accent hover:text-accent ${danger ? "hover:!border-accent hover:!text-accent" : ""}`}
       onClick={onClick}
       title={label}
       type="button"
@@ -158,7 +158,7 @@ function AiJobState({
 }) {
   if (job.status === "completed") {
     return (
-      <div className="mt-3 flex min-h-8 items-center gap-2 text-xs opacity-70">
+      <div className="mt-3 flex min-h-8 items-center gap-2 text-xs text-muted">
         <CircleCheck aria-hidden="true" size={15} />
         AI 已回答
       </div>
@@ -166,14 +166,14 @@ function AiJobState({
   }
   if (job.status === "failed") {
     return (
-      <div className="mt-3 flex min-h-8 items-center justify-between gap-3 text-xs text-red-600">
+      <div className="mt-3 flex min-h-8 items-center justify-between gap-3 text-xs text-accent">
         <span className="flex items-center gap-2">
           <CircleAlert aria-hidden="true" size={15} />
           AI 回答失败
         </span>
         {canRetry && (
           <button
-            className="inline-flex h-8 items-center gap-1 rounded px-2 hover:bg-skin-card"
+            className="inline-flex h-8 items-center gap-1 rounded-control px-2 hover:bg-sunken"
             onClick={onRetry}
             title="重新请求 AI 回答"
             type="button"
@@ -188,7 +188,7 @@ function AiJobState({
   return (
     <div
       aria-live="polite"
-      className="mt-3 flex min-h-8 items-center gap-2 text-xs opacity-70"
+      className="mt-3 flex min-h-8 items-center gap-2 text-xs text-muted"
     >
       {job.status === "answering" ? (
         <Bot aria-hidden="true" size={15} />
@@ -676,7 +676,7 @@ export default function InlineComments({
       {positions.map(position => (
         <button
           aria-label={`${position.count} 条批注`}
-          className="fixed z-30 inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded border border-skin-accent bg-skin-fill px-1.5 text-xs font-semibold text-skin-accent shadow-sm"
+          className="fixed z-30 inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-control border border-accent bg-canvas px-1.5 text-xs font-semibold text-accent shadow-sm"
           key={position.key}
           onClick={() => {
             setSelectedKey(position.key);
@@ -701,7 +701,7 @@ export default function InlineComments({
         !selectionAnchor && (
           <button
             aria-label="给整段添加批注"
-            className="fixed z-30 inline-flex h-8 w-8 items-center justify-center rounded border border-skin-line bg-skin-fill text-skin-base shadow-sm hover:border-skin-accent hover:text-skin-accent"
+            className="fixed z-30 inline-flex h-8 w-8 items-center justify-center rounded-control border border-line bg-canvas text-ink shadow-sm hover:border-accent hover:text-accent"
             onClick={() =>
               openComposer({ anchor: anchorForBlock(hoveredBlock) })
             }
@@ -719,7 +719,7 @@ export default function InlineComments({
       {ownerSession && ownerMode && selectionAnchor && (
         <button
           aria-label="给选中文字添加批注"
-          className="fixed z-40 inline-flex h-9 w-9 items-center justify-center rounded bg-skin-accent text-skin-inverted shadow-lg"
+          className="fixed z-40 inline-flex h-9 w-9 items-center justify-center rounded-control bg-accent text-accent-ink shadow-lg"
           onClick={() => openComposer({ anchor: selectionAnchor })}
           style={selectionPosition}
           title="添加批注"
@@ -732,7 +732,7 @@ export default function InlineComments({
       {ownerMode && authChecked && !ownerSession && (
         <button
           aria-label="作者登录"
-          className="fixed bottom-5 right-5 z-30 inline-flex h-10 w-10 items-center justify-center rounded border border-skin-line bg-skin-fill shadow-md hover:border-skin-accent hover:text-skin-accent"
+          className="fixed bottom-5 right-5 z-30 inline-flex h-10 w-10 items-center justify-center rounded-control border border-line bg-canvas shadow-md hover:border-accent hover:text-accent"
           onClick={() => {
             const authorizeUrl = new URL(
               `${endpoint}/auth/github/start`,
@@ -753,10 +753,10 @@ export default function InlineComments({
       )}
 
       {ownerSession && authChecked && (
-        <div className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded border border-skin-line bg-skin-fill p-1 shadow-md">
+        <div className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded-control border border-line bg-canvas p-1 shadow-md">
           <button
             aria-pressed={ownerMode}
-            className={`inline-flex h-9 items-center gap-2 rounded px-3 text-sm font-medium ${ownerMode ? "bg-skin-accent text-skin-inverted" : "hover:bg-skin-card"}`}
+            className={`inline-flex h-9 items-center gap-2 rounded-control px-3 text-sm font-medium ${ownerMode ? "bg-accent text-accent-ink" : "hover:bg-sunken"}`}
             onClick={() => setOwnerMode(value => !value)}
             title={ownerMode ? "关闭批注模式" : "开启批注模式"}
             type="button"
@@ -785,7 +785,7 @@ export default function InlineComments({
       {(selectedKey || composer) && (
         <aside
           aria-label="文章批注"
-          className="fixed inset-x-0 bottom-0 z-50 max-h-[78svh] overflow-y-auto border-t border-skin-line bg-skin-fill p-4 shadow-2xl sm:inset-y-0 sm:left-auto sm:w-[24rem] sm:max-h-none sm:border-l sm:border-t-0"
+          className="fixed inset-x-0 bottom-0 z-50 max-h-[78svh] overflow-y-auto border-t border-line bg-canvas p-4 shadow-2xl sm:inset-y-0 sm:left-auto sm:w-[24rem] sm:max-h-none sm:border-l sm:border-t-0"
         >
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -804,12 +804,12 @@ export default function InlineComments({
           </div>
 
           {error && (
-            <div className="mb-3 flex min-h-9 items-center justify-between gap-3 border-l-2 border-red-600 pl-3 text-sm text-red-600">
+            <div className="mb-3 flex min-h-9 items-center justify-between gap-3 border-l-2 border-accent pl-3 text-sm text-accent">
               <span>{error}</span>
               {retryAction && (
                 <button
                   aria-label="重试"
-                  className="inline-flex h-8 shrink-0 items-center gap-1 rounded px-2 hover:bg-skin-card"
+                  className="inline-flex h-8 shrink-0 items-center gap-1 rounded-control px-2 hover:bg-sunken"
                   onClick={() => retryAction()}
                   title="重试"
                   type="button"
@@ -826,13 +826,13 @@ export default function InlineComments({
 
           {activeThreads.map(thread => (
             <article
-              className={`border-b border-skin-line py-4 first:pt-0 ${syncStates[thread.id] ? "opacity-60" : ""}`}
+              className={`border-b border-line py-4 first:pt-0 ${syncStates[thread.id] ? "opacity-60" : ""}`}
               key={thread.id}
             >
-              <blockquote className="mb-3 border-l-2 border-skin-accent pl-3 text-xs opacity-70">
+              <blockquote className="mb-3 border-l-2 border-accent pl-3 text-xs text-muted">
                 {thread.anchor.exact}
               </blockquote>
-              <div className="mb-2 flex items-center justify-between gap-2 text-xs opacity-70">
+              <div className="mb-2 flex items-center justify-between gap-2 text-xs text-muted">
                 <span>
                   @{thread.author.login} ·{" "}
                   {new Date(thread.createdAt).toLocaleDateString("zh-CN")}
@@ -865,10 +865,10 @@ export default function InlineComments({
               )}
               {thread.replies.map(reply => (
                 <div
-                  className={`ml-4 mt-3 border-l border-skin-line pl-3 ${syncStates[reply.id] ? "opacity-60" : ""}`}
+                  className={`ml-4 mt-3 border-l border-line pl-3 ${syncStates[reply.id] ? "opacity-60" : ""}`}
                   key={reply.id}
                 >
-                  <div className="mb-1 text-xs opacity-70">
+                  <div className="mb-1 text-xs text-muted">
                     <span>@{reply.author.login}</span>
                     {syncStates[reply.id] && (
                       <Loader2
@@ -945,9 +945,9 @@ export default function InlineComments({
           ))}
 
           {composer && (
-            <div className="mt-4 border-t border-skin-line pt-4">
+            <div className="mt-4 border-t border-line pt-4">
               {composer.anchor && (
-                <blockquote className="mb-3 border-l-2 border-skin-accent pl-3 text-xs opacity-70">
+                <blockquote className="mb-3 border-l-2 border-accent pl-3 text-xs text-muted">
                   {composer.anchor.exact}
                 </blockquote>
               )}
@@ -963,7 +963,7 @@ export default function InlineComments({
               </label>
               <textarea
                 autoFocus
-                className="min-h-28 w-full resize-y rounded border border-skin-line bg-skin-fill p-3 text-sm outline-none focus:border-skin-accent"
+                className="min-h-28 w-full resize-y rounded-control border border-line bg-canvas p-3 text-sm outline-none focus:border-accent"
                 id="inline-comment-body"
                 maxLength={8000}
                 onChange={event => setBody(event.target.value)}
@@ -972,14 +972,14 @@ export default function InlineComments({
               />
               <div className="mt-3 flex justify-end gap-2">
                 <button
-                  className="rounded px-3 py-2 text-sm hover:bg-skin-card"
+                  className="rounded-control px-3 py-2 text-sm hover:bg-sunken"
                   onClick={() => setComposer(null)}
                   type="button"
                 >
                   取消
                 </button>
                 <button
-                  className="inline-flex min-w-20 items-center justify-center gap-2 rounded bg-skin-accent px-3 py-2 text-sm text-skin-inverted disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-w-20 items-center justify-center gap-2 rounded-control bg-accent px-3 py-2 text-sm text-accent-ink disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={saving || !body.trim()}
                   onClick={() => void saveComment()}
                   type="button"

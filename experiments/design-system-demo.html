@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="zh-CN" data-demo="today" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Blog Design System · 三套改造深度对比 Demo</title>
+    <style>
+      :root {
+        --stage-bg: #f4f4f2;
+        --panel: #ffffff;
+        --panel-ink: #1c1c1a;
+        --panel-muted: #6b6a66;
+        --panel-line: #e2e0dc;
+        --panel-accent: #1d64a8;
+        --chip: #eceae5;
+        --chip-on: #1d64a8;
+        --chip-on-ink: #ffffff;
+        --radius: 10px;
+      }
+      html[data-theme="dark"] {
+        --stage-bg: #14161c;
+        --panel: #1c1f26;
+        --panel-ink: #eceae5;
+        --panel-muted: #9a988f;
+        --panel-line: #33363f;
+        --panel-accent: #7fb2e8;
+        --chip: #282c34;
+        --chip-on: #7fb2e8;
+        --chip-on-ink: #14161c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--stage-bg);
+        color: var(--panel-ink);
+        font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      /* ── 控制面板 ───────────────────────────── */
+      .controls {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--panel);
+        border-bottom: 1px solid var(--panel-line);
+        padding: 12px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+      }
+      .ctl {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .ctl > span.lab {
+        font-size: 12px;
+        color: var(--panel-muted);
+      }
+      .seg {
+        display: inline-flex;
+        border: 1px solid var(--panel-line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .seg button {
+        border: 0;
+        background: transparent;
+        color: var(--panel-ink);
+        font: inherit;
+        font-size: 13px;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      .seg button + button {
+        border-left: 1px solid var(--panel-line);
+      }
+      .seg button[aria-pressed="true"] {
+        background: var(--chip-on);
+        color: var(--chip-on-ink);
+      }
+      .seg button:focus-visible {
+        outline: 2px solid var(--panel-accent);
+        outline-offset: -2px;
+      }
+      .toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .hint {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--panel-muted);
+      }
+
+      /* ── 指标条 ───────────────────────────── */
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 10px;
+        padding: 14px 20px 0;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .metric {
+        background: var(--panel);
+        border: 1px solid var(--panel-line);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+      }
+      .metric .k {
+        font-size: 11px;
+        color: var(--panel-muted);
+        letter-spacing: 0.04em;
+      }
+      .metric .v {
+        font-size: 13px;
+        margin-top: 3px;
+      }
+      .metric .v.bad {
+        color: #b3402f;
+      }
+      .metric .v.good {
+        color: #2f6b4f;
+      }
+      html[data-theme="dark"] .metric .v.bad {
+        color: #e8836f;
+      }
+      html[data-theme="dark"] .metric .v.good {
+        color: #7fc9a3;
+      }
+
+      /* ── 舞台与视口 ───────────────────────────── */
+      .stage {
+        padding: 16px 20px 48px;
+        display: flex;
+        justify-content: center;
+      }
+      .viewport {
+        container-type: inline-size;
+        width: 100%;
+        max-width: 1280px;
+        background: var(--ds-fill);
+        color: var(--ds-text);
+        border: 1px solid var(--panel-line);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: width 0.25s ease;
+      }
+
+      /* ══════════════════════════════════════════
+         三套 Design System 变体
+         ══════════════════════════════════════════ */
+
+      /* ── 1) Today：复刻当前线上 ───────────────── */
+      html[data-demo="today"] {
+        --ds-fill: #fbfefb;
+        --ds-text: #282728;
+        --ds-accent: #006cac;
+        --ds-border: #ece9e9;
+        --ds-card: #e6e6e6;
+        --ds-font: ui-monospace, "Cascadia Mono", Consolas, "PingFang SC",
+          "Microsoft YaHei", monospace;
+        --ds-prose: 48rem;
+        --ds-archive: 48rem;
+        --weak-1: 0.6;
+        --weak-2: 0.7;
+        --ds-lh: 1.6;
+        --ds-measure: none;
+      }
+      html[data-demo="today"][data-theme="dark"] {
+        --ds-fill: #212737;
+        --ds-text: #eaedf3;
+        --ds-accent: #ff6b01;
+        --ds-border: #ab4b08;
+        --ds-card: #343f60;
+      }
+
+      /* ── 2) Tokens：方案 A / Quick Wins ──────── */
+      html[data-demo="tokens"] {
+        --ds-fill: #fbfefb;
+        --ds-text: #282728;
+        --ds-muted: #5f5e5c;
+        --ds-subtle: #737271;
+        --ds-accent: #006cac;
+        --ds-border: #ece9e9;
+        --ds-card: #f2f2f0;
+        --ds-font: system-ui, -apple-system, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", sans-serif;
+        --ds-prose: 44rem;
+        --ds-archive: 72rem;
+        --ds-lh: 1.75;
+        --ds-measure: 40em;
+      }
+      html[data-demo="tokens"][data-theme="dark"] {
+        --ds-fill: #212737;
+        --ds-text: #eaedf3;
+        --ds-muted: #a8adb9;
+        --ds-subtle: #8b909c;
+        --ds-accent: #ff8a2b;
+        --ds-border: #6b3a12;
+        --ds-card: #2b3145;
+      }
+
+      /* ── 3) Components：方案 B ───────────────── */
+      html[data-demo="components"] {
+        --ds-fill: #fdfdfc;
+        --ds-text: #232322;
+        --ds-muted: #5f5e5c;
+        --ds-subtle: #737271;
+        --ds-accent: #0a5f9c;
+        --ds-border: #e6e3de;
+        --ds-card: #ffffff;
+        --ds-raised: #f5f4f1;
+        --ds-font: system-ui, -apple-system, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", sans-serif;
+        --ds-prose: 42rem;
+        --ds-archive: 72rem;
+        --ds-lh: 1.8;
+        --ds-measure: 38em;
+        --ds-radius: 10px;
+      }
+      html[data-demo="components"][data-theme="dark"] {
+        --ds-fill: #1a1d24;
+        --ds-text: #eceef2;
+        --ds-muted: #a8adb9;
+        --ds-subtle: #8b909c;
+        --ds-accent: #ff9340;
+        --ds-border: #333844;
+        --ds-card: #21252e;
+        --ds-raised: #282d38;
+      }
+
+      /* ── 内容通用排版 ────────────────────────── */
+      .ds {
+        font-family: var(--ds-font);
+        line-height: var(--ds-lh);
+        min-height: 520px;
+      }
+      .wrap-prose {
+        max-width: var(--ds-prose);
+        margin: 0 auto;
+        padding: 32px 16px 48px;
+      }
+      .wrap-archive {
+        max-width: var(--ds-archive);
+        margin: 0 auto;
+        padding: 32px 16px 48px;
+      }
+      html[data-demo="today"] .wrap-archive {
+        max-width: var(--ds-archive);
+      }
+
+      .ds h1,
+      .ds h2,
+      .ds h3 {
+        color: var(--ds-text);
+        line-height: 1.25;
+        margin: 0;
+      }
+      .ds p {
+        margin: 0 0 1em;
+      }
+      .ds a {
+        color: var(--ds-accent);
+      }
+
+      /* 弱化层级：Today 用 opacity，其余用语义色 */
+      .muted {
+        color: var(--ds-text);
+        opacity: var(--weak-2, 1);
+      }
+      html:not([data-demo="today"]) .muted {
+        color: var(--ds-muted);
+        opacity: 1;
+      }
+      .subtle {
+        color: var(--ds-text);
+        opacity: var(--weak-1, 1);
+      }
+      html:not([data-demo="today"]) .subtle {
+        color: var(--ds-subtle);
+        opacity: 1;
+      }
+
+      /* ── 站点头部 ────────────────────────── */
+      .site-head {
+        border-bottom: 1px solid var(--ds-border);
+      }
+      .site-head-in {
+        max-width: var(--ds-archive);
+        margin: 0 auto;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .logo {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--ds-text);
+        text-decoration: none;
+      }
+      .nav {
+        display: flex;
+        gap: 14px;
+        font-size: 13px;
+        flex-wrap: wrap;
+      }
+      .nav a {
+        color: var(--ds-muted, var(--ds-text));
+        text-decoration: none;
+      }
+      html[data-demo="today"] .nav a {
+        color: var(--ds-text);
+        opacity: var(--weak-2);
+      }
+      .nav a.on {
+        color: var(--ds-accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      /* ── 文章视图 ────────────────────────── */
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+      }
+      .post-title {
+        font-size: 26px;
+        font-weight: 650;
+        color: var(--ds-accent);
+        margin: 0 0 10px;
+      }
+      @container (min-width: 640px) {
+        .post-title {
+          font-size: 30px;
+        }
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 26px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--ds-border);
+      }
+      .meta .dot {
+        opacity: 0.4;
+      }
+      .tagrow {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .tag {
+        font-size: 12px;
+        padding: 2px 8px;
+        border: 1px solid var(--ds-border);
+        border-radius: 999px;
+        color: var(--ds-muted, var(--ds-text));
+        text-decoration: none;
+      }
+      html[data-demo="today"] .tag {
+        color: var(--ds-text);
+        opacity: var(--weak-2);
+      }
+      html[data-demo="components"] .tag {
+        background: var(--ds-raised);
+        border-color: transparent;
+      }
+
+      .lede {
+        font-size: 16px;
+        margin-bottom: 1.6em;
+      }
+      html[data-demo="components"] .lede {
+        color: var(--ds-muted);
+        border-left: 3px solid var(--ds-border);
+        padding-left: 14px;
+      }
+
+      .ds h2 {
+        font-size: 20px;
+        font-weight: 650;
+        margin: 2em 0 0.7em;
+      }
+      .ds h3 {
+        font-size: 16px;
+        font-weight: 650;
+        margin: 1.6em 0 0.6em;
+      }
+      html[data-demo="components"] .ds h2 {
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--ds-border);
+      }
+      .ds ul {
+        margin: 0 0 1.2em;
+        padding-left: 1.3em;
+      }
+      .ds li {
+        margin-bottom: 0.45em;
+      }
+      .ds blockquote {
+        margin: 0 0 1.4em;
+        padding: 2px 0 2px 14px;
+        border-left: 3px solid var(--ds-accent);
+        opacity: var(--weak-2, 1);
+        font-style: italic;
+      }
+      html:not([data-demo="today"]) .ds blockquote {
+        opacity: 1;
+        color: var(--ds-muted);
+      }
+      .ds pre {
+        background: var(--ds-card);
+        border: 1px solid var(--ds-border);
+        border-radius: 6px;
+        padding: 14px;
+        overflow-x: auto;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 12.5px;
+        line-height: 1.55;
+        margin: 0 0 1.6em;
+      }
+      html[data-demo="components"] .ds pre {
+        border-radius: var(--ds-radius);
+      }
+      .ds code.inl {
+        background: var(--ds-card);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.9em;
+      }
+
+      /* Callout：仅 Components demo 展示的语义组件 */
+      .callout {
+        display: none;
+      }
+      html[data-demo="components"] .callout {
+        display: block;
+        background: var(--ds-raised);
+        border: 1px solid var(--ds-border);
+        border-left: 3px solid var(--ds-accent);
+        border-radius: var(--ds-radius);
+        padding: 12px 14px;
+        margin: 0 0 1.6em;
+        font-size: 14px;
+      }
+      html[data-demo="components"] .callout .ct {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ds-subtle);
+        margin-bottom: 4px;
+      }
+
+      /* 目录 */
+      .toc {
+        border: 1px solid var(--ds-border);
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-bottom: 26px;
+        font-size: 13px;
+      }
+      html[data-demo="components"] .toc {
+        background: var(--ds-raised);
+        border-radius: var(--ds-radius);
+      }
+      .toc summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .toc ul {
+        margin: 8px 0 0;
+        padding-left: 1.1em;
+        list-style: none;
+      }
+      .toc li {
+        margin: 3px 0;
+      }
+      .toc a {
+        color: var(--ds-muted, var(--ds-text));
+        text-decoration: none;
+      }
+      html[data-demo="today"] .toc a {
+        color: var(--ds-text);
+        opacity: var(--weak-2);
+      }
+      html[data-demo="components"] .toc a.cur {
+        color: var(--ds-accent);
+        font-weight: 600;
+      }
+
+      /* 正文测量宽度（仅非 Today） */
+      html:not([data-demo="today"]) .measure > p,
+      html:not([data-demo="today"]) .measure > ul {
+        max-width: var(--ds-measure);
+      }
+
+      .post-foot {
+        margin-top: 36px;
+        padding-top: 16px;
+        border-top: 1px solid var(--ds-border);
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .btn {
+        font: inherit;
+        font-size: 13px;
+        padding: 7px 14px;
+        border: 1px solid var(--ds-border);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--ds-text);
+        cursor: pointer;
+      }
+      html[data-demo="components"] .btn {
+        border-radius: var(--ds-radius);
+        min-height: 40px;
+      }
+      html[data-demo="components"] .btn.primary {
+        background: var(--ds-accent);
+        border-color: var(--ds-accent);
+        color: #fff;
+      }
+      html[data-demo="components"][data-theme="dark"] .btn.primary {
+        color: #14161c;
+      }
+
+      /* ── 归档列表视图 ──────────────────────── */
+      .archive-head {
+        padding-bottom: 36px;
+        border-bottom: 1px solid var(--ds-border);
+        margin-bottom: 0;
+      }
+      .archive-head h1 {
+        font-size: 34px;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+      }
+      @container (min-width: 640px) {
+        .archive-head h1 {
+          font-size: 52px;
+        }
+        .archive-head .split {
+          display: grid;
+          grid-template-columns: 1.25fr 0.75fr;
+          gap: 24px;
+          align-items: end;
+        }
+      }
+      .archive-head .split > p {
+        margin: 0;
+        font-size: 14px;
+      }
+      .sec-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 28px 0 12px;
+        border-bottom: 1px solid var(--ds-border);
+      }
+      .sec-head h2 {
+        font-size: 14px;
+        font-weight: 650;
+      }
+      .sec-head span {
+        font-size: 12px;
+      }
+      .filterbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--ds-border);
+      }
+      .flabel {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .pill {
+        font: inherit;
+        font-size: 13px;
+        padding: 4px 12px;
+        border: 1px solid var(--ds-border);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--ds-text);
+        cursor: pointer;
+      }
+      html[data-demo="components"] .pill {
+        padding: 7px 14px;
+      }
+      .pill.on {
+        border-color: var(--ds-accent);
+        color: var(--ds-accent);
+        background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+      }
+      .sel {
+        font: inherit;
+        font-size: 13px;
+        padding: 5px 8px;
+        border: 1px solid var(--ds-border);
+        border-radius: 6px;
+        background: var(--ds-fill);
+        color: var(--ds-text);
+        cursor: pointer;
+      }
+      html[data-demo="today"] .sel {
+        outline: none;
+      }
+
+      .plist {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .card {
+        border-bottom: 1px solid var(--ds-border);
+      }
+      .card a {
+        display: block;
+        padding: 22px 2px;
+        text-decoration: none;
+        color: var(--ds-text);
+      }
+      @container (min-width: 640px) {
+        .card a {
+          display: grid;
+          grid-template-columns: 9rem minmax(0, 1fr) 3rem;
+          gap: 24px;
+          padding: 26px 0;
+          align-items: start;
+        }
+      }
+      html[data-demo="components"][data-theme="light"] .card {
+        border-bottom-color: var(--ds-border);
+      }
+      .card .cwhen {
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      @container (min-width: 640px) {
+        .card .cwhen {
+          display: block;
+          margin-bottom: 0;
+        }
+        .card .cwhen .ctag {
+          display: block;
+          margin-top: 6px;
+        }
+      }
+      .card h3 {
+        font-size: 18px;
+        font-weight: 650;
+        margin: 0 0 6px;
+        line-height: 1.35;
+      }
+      .card p {
+        margin: 0;
+        font-size: 13.5px;
+      }
+      .card .arw {
+        display: none;
+      }
+      @container (min-width: 640px) {
+        .card .arw {
+          display: block;
+          justify-self: end;
+          font-size: 15px;
+          color: var(--ds-subtle, var(--ds-text));
+        }
+      }
+      html[data-demo="today"] .card .arw {
+        opacity: var(--weak-2);
+      }
+
+      /* Components demo：卡片抬升与 hover */
+      html[data-demo="components"] .card {
+        border-bottom: 1px solid var(--ds-border);
+      }
+      html[data-demo="components"] .card a:hover h3 {
+        color: var(--ds-accent);
+      }
+
+      /* 焦点环开关：Today 下按钮/下拉框刻意保持无焦点样式，以还原现状缺陷 */
+      .show-focus .btn:focus,
+      .show-focus .pill:focus,
+      .show-focus .sel:focus,
+      .show-focus a:focus,
+      .show-focus summary:focus {
+        outline: 2px dashed var(--ds-accent);
+        outline-offset: 2px;
+      }
+      html[data-demo="today"] .show-focus .btn:focus,
+      html[data-demo="today"] .show-focus .pill:focus,
+      html[data-demo="today"] .show-focus .sel:focus {
+        outline: none;
+      }
+
+      .view[hidden] {
+        display: none;
+      }
+      .note {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px 40px;
+        font-size: 12.5px;
+        color: var(--panel-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="controls">
+      <div class="ctl">
+        <span class="lab">改造深度</span>
+        <div class="seg" id="seg-demo">
+          <button data-v="today" aria-pressed="true">现状 Today</button>
+          <button data-v="tokens" aria-pressed="false">方案 A 令牌</button>
+          <button data-v="components" aria-pressed="false">方案 B 组件化</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="lab">视图</span>
+        <div class="seg" id="seg-view">
+          <button data-v="post" aria-pressed="true">文章详情</button>
+          <button data-v="archive" aria-pressed="false">归档列表</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="lab">主题</span>
+        <div class="seg" id="seg-theme">
+          <button data-v="light" aria-pressed="true">浅色</button>
+          <button data-v="dark" aria-pressed="false">暗色</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="lab">视口</span>
+        <div class="seg" id="seg-vw">
+          <button data-v="375">375</button>
+          <button data-v="768">768</button>
+          <button data-v="1280" aria-pressed="true">1280</button>
+        </div>
+      </div>
+      <label class="toggle"
+        ><input type="checkbox" id="focusToggle" /> 显示键盘焦点环</label
+      >
+      <span class="hint">内容取自真实文章，三套共用同一份 DOM</span>
+    </header>
+
+    <div class="metrics" id="metrics"></div>
+
+    <div class="stage">
+      <div class="viewport" id="viewport">
+        <div class="ds">
+          <div class="site-head">
+            <div class="site-head-in">
+              <a class="logo" href="#">Rowan's Blog</a>
+              <nav class="nav">
+                <a href="#" class="on">Posts</a>
+                <a href="#">Projects</a>
+                <a href="#">Digest</a>
+                <a href="#">Tags</a>
+                <a href="#">About</a>
+                <a href="#">Search</a>
+              </nav>
+            </div>
+          </div>
+
+          <!-- ── 文章详情 ── -->
+          <section class="view" id="view-post">
+            <div class="wrap-prose">
+              <p class="eyebrow subtle">Writing / ai</p>
+              <h1 class="post-title">AI 写代码，我守住外循环</h1>
+              <div class="meta">
+                <span class="subtle">2026-10-31</span>
+                <span class="subtle dot">|</span>
+                <span class="subtle">12 分钟阅读</span>
+                <span class="tagrow">
+                  <a class="tag" href="#">ai</a>
+                  <a class="tag" href="#">workflow</a>
+                  <a class="tag" href="#">code-review</a>
+                </span>
+              </div>
+
+              <div class="measure">
+                <p class="lede">
+                  我最近一直在想一个问题：当 AI
+                  能写的代码越来越多的时候，人到底还剩什么。
+                </p>
+                <p>
+                  不是那种宏大的「AI
+                  会不会取代程序员」——那个问题问法本身就有毛病。真正每天困扰我的是一件具体的事：<strong>一段
+                  AI 写的、几千行的改动摆在我面前，我该怎么判断它能不能合并？</strong>
+                </p>
+                <p>
+                  一行行看，看不过来。不看，又不敢发。说「只审重要的部分」，可问题恰恰出在——你并不知道哪部分重要。
+                </p>
+
+                <details class="toc" open>
+                  <summary>目录</summary>
+                  <ul>
+                    <li><a href="#" class="cur">先立三个词</a></li>
+                    <li><a href="#">内循环与外循环</a></li>
+                    <li><a href="#">三个隐藏成本</a></li>
+                  </ul>
+                </details>
+
+                <h2>先立三个词</h2>
+                <p>
+                  Addy
+                  的开场没有谈架构，先定义了三个词。这三个词是整个框架的基石：
+                </p>
+                <ul>
+                  <li>
+                    <strong>Quality</strong
+                    >：我们在放系统出去之前装好的所有检查。这些检查产出<strong>证据</strong>。
+                  </li>
+                  <li>
+                    <strong>Verdict</strong
+                    >：在东西进入我们的依赖系统之前，人做的那个<strong>生产决策</strong>。
+                  </li>
+                  <li>
+                    <strong>Answerability</strong>：<strong
+                      >有人问起的时候，我能解释为什么。</strong
+                    >
+                  </li>
+                </ul>
+                <blockquote>
+                  Quality produces evidence; a verdict assigns responsibility.
+                </blockquote>
+                <p>
+                  <strong
+                    >质量产出证据，裁定分配责任。而可解释性，让你站得住你做的那个裁定。</strong
+                  >
+                </p>
+
+                <div class="callout">
+                  <span class="ct">要点</span>
+                  verdict 不是「看一眼 AI
+                  的输出」，而是「有人为这个决定负责」。把人留在环里，保留的是那份责任。
+                </div>
+
+                <h2>内循环与外循环</h2>
+                <p>整个工作被切成两个环：</p>
+                <pre>
+内循环 · capability        外循环 · agency
+─────────────────          ─────────────────
+Investigate                Decide
+Implement        ──────▶   Verify
+Test           evidence    Approve
+Report                     Own
+
+智能体在跑                   人守住</pre
+                >
+                <p>
+                  内循环是 capability（能力）：调查、实现、测试、报告。外循环是
+                  agency（能动性）：决定、验证、批准、拥有。
+                </p>
+
+                <h2>三个隐藏成本</h2>
+                <p>
+                  后半段他讲了三件必须避免的事。它们描述的是<strong
+                    >没有立刻报错、但会慢慢吃掉你的东西</strong
+                  >。
+                </p>
+                <h3>认知负债（cognitive debt）</h3>
+                <p>
+                  <strong>理解力和记忆力的流失</strong
+                  >，因为你把越来越多的问题解决外包给了 AI。放在代码仓库里，它是这么度量的：<strong>仓库里有多少代码</strong>和<strong>团队里有多少人真正理解这些代码</strong>之间的差距。
+                </p>
+                <blockquote>
+                  A build can pass its tests and a PR can be ready to merge
+                  while the team loses its ability to explain the system it is
+                  shipping.
+                </blockquote>
+                <p>
+                  委托深度变了，审核的性质就变了。三十秒的 agent
+                  运行，感觉像一次交互；运行一小时甚至一整天的任务，那是一条<strong>工作流</strong>。
+                </p>
+              </div>
+
+              <div class="post-foot">
+                <button class="btn">↑ 返回顶部</button>
+                <span class="subtle">分享到 X / 微博</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── 归档列表 ── -->
+          <section class="view" id="view-archive" hidden>
+            <div class="wrap-archive">
+              <div class="archive-head">
+                <p class="eyebrow subtle">Writing / archive</p>
+                <div class="split">
+                  <h1>Posts</h1>
+                  <p class="muted">
+                    Long-form notes on software, AI, research and the practical
+                    work of building systems.
+                  </p>
+                </div>
+              </div>
+
+              <div class="sec-head">
+                <h2>Full archive</h2>
+                <span class="subtle">05</span>
+              </div>
+
+              <div class="filterbar">
+                <span class="flabel subtle">目录</span>
+                <button class="pill on">全部</button>
+                <button class="pill">other</button>
+                <button class="pill">life</button>
+                <span class="flabel subtle">标签</span>
+                <select class="sel onforce">
+                  <option>全部标签</option>
+                  <option>ai</option>
+                  <option>workflow</option>
+                  <option>architecture</option>
+                </select>
+              </div>
+
+              <ul class="plist">
+                <li class="card">
+                  <a href="#">
+                    <div class="cwhen">
+                      <span class="subtle">2026-10-31</span>
+                      <span class="ctag subtle">ai</span>
+                    </div>
+                    <div>
+                      <h3>AI 写代码，我守住外循环</h3>
+                      <p class="muted">
+                        从 Addy Osmani 的闭幕 keynote
+                        出发，拆开「内循环 / 外循环」的分工边界、三个隐藏成本，以及
+                        Claude Code 团队把回滚率降下来的具体做法。
+                      </p>
+                    </div>
+                    <span class="arw">↗</span>
+                  </a>
+                </li>
+                <li class="card">
+                  <a href="#">
+                    <div class="cwhen">
+                      <span class="subtle">2026-10-21</span>
+                      <span class="ctag subtle">workflow</span>
+                    </div>
+                    <div>
+                      <h3>很久没手写代码之后，我在企业项目里怎样做开发</h3>
+                      <p class="muted">
+                        两个 sprint 的 GitHub Copilot Agent mode
+                        实践：从理解 Jira story、整理 spec 和任务，到让 AI
+                        实现、测试，再由人检查业务边界和变更。
+                      </p>
+                    </div>
+                    <span class="arw">↗</span>
+                  </a>
+                </li>
+                <li class="card">
+                  <a href="#">
+                    <div class="cwhen">
+                      <span class="subtle">2026-08-18</span>
+                      <span class="ctag subtle">architecture</span>
+                    </div>
+                    <div>
+                      <h3>AI 写业务代码，我写约束</h3>
+                      <p class="muted">
+                        一个上线中的儿童识字应用，代码几乎全是 AI
+                        写的。我在里面投入最多的不是代码，是一份 4KB
+                        的约束文件。
+                      </p>
+                    </div>
+                    <span class="arw">↗</span>
+                  </a>
+                </li>
+                <li class="card">
+                  <a href="#">
+                    <div class="cwhen">
+                      <span class="subtle">2026-08-02</span>
+                      <span class="ctag subtle">cloudflare</span>
+                    </div>
+                    <div>
+                      <h3>
+                        每天 90 亿次请求如何搬家：深入理解 cdnjs 迁移到
+                        Cloudflare Developer Platform
+                      </h3>
+                      <p class="muted">
+                        从 cdnjs 的旧架构、五个痛点和一次失败回滚讲起，逐层理解
+                        R2、Workers、Workflows、Queues 与 Durable Objects
+                        如何共同承载每天 90 亿次请求。
+                      </p>
+                    </div>
+                    <span class="arw">↗</span>
+                  </a>
+                </li>
+                <li class="card">
+                  <a href="#">
+                    <div class="cwhen">
+                      <span class="subtle">2024-05-13</span>
+                      <span class="ctag subtle">reflection</span>
+                    </div>
+                    <div>
+                      <h3>AI Changed My Life</h3>
+                      <p class="muted">
+                        ChatGPT 彻底改变了我的工作流程，成为了我的得力助手。
+                      </p>
+                    </div>
+                    <span class="arw">↗</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <p class="note">
+      说明：三套 demo 共用同一份 DOM，只切换 CSS 变量与组件样式规则 —— 这正是
+      Design System 想达到的效果。视口切换用 CSS 容器查询模拟，因此
+      「现状」那套只有 640px 一档会生效（对应线上 md/lg/xl 断点缺失），方案 A/B
+      则具备完整的多档响应。
+    </p>
+
+    <script>
+      var root = document.documentElement;
+      var vp = document.getElementById("viewport");
+
+      var METRICS = {
+        today: [
+          ["正文字体", "IBM Plex Mono，中文走系统等宽回退", "bad"],
+          ["版心", "48rem 文章 / 48rem 归档，与 72rem 页面冲突", "bad"],
+          ["弱化层级", "opacity 50–70%，随主题漂移", "bad"],
+          ["弱化文字对比度", "3.1–4.1:1，未达 WCAG AA 4.5:1", "bad"],
+          ["断点", "仅 640px 一档（md/lg/xl 失效）", "bad"],
+          ["组件", "无变体契约，样式散落在各页面", "bad"],
+        ],
+        tokens: [
+          ["正文字体", "system-ui + PingFang SC / 微软雅黑", "good"],
+          ["版心", "prose 44rem / archive 72rem，两个令牌", "good"],
+          ["弱化层级", "--text-muted / --text-subtle 语义色", "good"],
+          ["弱化文字对比度", "6.3:1 / 4.7:1，达到 WCAG AA", "good"],
+          ["断点", "640 / 1024 多档生效", "good"],
+          ["组件", "令牌就位，组件结构未动", ""],
+        ],
+        components: [
+          ["正文字体", "中文行高 1.8、行宽约 38 字", "good"],
+          ["版心", "prose 42rem / archive 72rem", "good"],
+          ["弱化层级", "两级语义色 + 抬升背景层", "good"],
+          ["弱化文字对比度", "6.3:1 / 4.7:1，达到 WCAG AA", "good"],
+          ["断点", "640 / 1024 多档生效", "good"],
+          ["组件", "MetaRow / Callout / TOC / Card 有契约", "good"],
+        ],
+      };
+
+      function renderMetrics() {
+        var rows = METRICS[root.dataset.demo];
+        document.getElementById("metrics").innerHTML = rows
+          .map(function (r) {
+            return (
+              '<div class="metric"><div class="k">' +
+              r[0] +
+              '</div><div class="v ' +
+              r[2] +
+              '">' +
+              r[1] +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function bindSeg(id, apply) {
+        var seg = document.getElementById(id);
+        seg.addEventListener("click", function (e) {
+          var b = e.target.closest("button");
+          if (!b) return;
+          Array.prototype.forEach.call(seg.children, function (x) {
+            x.setAttribute("aria-pressed", String(x === b));
+          });
+          apply(b.dataset.v);
+        });
+      }
+
+      bindSeg("seg-demo", function (v) {
+        root.dataset.demo = v;
+        renderMetrics();
+      });
+      bindSeg("seg-view", function (v) {
+        document.getElementById("view-post").hidden = v !== "post";
+        document.getElementById("view-archive").hidden = v !== "archive";
+      });
+      bindSeg("seg-theme", function (v) {
+        root.dataset.theme = v;
+      });
+      bindSeg("seg-vw", function (v) {
+        vp.style.width = v + "px";
+        vp.style.maxWidth = "100%";
+      });
+
+      document
+        .getElementById("focusToggle")
+        .addEventListener("change", function (e) {
+          vp.classList.toggle("show-focus", e.target.checked);
+        });
+
+      /* 支持 URL 参数直达某一种组合，便于对比与分享：
+         ?demo=components&view=archive&theme=dark&vw=768 */
+      var q = new URLSearchParams(location.search);
+      function preset(id, key, apply) {
+        var v = q.get(key);
+        if (!v) return;
+        var seg = document.getElementById(id);
+        var b = seg.querySelector('[data-v="' + v + '"]');
+        if (!b) return;
+        Array.prototype.forEach.call(seg.children, function (x) {
+          x.setAttribute("aria-pressed", String(x === b));
+        });
+        apply(v);
+      }
+      preset("seg-demo", "demo", function (v) {
+        root.dataset.demo = v;
+      });
+      preset("seg-view", "view", function (v) {
+        document.getElementById("view-post").hidden = v !== "post";
+        document.getElementById("view-archive").hidden = v !== "archive";
+      });
+      preset("seg-theme", "theme", function (v) {
+        root.dataset.theme = v;
+      });
+      preset("seg-vw", "vw", function (v) {
+        vp.style.width = v + "px";
+        vp.style.maxWidth = "100%";
+      });
+
+      renderMetrics();
+    </script>
+  </body>
+</html>

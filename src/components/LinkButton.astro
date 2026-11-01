@@ -17,13 +17,14 @@ const { href, className, ariaLabel, title, disabled = false } = Astro.props;
       aria-label={ariaLabel}
       title={title}
       aria-disabled={disabled}
+      role="presentation"
     >
       <slot />
     </span>
   ) : (
     <a
-      {href}
-      class={`group inline-block hover:text-skin-accent ${className}`}
+      href={href}
+      class={`group inline-block ${className}`}
       aria-label={ariaLabel}
       title={title}
     >

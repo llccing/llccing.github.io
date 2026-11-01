@@ -16,42 +16,71 @@ const next = currentPage < totalPages ? "" : "disabled";
 
 {
   totalPages > 1 && (
-    <nav class="pagination-wrapper" aria-label="Pagination">
+    <nav class="pagination" aria-label="Pagination">
       <LinkButton
         disabled={prev === "disabled"}
         href={prevUrl}
-        className={`mr-4 select-none ${prev}`}
+        className={`btn pagination__btn ${prev}`}
         ariaLabel="Previous"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class={`${prev}-svg`}>
-          <path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z" />
-        </svg>
-        Prev
+        <span aria-hidden="true">←</span> 上一页
       </LinkButton>
-      {currentPage} / {totalPages}
+
+      <span class="pagination__status">
+        <b>{String(currentPage).padStart(2, "0")}</b>
+        <span aria-hidden="true">/</span>
+        <span>{String(totalPages).padStart(2, "0")}</span>
+      </span>
+
       <LinkButton
         disabled={next === "disabled"}
         href={nextUrl}
-        className={`ml-4 select-none ${next}`}
+        className={`btn pagination__btn ${next}`}
         ariaLabel="Next"
       >
-        Next
-        <svg xmlns="http://www.w3.org/2000/svg" class={`${next}-svg`}>
-          <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z" />
-        </svg>
+        下一页 <span aria-hidden="true">→</span>
       </LinkButton>
     </nav>
   )
 }
 
 <style>
-  .pagination-wrapper {
-    @apply mb-8 mt-auto flex justify-center;
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: var(--measure-wide);
+    margin: 3.5rem auto 0;
+    padding: 1.5rem var(--gutter) 0;
+    border-top: var(--hairline);
   }
-  .disabled {
-    @apply pointer-events-none select-none opacity-50 hover:text-skin-base group-hover:fill-skin-base;
+
+  .pagination__btn {
+    text-decoration: none;
   }
-  .disabled-svg {
-    @apply group-hover:!fill-skin-base;
+
+  .pagination__btn.disabled {
+    color: var(--faint);
+    border-color: var(--line);
+    border-style: dashed;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .pagination__status {
+    display: inline-flex;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: var(--step-meta);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+  }
+
+  .pagination__status b {
+    color: var(--accent);
+    font-weight: 700;
   }
 </style>

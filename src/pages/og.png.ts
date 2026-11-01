@@ -3,6 +3,8 @@ import { generateOgImageForSite } from "@utils/generateOgImages";
 
 export const GET: APIRoute = async () => {
   const imageBuffer = await generateOgImageForSite();
+  if (!imageBuffer) return new Response(null, { status: 204 });
+
   const body = new Blob([new Uint8Array(imageBuffer)]);
 
   return new Response(body, {

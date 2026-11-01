@@ -1,0 +1,1598 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Rowan's Blog · TECHNICAL DOSSIER 设计提案</title>
+    <style>
+      /* ═══════════════════════════════════════════════════
+         DESIGN TOKENS — 「纸」 × 「朱批」
+         所有视觉值的唯一入口，改这里即全局生效
+         ═══════════════════════════════════════════════════ */
+      :root {
+        /* 色彩 · 浅色（暖纸 + 近黑墨 + 朱砂印） */
+        --canvas: #f6f5f2;
+        --surface: #ffffff;
+        --surface-sunken: #efeee9;
+        --ink: #1a1a18;
+        --ink-muted: #6e6c66;
+        --ink-faint: #8d8a83;
+        --line: #dedbd4;
+        --line-strong: #1a1a18;
+        --accent: #b8322a;
+        --accent-soft: rgba(184, 50, 42, 0.08);
+        --accent-ink: #ffffff;
+        --mark: #f2e4c9;
+
+        /* 字体 */
+        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+        /* 字阶 */
+        --fs-display: clamp(2.75rem, 8vw, 6rem);
+        --fs-h1: clamp(2.1rem, 4.6vw, 3.4rem);
+        --fs-h2: 1.5rem;
+        --fs-h3: 1.125rem;
+        --fs-lede: 1.1875rem;
+        --fs-body: 1.0625rem;
+        --fs-sm: 0.875rem;
+        --fs-xs: 0.75rem;
+        --fs-eyebrow: 0.6875rem;
+
+        --lh-body: 1.8;
+        --lh-title: 1.22;
+
+        /* 形状 · 全系统只两种圆角 */
+        --r-sharp: 0px;
+        --r-soft: 8px;
+
+        /* 间距 · 8 基数 */
+        --s1: 8px;
+        --s2: 16px;
+        --s3: 24px;
+        --s4: 32px;
+        --s5: 48px;
+        --s6: 64px;
+        --s7: 96px;
+
+        --measure: 40em;
+        --shell: 1440px;
+      }
+
+      [data-theme="dark"] {
+        --canvas: #131316;
+        --surface: #1b1b1f;
+        --surface-sunken: #0d0d0f;
+        --ink: #edede8;
+        --ink-muted: #9a978f;
+        --ink-faint: #77746d;
+        --line: #2c2c33;
+        --line-strong: #edede8;
+        --accent: #ff6a4d;
+        --accent-soft: rgba(255, 106, 77, 0.12);
+        --accent-ink: #14140f;
+        --mark: #3a2c1c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: var(--accent);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+      img,
+      svg {
+        display: block;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        line-height: var(--lh-title);
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1.2em;
+      }
+      ul,
+      ol {
+        margin: 0 0 1.2em;
+        padding-left: 1.4em;
+      }
+      li {
+        margin-bottom: 0.5em;
+      }
+      strong {
+        font-weight: 700;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+      }
+
+      /* focus 全局可见 */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* ── 演示外壳 ─────────────────────────── */
+      .ribbon {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .ribbon-in {
+        max-width: var(--shell);
+        margin: 0 auto;
+        padding: var(--s2) var(--s3);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s2);
+        align-items: center;
+      }
+      .ribbon .who {
+        font-size: var(--fs-xs);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+      }
+      .seg {
+        display: inline-flex;
+        border: 1px solid var(--line);
+        border-radius: var(--r-soft);
+        overflow: hidden;
+      }
+      .seg button {
+        border: 0;
+        background: transparent;
+        padding: 6px 14px;
+        font-size: var(--fs-sm);
+        cursor: pointer;
+        min-height: 34px;
+      }
+      .seg button + button {
+        border-left: 1px solid var(--line);
+      }
+      .seg button[aria-pressed="true"] {
+        background: var(--accent);
+        color: var(--accent-ink);
+      }
+      .spacer {
+        margin-left: auto;
+      }
+
+      /* ── 站点头 ─────────────────────────── */
+      .site {
+        border-bottom: 1px solid var(--line-strong);
+      }
+      .site-in {
+        max-width: var(--shell);
+        margin: 0 auto;
+        padding: var(--s3);
+        display: flex;
+        align-items: baseline;
+        gap: var(--s4);
+        flex-wrap: wrap;
+      }
+      .brand {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: 0;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .brand em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .nav {
+        display: flex;
+        gap: var(--s3);
+        font-size: var(--fs-sm);
+        margin-left: auto;
+        flex-wrap: wrap;
+      }
+      .nav a {
+        color: var(--ink-muted);
+        text-decoration: none;
+        padding-bottom: 2px;
+        border-bottom: 2px solid transparent;
+      }
+      .nav a:hover {
+        color: var(--ink);
+      }
+      .nav a[aria-current="page"] {
+        color: var(--ink);
+        font-weight: 500;
+        border-bottom-color: var(--accent);
+      }
+
+      .shell {
+        max-width: var(--shell);
+        margin: 0 auto;
+        padding: 0 var(--s3);
+      }
+
+      /* ═══════════ 通用原子 ═══════════ */
+      .eyebrow {
+        margin: 0 0 var(--s2);
+        font-size: var(--fs-eyebrow);
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .num {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+      }
+      .rule {
+        height: 1px;
+        background: var(--line);
+        border: 0;
+        margin: 0;
+      }
+      .rule-strong {
+        background: var(--line-strong);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 10px;
+        border: 1px solid var(--line);
+        border-radius: var(--r-soft);
+        font-size: var(--fs-xs);
+        color: var(--ink-muted);
+        text-decoration: none;
+        background: transparent;
+      }
+      .tag:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .tag-qty {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        opacity: 0.7;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 0 var(--s3);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--r-soft);
+        background: transparent;
+        color: var(--ink);
+        font-size: var(--fs-sm);
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s, transform 0.15s;
+      }
+      .btn:hover {
+        background: var(--ink);
+        color: var(--canvas);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn[disabled] {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .btn[disabled]:hover {
+        background: transparent;
+        color: var(--ink);
+      }
+      .btn-solid {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-ink);
+      }
+      .btn-solid:hover {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--canvas);
+      }
+
+      .field {
+        width: 100%;
+        min-height: 44px;
+        padding: 0 var(--s2);
+        border: 1px solid var(--line);
+        border-radius: var(--r-soft);
+        background: var(--surface);
+        color: var(--ink);
+        font-size: 16px;
+        font-family: inherit;
+      }
+      .field::placeholder {
+        color: var(--ink-faint);
+      }
+      .field:focus {
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+
+      /* ═══════════ 文章页 · DOSSIER 布局 ═══════════ */
+      .dossier {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+        padding: var(--s6) 0 var(--s7);
+        align-items: start;
+      }
+
+      /* 左：元信息栏 */
+      .dossier-aside {
+        border-top: 3px solid var(--line-strong);
+        padding-top: var(--s3);
+      }
+      .dossier-main {
+        min-width: 0;
+      }
+      .meta-dl {
+        margin: 0;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 10px var(--s2);
+        font-size: var(--fs-sm);
+      }
+      .meta-dl dt {
+        color: var(--ink-faint);
+        font-size: var(--fs-eyebrow);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding-top: 3px;
+      }
+      .meta-dl dd {
+        margin: 0;
+        color: var(--ink);
+      }
+      .toc {
+        margin: var(--s4) 0 0;
+        padding: 0;
+        list-style: none;
+        border-left: 1px solid var(--line);
+      }
+      .toc li {
+        margin: 0;
+      }
+      .toc a {
+        display: block;
+        padding: 7px 0 7px var(--s2);
+        margin-left: -1px;
+        border-left: 2px solid transparent;
+        color: var(--ink-muted);
+        font-size: var(--fs-sm);
+        text-decoration: none;
+        line-height: 1.5;
+      }
+      .toc a:hover {
+        color: var(--ink);
+      }
+      .toc a[aria-current="true"] {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        font-weight: 500;
+      }
+      .toc .sub {
+        padding-left: var(--s4);
+        font-size: var(--fs-xs);
+      }
+      .progress {
+        margin-top: var(--s4);
+      }
+      .progress-bar {
+        height: 3px;
+        background: var(--line);
+        border-radius: 0;
+        overflow: hidden;
+      }
+      .progress-bar i {
+        display: block;
+        height: 100%;
+        width: 34%;
+        background: var(--accent);
+      }
+      .progress-txt {
+        margin-top: 6px;
+        font-size: var(--fs-xs);
+        color: var(--ink-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* 正文 */
+      .post-title {
+        font-size: var(--fs-h1);
+        font-weight: 700;
+        letter-spacing: 0;
+        margin: 0 0 var(--s3);
+        text-wrap: balance;
+      }
+      .lede {
+        font-size: var(--fs-lede);
+        line-height: 1.7;
+        color: var(--ink);
+        border-left: 3px solid var(--accent);
+        padding-left: var(--s3);
+        margin-bottom: var(--s5);
+      }
+      .measure > p,
+      .measure > ul,
+      .measure > ol {
+        max-width: var(--measure);
+      }
+      .measure > h2 {
+        margin: var(--s6) 0 var(--s2);
+        font-size: var(--fs-h2);
+        scroll-margin-top: var(--s5);
+      }
+      .measure > h3 {
+        margin: var(--s4) 0 var(--s1);
+        font-size: var(--fs-h3);
+      }
+      .measure > p {
+        color: var(--ink);
+      }
+
+      /* ── 内容组件 1：术语定义 ── */
+      .terms {
+        display: grid;
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sharp);
+        margin: 0 0 var(--s5);
+        max-width: var(--measure);
+      }
+      .term {
+        background: var(--surface);
+        padding: var(--s3);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      .term dt {
+        font-weight: 700;
+        font-size: var(--fs-body);
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .term dt .idx {
+        font-family: var(--font-mono);
+        font-size: var(--fs-xs);
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        padding: 1px 6px;
+        border-radius: var(--r-soft);
+      }
+      .term dd {
+        margin: 0;
+        color: var(--ink-muted);
+        font-size: var(--fs-sm);
+        line-height: 1.7;
+      }
+
+      /* ── 内容组件 2：中西对照引文 ── */
+      .bilingual {
+        border: 1px solid var(--line);
+        border-radius: var(--r-sharp);
+        margin: 0 0 var(--s5);
+        max-width: var(--measure);
+        overflow: hidden;
+      }
+      .bilingual .orig {
+        background: var(--surface-sunken);
+        padding: var(--s3);
+        font-size: var(--fs-body);
+        line-height: 1.6;
+        border-bottom: 1px solid var(--line);
+      }
+      .bilingual .tr {
+        padding: var(--s3);
+        font-size: var(--fs-body);
+        line-height: 1.75;
+      }
+      .bilingual .tr strong {
+        background: var(--mark);
+        padding: 0 2px;
+      }
+      .bilingual figcaption {
+        padding: var(--s2) var(--s3);
+        border-top: 1px solid var(--line);
+        font-size: var(--fs-xs);
+        color: var(--ink-faint);
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .bilingual figcaption .src {
+        font-family: var(--font-mono);
+      }
+
+      /* ── 内容组件 3：证据块（代码/图示） ── */
+      .exhibit {
+        border: 1px solid var(--line);
+        border-radius: var(--r-sharp);
+        margin: 0 0 var(--s5);
+        max-width: var(--measure);
+      }
+      .exhibit-hd {
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        padding: 10px var(--s2);
+        border-bottom: 1px solid var(--line);
+        background: var(--surface-sunken);
+        font-size: var(--fs-xs);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .exhibit-hd .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .exhibit pre {
+        margin: 0;
+        padding: var(--s3);
+        overflow-x: auto;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        line-height: 1.65;
+        background: transparent;
+      }
+
+      /* ── 内容组件 4：朱批要点 ── */
+      .verdict {
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+        padding: var(--s3);
+        margin: 0 0 var(--s5);
+        max-width: var(--measure);
+      }
+      .verdict .lbl {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: var(--fs-eyebrow);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .verdict p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ── 内容组件 5：反驳证据 ── */
+      .counter {
+        border: 1px dashed var(--line-strong);
+        border-radius: var(--r-sharp);
+        padding: var(--s3);
+        margin: 0 0 var(--s5);
+        max-width: var(--measure);
+      }
+      .counter .lbl {
+        font-size: var(--fs-eyebrow);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .counter p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ── 内容组件 6：尺度数据 ── */
+      .scale {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: var(--s2);
+        margin: 0 0 var(--s5);
+        max-width: var(--measure);
+      }
+      .stat {
+        border-top: 2px solid var(--line-strong);
+        padding-top: var(--s1);
+      }
+      .stat .k {
+        font-size: 1.75rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        line-height: 1.2;
+      }
+      .stat .k.warn {
+        color: var(--accent);
+      }
+      .stat .v {
+        font-size: var(--fs-xs);
+        color: var(--ink-muted);
+        line-height: 1.5;
+        margin-top: 2px;
+      }
+
+      /* ── 内容组件 7：清单 ── */
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 var(--s5);
+        max-width: var(--measure);
+        border-top: 1px solid var(--line);
+      }
+      .checklist li {
+        margin: 0;
+        padding: 12px 0 12px 34px;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+        font-size: var(--fs-body);
+        line-height: 1.7;
+      }
+      .checklist li::before {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 17px;
+        width: 12px;
+        height: 12px;
+        border: 1.5px solid var(--ink-faint);
+        border-radius: 3px;
+      }
+      .checklist li.done::before {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* 文末 */
+      .post-foot {
+        margin-top: var(--s6);
+        padding-top: var(--s3);
+        border-top: 3px solid var(--line-strong);
+      }
+      .tagrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s1);
+        margin-bottom: var(--s4);
+      }
+      .pager {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s2);
+      }
+      .pager a {
+        border: 1px solid var(--line);
+        border-radius: var(--r-soft);
+        padding: var(--s2);
+        text-decoration: none;
+        color: var(--ink);
+        display: block;
+      }
+      .pager a:hover {
+        border-color: var(--accent);
+      }
+      .pager .dir {
+        font-size: var(--fs-eyebrow);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .pager .t {
+        font-weight: 500;
+        line-height: 1.5;
+      }
+      .pager .next {
+        text-align: right;
+      }
+
+      /* ═══════════ 档案首页 ═══════════ */
+      .hero {
+        padding: var(--s7) 0 var(--s5);
+        border-bottom: 3px solid var(--line-strong);
+      }
+      .hero h1 {
+        font-size: var(--fs-display);
+        font-weight: 700;
+        letter-spacing: 0;
+        line-height: 0.98;
+        margin-bottom: var(--s3);
+      }
+      .hero h1 span {
+        color: var(--accent);
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s4);
+        align-items: end;
+      }
+      .hero .lede-txt {
+        font-size: var(--fs-lede);
+        line-height: 1.7;
+        color: var(--ink-muted);
+        max-width: 34em;
+        margin: 0;
+      }
+      .hero-stats {
+        display: flex;
+        gap: var(--s5);
+        flex-wrap: wrap;
+        margin-top: var(--s4);
+      }
+      .hero-stats .s .k {
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.2;
+      }
+      .hero-stats .s .v {
+        font-size: var(--fs-xs);
+        color: var(--ink-faint);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s1) var(--s2);
+        align-items: center;
+        padding: var(--s3) 0;
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 53px;
+        background: var(--canvas);
+        z-index: 30;
+      }
+      .filters .fl {
+        font-size: var(--fs-eyebrow);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin-right: 4px;
+      }
+      .chip {
+        min-height: 34px;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--ink-muted);
+        font-size: var(--fs-sm);
+        cursor: pointer;
+      }
+      .chip:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .chip[aria-pressed="true"] {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-ink);
+      }
+
+      /* Featured 大卡 */
+      .feature {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+        padding: var(--s5) 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .feature .no {
+        font-family: var(--font-mono);
+        font-size: var(--fs-xs);
+        color: var(--accent);
+        letter-spacing: 0.1em;
+      }
+      .feature h2 {
+        font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+        line-height: 1.25;
+        margin-bottom: var(--s2);
+      }
+      .feature h2 a {
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .feature h2 a:hover {
+        color: var(--accent);
+      }
+      .feature p {
+        color: var(--ink-muted);
+        max-width: 44em;
+        margin-bottom: var(--s3);
+      }
+
+      /* 年份分组 */
+      .yeargroup {
+        border-top: 1px solid var(--line);
+        padding: var(--s4) 0 0;
+      }
+      .year-hd {
+        display: flex;
+        align-items: baseline;
+        gap: var(--s2);
+        margin-bottom: var(--s2);
+      }
+      .year-hd h3 {
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .year-hd .count {
+        font-size: var(--fs-xs);
+        color: var(--ink-faint);
+        font-family: var(--font-mono);
+      }
+      .year-hd .line {
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+      .entries {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .entry {
+        border-bottom: 1px solid var(--line);
+      }
+      .entry a {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: var(--s3) 0;
+        text-decoration: none;
+        color: var(--ink);
+        align-items: baseline;
+      }
+      .entry a:hover .t {
+        color: var(--accent);
+      }
+      .entry .when {
+        font-family: var(--font-mono);
+        font-size: var(--fs-xs);
+        color: var(--ink-faint);
+        font-variant-numeric: tabular-nums;
+      }
+      .entry .t {
+        font-size: var(--fs-h3);
+        font-weight: 500;
+        line-height: 1.45;
+      }
+      .entry .desc {
+        font-size: var(--fs-sm);
+        color: var(--ink-muted);
+        line-height: 1.65;
+      }
+      .entry .tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+
+      /* 状态反馈区 */
+      .states {
+        padding: var(--s6) 0 var(--s7);
+        border-top: 3px solid var(--line-strong);
+        margin-top: var(--s6);
+      }
+      .states h2 {
+        font-size: var(--fs-h2);
+        margin-bottom: var(--s1);
+      }
+      .states .note {
+        color: var(--ink-muted);
+        font-size: var(--fs-sm);
+        margin-bottom: var(--s4);
+      }
+      .state-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+      }
+      .state {
+        border: 1px solid var(--line);
+        border-radius: var(--r-soft);
+        padding: var(--s3);
+        background: var(--surface);
+      }
+      .state .cap {
+        font-size: var(--fs-eyebrow);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin-bottom: var(--s2);
+      }
+      .skel {
+        height: 12px;
+        background: linear-gradient(
+          90deg,
+          var(--surface-sunken) 25%,
+          var(--line) 50%,
+          var(--surface-sunken) 75%
+        );
+        background-size: 240px 100%;
+        animation: sweep 1.4s infinite linear;
+        border-radius: 3px;
+        margin-bottom: 10px;
+      }
+      @keyframes sweep {
+        from {
+          background-position: -240px 0;
+        }
+        to {
+          background-position: 240px 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .skel {
+          animation: none;
+        }
+      }
+      .empty {
+        text-align: center;
+        padding: var(--s3) 0;
+      }
+      .empty .ico {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto var(--s2);
+        border: 1.5px dashed var(--line-strong);
+        border-radius: var(--r-soft);
+      }
+      .alert {
+        display: flex;
+        gap: 10px;
+        padding: 12px var(--s2);
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        font-size: var(--fs-sm);
+        line-height: 1.6;
+      }
+      .toast {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px var(--s2);
+        background: var(--ink);
+        color: var(--canvas);
+        border-radius: var(--r-soft);
+        font-size: var(--fs-sm);
+      }
+      .btnrow {
+        display: flex;
+        gap: var(--s1);
+        flex-wrap: wrap;
+      }
+
+      footer.site-foot {
+        border-top: 1px solid var(--line);
+        padding: var(--s4) 0 var(--s6);
+        color: var(--ink-faint);
+        font-size: var(--fs-sm);
+      }
+      footer.site-foot .in {
+        max-width: var(--shell);
+        margin: 0 auto;
+        padding: 0 var(--s3);
+        display: flex;
+        gap: var(--s3);
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      footer.site-foot a {
+        color: var(--ink-muted);
+      }
+
+      /* ═══════════ 断点 · 768 / 1200 ═══════════ */
+      @media (min-width: 768px) {
+        .shell,
+        .site-in,
+        .ribbon-in,
+        footer.site-foot .in {
+          padding-left: var(--s5);
+          padding-right: var(--s5);
+        }
+        .hero-grid {
+          grid-template-columns: 1.4fr 1fr;
+        }
+        .hero-stats {
+          margin-top: 0;
+        }
+        .entry a {
+          grid-template-columns: 7rem 1fr;
+          gap: var(--s3);
+          padding: var(--s3) 0;
+        }
+        .entry .when {
+          grid-row: span 3;
+        }
+        .feature {
+          grid-template-columns: 1fr 1fr;
+          gap: var(--s5);
+          align-items: start;
+        }
+        .terms {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .state-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .pager {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (min-width: 1200px) {
+        .dossier {
+          grid-template-columns: 240px minmax(0, 46rem);
+          gap: var(--s6);
+          justify-content: center;
+        }
+        .dossier-aside {
+          position: sticky;
+          top: 90px;
+        }
+        .state-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .hero-grid {
+          grid-template-columns: 1.6fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 演示控制条 -->
+    <div class="ribbon">
+      <div class="ribbon-in">
+        <span class="who">TECHNICAL DOSSIER · 提案 v1</span>
+        <div class="seg" id="segView">
+          <button data-v="post" aria-pressed="true">文章详情</button>
+          <button data-v="archive" aria-pressed="false">档案首页</button>
+        </div>
+        <span class="spacer"></span>
+        <div class="seg" id="segTheme">
+          <button data-v="light" aria-pressed="true">纸 · 浅色</button>
+          <button data-v="dark" aria-pressed="false">墨 · 暗色</button>
+        </div>
+      </div>
+    </div>
+
+    <header class="site">
+      <div class="site-in">
+        <a class="brand" href="#">Rowan<em>.</em>blog</a>
+        <nav class="nav">
+          <a href="#" aria-current="page">档案</a>
+          <a href="#">领域</a>
+          <a href="#">项目</a>
+          <a href="#">Digest</a>
+          <a href="#">关于</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ══════════ 视图 1 · 文章详情 ══════════ -->
+    <main id="viewPost">
+      <div class="shell">
+        <div class="dossier">
+          <aside class="dossier-aside">
+            <p class="eyebrow">档案元数据</p>
+            <dl class="meta-dl">
+              <dt>编号</dt>
+              <dd class="num">No.180</dd>
+              <dt>领域</dt>
+              <dd>AI · 工程实践</dd>
+              <dt>发布</dt>
+              <dd class="num">2026-10-31</dd>
+              <dt>更新</dt>
+              <dd class="num">2026-10-31</dd>
+              <dt>篇幅</dt>
+              <dd class="num">12 min</dd>
+              <dt>证据</dt>
+              <dd>一手来源 ×2</dd>
+            </dl>
+
+            <nav aria-label="章节导航">
+              <p class="eyebrow" style="margin-top: 32px">章节</p>
+              <ul class="toc">
+                <li><a href="#" aria-current="true">先立三个词</a></li>
+                <li><a href="#"><span class="num">→</span> 内循环与外循环</a></li>
+                <li><a href="#"><span class="num">→</span> 三个隐藏成本</a></li>
+                <li>
+                  <a href="#" class="sub">认知负债</a>
+                </li>
+                <li>
+                  <a href="#" class="sub">认知投降</a>
+                </li>
+                <li><a href="#">我的审核清单</a></li>
+              </ul>
+            </nav>
+
+            <div class="progress">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                aria-valuenow="34"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-label="阅读进度"
+              >
+                <i></i>
+              </div>
+              <div class="progress-txt">34% · 剩余约 8 min</div>
+            </div>
+          </aside>
+
+          <article class="dossier-main">
+            <p class="eyebrow">Writing / AI &amp; Workflow</p>
+            <h1 class="post-title">AI 写代码，我守住外循环</h1>
+            <p class="lede">
+              当 AI 能写的代码越来越多，人的判断该放在哪里？这篇拆开「内循环 /
+              外循环」的分工边界、三个隐藏成本，以及 Claude Code
+              团队把回滚率降下来的具体做法 —— 最后给一份我自己能跑的审核清单。
+            </p>
+
+            <div class="measure">
+              <p>
+                我最近一直在想一个问题：当 AI
+                能写的代码越来越多的时候，人到底还剩什么。不是那种宏大的「AI
+                会不会取代程序员」——那个问题问法本身就有毛病。
+              </p>
+              <p>
+                真正每天困扰我的是一件具体的事：<strong>一段 AI
+                写的、几千行的改动摆在我面前，我该怎么判断它能不能合并？</strong>
+              </p>
+              <p>
+                这个问题我找了一圈资料，最后有两组一手来源给了我答案，而且它们指向同一个结论。
+              </p>
+
+              <h2 id="terms">先立三个词</h2>
+              <p>
+                Addy
+                的开场没有谈架构，先定义了三个词。这三个词是整个框架的基石：
+              </p>
+
+              <dl class="terms">
+                <div class="term">
+                  <dt><span class="idx">01</span> Quality</dt>
+                  <dd>
+                    我们在放系统出去之前装好的所有检查。这些检查产出<strong>证据</strong>。
+                  </dd>
+                </div>
+                <div class="term">
+                  <dt><span class="idx">02</span> Verdict</dt>
+                  <dd>
+                    在东西进入依赖系统之前，人做的那个<strong>生产决策</strong>——放行、拦截、重定向还是拒绝。
+                  </dd>
+                </div>
+                <div class="term">
+                  <dt><span class="idx">03</span> Answerability</dt>
+                  <dd><strong>有人问起的时候，我能解释为什么。</strong></dd>
+                </div>
+              </dl>
+
+              <figure class="bilingual">
+                <div class="orig">
+                  “Quality produces evidence; a verdict assigns
+                  responsibility.”
+                </div>
+                <div class="tr">
+                  <strong>质量产出证据，裁定分配责任。</strong
+                  >而可解释性，让你站得住你做的那个裁定。
+                </div>
+                <figcaption>
+                  <span class="src">Addy Osmani</span>
+                  <span>·</span>
+                  <span>AI Engineer World's Fair 2026 闭幕 keynote</span>
+                </figcaption>
+              </figure>
+
+              <div class="verdict">
+                <p class="lbl">裁决要点</p>
+                <p>
+                  verdict 不是「看一眼 AI
+                  的输出」，而是「有人为这个决定负责」。把人留在环里，保留的是那份责任，不是那段阅读时间。
+                </p>
+              </div>
+
+              <h2 id="loops">内循环与外循环</h2>
+              <p>
+                整个工作被切成两个环。交界处 agent
+                交出来的不是代码，是一个<strong>证据包</strong>：
+              </p>
+
+              <div class="exhibit">
+                <div class="exhibit-hd">
+                  <span class="dot"></span>图 1 · 两个循环的边界
+                </div>
+                <pre>
+内循环 · capability        外循环 · agency
+─────────────────          ─────────────────
+Investigate                Decide
+Implement        ──────▶   Verify
+Test           evidence    Approve
+Report                     Own
+
+智能体在跑                   人守住</pre
+                >
+              </div>
+
+              <p>
+                然后工程才真正开始：这件事值不值得做？证据够不够？放行还是打回？
+              </p>
+
+              <figure class="bilingual">
+                <div class="orig">
+                  “The boundary is not human looks at AI output. The boundary is
+                  evidence and responsibility.”
+                </div>
+                <div class="tr">
+                  <strong>边界不是「人看过 AI 的输出」，而是证据与责任。</strong>
+                </div>
+                <figcaption>
+                  <span class="src">Addy Osmani</span>
+                  <span>·</span>
+                  <span>整场演讲里我最有收获的一句</span>
+                </figcaption>
+              </figure>
+
+              <h2 id="costs">三个隐藏成本</h2>
+              <p>
+                后半段他讲了三件必须避免的事。它们描述的是<strong
+                  >没有立刻报错、但会慢慢吃掉你的东西</strong
+                >。
+              </p>
+
+              <h3 id="debt">认知负债（cognitive debt）</h3>
+              <p>
+                理解力和记忆力的流失，因为你把越来越多的问题解决外包给了
+                AI。它的严重程度取决于<strong>委托深度</strong>：
+              </p>
+
+              <div class="scale">
+                <div class="stat">
+                  <div class="k">80.6%</div>
+                  <div class="v">30 分钟量级任务成功率</div>
+                </div>
+                <div class="stat">
+                  <div class="k">70.2%</div>
+                  <div class="v">1 小时量级</div>
+                </div>
+                <div class="stat">
+                  <div class="k warn">25.6%</div>
+                  <div class="v">8 小时量级</div>
+                </div>
+              </div>
+
+              <div class="counter">
+                <p class="lbl">反驳证据</p>
+                <p>
+                  这组数字来自 keynote 的实测，但书面版《Own the Outer
+                  Loop》里没有收录；25.6%
+                  那个样本的任务类型也未公开。我把它标为<strong>待独立核实</strong>，不作为结论依据。
+                </p>
+              </div>
+
+              <h2 id="checklist">我的审核清单</h2>
+              <p>把上面的框架落到每天能执行的动作：</p>
+              <ul class="checklist">
+                <li class="done">先问「证据包里有什么」，而不是先打开 diff</li>
+                <li class="done">对每个 Verdict 写一句「为什么放行」，不写就不合并</li>
+                <li>超过 1 小时量级的任务，按工作流而非一次性结果来审</li>
+                <li>每周挑一段自己没写过的代码，向同事讲一遍</li>
+              </ul>
+            </div>
+
+            <footer class="post-foot">
+              <div class="tagrow">
+                <a class="tag" href="#">ai <span class="tag-qty">42</span></a>
+                <a class="tag" href="#">workflow <span class="tag-qty">18</span></a>
+                <a class="tag" href="#">code-review <span class="tag-qty">9</span></a>
+              </div>
+              <nav class="pager" aria-label="上下篇">
+                <a href="#">
+                  <span class="dir">← 上一篇</span>
+                  <span class="t">很久没手写代码之后，我在企业项目里怎样做开发</span>
+                </a>
+                <a href="#" class="next">
+                  <span class="dir">下一篇 →</span>
+                  <span class="t">AI 写业务代码，我写约束</span>
+                </a>
+              </nav>
+            </footer>
+          </article>
+        </div>
+      </div>
+    </main>
+
+    <!-- ══════════ 视图 2 · 档案首页 ══════════ -->
+    <main id="viewArchive" hidden>
+      <div class="shell">
+        <section class="hero">
+          <p class="eyebrow">Archive / 2016 — 2026</p>
+          <h1>工程<span>档案</span></h1>
+          <div class="hero-grid">
+            <p class="lede-txt">
+              十年开发与 AI
+              实践的一手记录。每一篇都写明当时的问题、做出的取舍，以及事后看哪些判断是错的。
+            </p>
+            <div class="hero-stats">
+              <div class="s">
+                <div class="k num">180</div>
+                <div class="v">篇归档</div>
+              </div>
+              <div class="s">
+                <div class="k num">4</div>
+                <div class="v">领域</div>
+              </div>
+              <div class="s">
+                <div class="k num">86</div>
+                <div class="v">本周新增天</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="filters">
+          <span class="fl">领域</span>
+          <button class="chip" aria-pressed="true">全部</button>
+          <button class="chip" aria-pressed="false">AI</button>
+          <button class="chip" aria-pressed="false">前端</button>
+          <button class="chip" aria-pressed="false">后端</button>
+          <button class="chip" aria-pressed="false">随笔</button>
+          <span class="fl" style="margin-left: 16px">排序</span>
+          <button class="chip" aria-pressed="true">时间 ↓</button>
+          <button class="chip" aria-pressed="false">篇幅</button>
+        </div>
+
+        <section class="feature">
+          <div>
+            <p class="no">FEATURED / No.180</p>
+            <h2><a href="#">AI 写代码，我守住外循环</a></h2>
+            <p>
+              从 Addy Osmani 的闭幕 keynote 出发，拆开「内循环 /
+              外循环」的分工边界、三个隐藏成本，以及 Claude Code
+              团队把回滚率降下来的具体做法。附反面证据。
+            </p>
+            <div class="btnrow">
+              <a class="btn btn-solid" href="#">阅读全文</a>
+              <button class="btn">收藏</button>
+            </div>
+          </div>
+          <div>
+            <div class="exhibit">
+              <div class="exhibit-hd"><span class="dot"></span>本篇要点</div>
+              <pre>
+Quality     → 产出证据
+Verdict     → 分配责任
+Answerable  → 站得住裁定
+
+边界 = 证据与责任
+不是人看过输出</pre
+              >
+            </div>
+          </div>
+        </section>
+
+        <section class="yeargroup">
+          <div class="year-hd">
+            <h3 class="num">2026</h3>
+            <span class="count num">38 篇</span>
+            <span class="line"></span>
+          </div>
+          <ul class="entries">
+            <li class="entry">
+              <a href="#">
+                <span class="when">10-31</span>
+                <span class="t">AI 写代码，我守住外循环</span>
+                <span class="desc"
+                  >当 AI 能写的代码越来越多，人的判断该放在哪里。</span
+                >
+                <span class="tags"
+                  ><span class="tag">ai</span><span class="tag">workflow</span></span
+                >
+              </a>
+            </li>
+            <li class="entry">
+              <a href="#">
+                <span class="when">10-21</span>
+                <span class="t"
+                  >很久没手写代码之后，我在企业项目里怎样做开发</span
+                >
+                <span class="desc"
+                  >两个 sprint 的 GitHub Copilot Agent mode 实践复盘。</span
+                >
+                <span class="tags"
+                  ><span class="tag">ai</span><span class="tag">workflow</span></span
+                >
+              </a>
+            </li>
+            <li class="entry">
+              <a href="#">
+                <span class="when">08-18</span>
+                <span class="t">AI 写业务代码，我写约束</span>
+                <span class="desc"
+                  >代码几乎全是 AI 写的儿童识字应用里，那份 4KB
+                  的约束文件防住了什么。</span
+                >
+                <span class="tags"
+                  ><span class="tag">architecture</span></span
+                >
+              </a>
+            </li>
+            <li class="entry">
+              <a href="#">
+                <span class="when">08-02</span>
+                <span class="t"
+                  >每天 90 亿次请求如何搬家：cdnjs 迁移到 Cloudflare Developer
+                  Platform</span
+                >
+                <span class="desc"
+                  >从旧架构、五个痛点和一次失败回滚讲起。</span
+                >
+                <span class="tags"
+                  ><span class="tag">cloudflare</span
+                  ><span class="tag">cdn</span></span
+                >
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="yeargroup">
+          <div class="year-hd">
+            <h3 class="num">2024</h3>
+            <span class="count num">21 篇</span>
+            <span class="line"></span>
+          </div>
+          <ul class="entries">
+            <li class="entry">
+              <a href="#">
+                <span class="when">05-13</span>
+                <span class="t">AI Changed My Life</span>
+                <span class="desc"
+                  >ChatGPT 彻底改变了我的工作流程，成为了我的得力助手。</span
+                >
+                <span class="tags"><span class="tag">reflection</span></span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="states">
+          <h2>状态与反馈</h2>
+          <p class="note">
+            同一套 token 下的关键页面状态：加载、空数据、错误、成功反馈与按钮四态。
+          </p>
+          <div class="state-grid">
+            <div class="state">
+              <p class="cap">加载中 · 骨架屏</p>
+              <div class="skel" style="width: 92%"></div>
+              <div class="skel" style="width: 76%"></div>
+              <div class="skel" style="width: 84%; margin-bottom: 0"></div>
+            </div>
+            <div class="state">
+              <p class="cap">空数据</p>
+              <div class="empty">
+                <div class="ico"></div>
+                <p style="margin: 0 0 12px">这个筛选条件下没有归档</p>
+                <button class="btn">清除筛选</button>
+              </div>
+            </div>
+            <div class="state">
+              <p class="cap">错误提示</p>
+              <div class="alert">
+                <span>评论加载失败，稍后可重试。已缓存你未提交的内容。</span>
+              </div>
+            </div>
+            <div class="state">
+              <p class="cap">成功反馈 / 按钮四态</p>
+              <div class="toast" style="margin-bottom: 12px">
+                <span>已加入收藏</span>
+              </div>
+              <div class="btnrow">
+                <button class="btn btn-solid">默认</button>
+                <button class="btn" disabled>禁用</button>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 24px; max-width: 420px">
+            <p class="cap" style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px">
+              输入框 · 搜索归档
+            </p>
+            <input class="field" type="search" placeholder="搜索标题、标签或正文…" />
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-foot">
+      <div class="in">
+        <span>© 2026 Rowan Liu</span>
+        <a href="#">RSS</a>
+        <a href="#">GitHub</a>
+        <a href="#">LinkedIn</a>
+        <span style="margin-left: auto" class="num">沪 · 上海</span>
+      </div>
+    </footer>
+
+    <script>
+      var root = document.documentElement;
+      function bind(id, fn) {
+        var seg = document.getElementById(id);
+        seg.addEventListener("click", function (e) {
+          var b = e.target.closest("button");
+          if (!b) return;
+          Array.prototype.forEach.call(seg.children, function (x) {
+            x.setAttribute("aria-pressed", String(x === b));
+          });
+          fn(b.dataset.v);
+        });
+      }
+      bind("segView", function (v) {
+        document.getElementById("viewPost").hidden = v !== "post";
+        document.getElementById("viewArchive").hidden = v !== "archive";
+      });
+      bind("segTheme", function (v) {
+        root.dataset.theme = v;
+      });
+
+      /* URL 参数直达：?view=archive&theme=dark */
+      var q = new URLSearchParams(location.search);
+      function preset(id, key, fn) {
+        var v = q.get(key);
+        if (!v) return;
+        var seg = document.getElementById(id);
+        var b = seg.querySelector('[data-v="' + v + '"]');
+        if (!b) return;
+        Array.prototype.forEach.call(seg.children, function (x) {
+          x.setAttribute("aria-pressed", String(x === b));
+        });
+        fn(v);
+      }
+      preset("segView", "view", function (v) {
+        document.getElementById("viewPost").hidden = v !== "post";
+        document.getElementById("viewArchive").hidden = v !== "archive";
+      });
+      preset("segTheme", "theme", function (v) {
+        root.dataset.theme = v;
+      });
+    </script>
+  </body>
+</html>

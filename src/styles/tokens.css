@@ -1,0 +1,133 @@
+/* ==========================================================================
+   Design tokens — 「纸 × 朱批 / Technical Dossier」
+   单一事实来源。任何颜色、字号、间距、圆角都必须从这里取值，
+   不允许在组件里硬编码 hex 或用 opacity-* 表达弱化层级。
+   ========================================================================== */
+
+:root,
+html[data-theme="light"] {
+  /* ── 色板：语义槽位 ─────────────────────────────────────── */
+  --canvas: #f6f5f2; /* 页面底色（纸） */
+  --surface: #ffffff; /* 抬升面（卡片/目录框） */
+  --sunken: #efeee9; /* 下沉面（代码块/证据块） */
+  --ink: #1a1a18; /* 正文墨色 */
+  --muted: #6e6c66; /* 弱化文字，AA 达标 */
+  --faint: #8d8a83; /* 极弱标签 / 元信息，大字或非文本专用 */
+  --accent: #b8322a; /* 朱砂：唯一强调，批注性 */
+  --accent-ink: #ffffff; /* 强调底上的文字 */
+  --line: #dedbd4; /* 分割线 / 描边 */
+  --mark: #f2e4c9; /* 高亮马克笔 */
+
+  /* 语义派生（rgba 分量，供 alpha 合成使用） */
+  --accent-soft: rgb(184 50 42 / 0.08);
+  --accent-rule: rgb(184 50 42 / 0.4);
+  --ink-soft: rgb(26 26 24 / 0.06);
+
+  /* ── 兼容旧 skin-* 工具类的映射 ────────────────────────── */
+  --color-fill: 246, 245, 242;
+  --color-text-base: 26, 26, 24;
+  --color-accent: 184, 50, 42;
+  --color-card: 239, 238, 233;
+  --color-card-muted: 222, 219, 212;
+  --color-border: 222, 219, 212;
+
+  --theme-color: #f6f5f2;
+}
+
+html[data-theme="dark"] {
+  --canvas: #131316;
+  --surface: #1b1b1f;
+  --sunken: #0d0d0f;
+  --ink: #edede8;
+  --muted: #9a978f;
+  --faint: #7c7972;
+  --accent: #ff6a4d;
+  --accent-ink: #14140f;
+  --line: #2e2e33;
+  --mark: #3a2c1c;
+
+  --accent-soft: rgb(255 106 77 / 0.12);
+  --accent-rule: rgb(255 106 77 / 0.45);
+  --ink-soft: rgb(237 237 232 / 0.08);
+
+  --color-fill: 19, 19, 22;
+  --color-text-base: 237, 237, 232;
+  --color-accent: 255, 106, 77;
+  --color-card: 13, 13, 15;
+  --color-card-muted: 46, 46, 51;
+  --color-border: 46, 46, 51;
+
+  --theme-color: #131316;
+}
+
+:root {
+  /* ── 字体 ─────────────────────────────────────────────── */
+  --font-sans:
+    ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC",
+    "Noto Sans CJK SC", sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* ── 字阶 ─────────────────────────────────────────────── */
+  --step-display: clamp(2.75rem, 8vw, 6rem);
+  --step-h1: clamp(2.125rem, 4.6vw, 3.375rem);
+  --step-h2: clamp(1.375rem, 2.4vw, 1.75rem);
+  --step-h3: 1.125rem;
+  --step-lede: 1.1875rem;
+  --step-body: 1.0625rem;
+  --step-meta: 0.875rem;
+  --step-eyebrow: 0.6875rem;
+
+  /* ── 行高 ─────────────────────────────────────────────── */
+  --lh-display: 0.98;
+  --lh-tight: 1.15;
+  --lh-snug: 1.4;
+  --lh-body: 1.8; /* 中文必需，拉丁文的 1.6 在 CJK 下会糊 */
+  --lh-meta: 1.5;
+
+  /* ── 间距：8 基数 ─────────────────────────────────────── */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-10: 2.5rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
+  --s-24: 6rem;
+
+  /* ── 形状：全站 2 种，不再出现第三种 ───────────────────── */
+  --r-container: 0px;
+  --r-control: 8px;
+
+  /* ── 版心 ─────────────────────────────────────────────── */
+  --measure-post: 46rem; /* 文章正文 */
+  --measure-wide: 72rem; /* 列表 / 归档 / 首页 */
+  --measure-page: 60rem; /* 通用页面（tags / 404 等） */
+
+  /* ── 边框 ─────────────────────────────────────────────── */
+  --hairline: 1px solid var(--line);
+
+  /* 页面左右留白：unlayered 样式会重置 base 层的 px-*，必须走同一个变量 */
+  --gutter: 1rem;
+
+  /* ── 动效 ─────────────────────────────────────────────── */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 2rem;
+  }
+}

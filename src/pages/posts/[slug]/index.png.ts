@@ -18,6 +18,8 @@ export const GET: APIRoute = async ({ props }) => {
   const imageBuffer = await generateOgImageForPost(
     props as CollectionEntry<"blog">
   );
+  if (!imageBuffer) return new Response(null, { status: 204 });
+
   const body = new Blob([new Uint8Array(imageBuffer)]);
 
   return new Response(body, {

@@ -42,43 +42,71 @@ const total = groups.reduce((sum, g) => sum + g.sources.length, 0);
     pageTitle={`${label} · 简报时间线`}
     pageDesc={`按日期倒序，共 ${total} 条动态。`}
   >
-    <div class="mb-8 flex flex-wrap gap-2">
+    <ul class="chip-row domain-switch">
       {
         DIGEST_DOMAINS.map(d => (
-          <a
-            href={`/digest/domain/${d}/`}
-            class={`rounded px-3 py-1 text-sm ${
-              d === domain
-                ? "bg-skin-accent text-skin-inverted"
-                : "bg-skin-card hover:text-skin-accent"
-            }`}
-          >
-            {DIGEST_DOMAIN_LABELS[d]}
-          </a>
+          <li>
+            <a
+              href={`/digest/domain/${d}/`}
+              class={d === domain ? "chip chip--on" : "chip"}
+              aria-current={d === domain ? "page" : undefined}
+            >
+              {DIGEST_DOMAIN_LABELS[d]}
+            </a>
+          </li>
         ))
       }
-    </div>
+    </ul>
 
     {
       groups.length === 0 ? (
-        <p class="opacity-70">该领域还没有收录动态。</p>
+        <p class="micro">该领域还没有收录动态。</p>
       ) : (
         groups.map(({ entry, sources }) => (
-          <section class="mb-8">
-            <h2 class="text-lg font-semibold">
-              <a href={digestPath(entry)} class="hover:text-skin-accent">
-                {digestDate(entry)}
-              </a>
-            </h2>
+          <section class="day-block">
+            <div class="subhead">
+              <h2>
+                <a href={digestPath(entry)} class="subhead__action">
+                  {digestDate(entry)}
+                </a>
+              </h2>
+              <span class="badge">{sources.length}</span>
+            </div>
             <DigestSourceList sources={sources} />
           </section>
         ))
       )
     }
 
-    <p class="mt-12 border-t border-skin-line pt-6 text-sm">
-      <a href="/digest/" class="hover:text-skin-accent">← 返回简报总览</a>
+    <p class="back-line">
+      <a href="/digest/" class="subhead__action">← 返回简报总览</a>
     </p>
   </Main>
   <Footer />
 </Layout>
+
+<style>
+  .domain-switch {
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+  }
+
+  .chip--on {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .chip--on:hover {
+    color: var(--accent-ink);
+  }
+
+  .day-block {
+    margin-top: 2.5rem;
+  }
+
+  .back-line {
+    margin: 3rem 0 0;
+    padding-top: 1.5rem;
+    border-top: var(--hairline);
+  }
+</style>

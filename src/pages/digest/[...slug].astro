@@ -3,6 +3,7 @@ import { type CollectionEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
+import MetaRow from "@components/MetaRow.astro";
 import { SITE, DIGEST_DOMAIN_LABELS } from "@config";
 import { getSortedDigests, digestDate, digestPath } from "@utils/getDigests";
 
@@ -37,47 +38,55 @@ const date = digestDate(entry);
 >
   <Header activeNav="digest" />
 
-  <div class="mx-auto flex w-full max-w-3xl justify-start px-4">
-    <a href="/digest/" class="focus-outline mb-2 mt-8 flex hover:opacity-75">
-      <svg xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-        ></path>
-      </svg><span>返回简报</span>
+  <div
+    class="mx-auto w-full"
+    style="max-width: var(--measure-wide); padding-inline: var(--gutter)"
+  >
+    <a class="doc-back" href="/digest/">
+      <span aria-hidden="true">←</span> 返回简报
     </a>
   </div>
 
-  <main id="main-content" class="mx-auto w-full max-w-3xl px-4 pb-12">
-    <h1 class="text-2xl font-semibold sm:text-3xl">技术简报 {date}</h1>
+  <main id="main-content">
+    <header class="doc-head">
+      <p class="eyebrow doc-head__eyebrow">每日简报</p>
+      <h1 class="doc-head__title">技术简报 {date}</h1>
 
-    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-      <span class="opacity-80">{entry.data.itemCount} 条</span>
-      {
-        entry.data.domains.map(domain => (
-          <a href={`/digest/domain/${domain}/`} class="digest-domain-tag">
-            {DIGEST_DOMAIN_LABELS[domain]}
-          </a>
-        ))
-      }
-    </div>
+      <div class="doc-head__meta">
+        <MetaRow
+          orientation="inline"
+          items={[
+            { label: "条目", value: `${entry.data.itemCount}` },
+            { label: "生成", value: entry.data.generatedBy },
+            {
+              label: "校对",
+              value: entry.data.reviewed ? "已人工校对" : "未人工校对",
+            },
+          ]}
+        />
+        <ul class="chip-row">
+          {
+            entry.data.domains.map(domain => (
+              <li>
+                <a class="chip" href={`/digest/domain/${domain}/`}>
+                  {DIGEST_DOMAIN_LABELS[domain]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </header>
 
-    <p class="mt-3 text-sm italic opacity-70">
-      由 {entry.data.generatedBy} 根据下列来源自动生成{
-        entry.data.reviewed ? "，已人工校对" : "，未经人工校对"
-      }。
-    </p>
-
-    <article class="prose mt-8 max-w-3xl">
+    <article class="prose doc-body">
       <Content />
     </article>
 
-    <nav
-      class="mt-12 flex justify-between gap-4 border-t border-skin-line pt-6"
-    >
+    <nav class="doc-foot" aria-label="简报日期导航">
       {
         older ? (
-          <a href={digestPath(older)} class="hover:text-skin-accent">
-            ← {digestDate(older)}
+          <a href={digestPath(older)} class="btn">
+            <span aria-hidden="true">←</span> {digestDate(older)}
           </a>
         ) : (
           <span />
@@ -85,8 +94,8 @@ const date = digestDate(entry);
       }
       {
         newer && (
-          <a href={digestPath(newer)} class="hover:text-skin-accent">
-            {digestDate(newer)} →
+          <a href={digestPath(newer)} class="btn">
+            {digestDate(newer)} <span aria-hidden="true">→</span>
           </a>
         )
       }
@@ -97,7 +106,54 @@ const date = digestDate(entry);
 </Layout>
 
 <style>
-  .digest-domain-tag {
-    @apply rounded bg-skin-card px-2 py-0.5 text-xs hover:text-skin-accent;
+  main {
+    width: 100%;
+    max-width: var(--measure-wide);
+    margin: 0 auto;
+    padding: 0 var(--gutter) 4rem;
+  }
+
+  .doc-head {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .doc-head__eyebrow {
+    color: var(--accent);
+  }
+
+  .doc-head__title {
+    margin: 0.75rem 0 0;
+    font-size: var(--step-h1);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: -0.02em;
+  }
+
+  .doc-head__meta {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .doc-body {
+    max-width: var(--measure-post);
+    padding-top: 2.5rem;
+  }
+  .doc-body :global(.prose),
+  .doc-body.prose {
+    max-width: none;
+  }
+
+  .doc-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: var(--hairline);
+  }
+  .doc-foot .btn {
+    text-decoration: none;
   }
 </style>

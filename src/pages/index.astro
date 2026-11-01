@@ -3,7 +3,8 @@ import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import Card from "@components/Card";
+import Card from "@components/Card.astro";
+import SectionHeader from "@components/SectionHeader.astro";
 import getSortedPosts from "@utils/getSortedPosts";
 
 const posts = await getCollection("blog");
@@ -11,7 +12,27 @@ const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts
   .filter(({ data }) => !data.featured)
-  .slice(0, 4);
+  .slice(0, 5);
+
+const tagCount = new Set(sortedPosts.flatMap(({ data }) => data.tags)).size;
+const yearsArr = sortedPosts.map(({ data }) =>
+  new Date(data.pubDatetime).getFullYear()
+);
+const span =
+  yearsArr.length > 0
+    ? `${Math.min(...yearsArr)}–${Math.max(...yearsArr)}`
+    : "—";
+
+const stats = [
+  {
+    label: "存档篇数",
+    value: String(sortedPosts.length).padStart(3, "0"),
+    accent: true,
+  },
+  { label: "标签", value: String(tagCount).padStart(2, "0") },
+  { label: "跨度", value: span },
+  { label: "订阅", value: "RSS" },
+];
 ---
 
 <Layout
@@ -19,42 +40,56 @@ const recentPosts = sortedPosts
   description="Notes on software, AI, research and the systems Rowan Liu builds around them."
 >
   <Header />
-  <main id="main-content" class="home-page">
-    <section class="home-intro">
-      <p class="eyebrow">Writing / systems / experiments</p>
-      <div class="intro-grid">
-        <h1>Notes from building things that have to work.</h1>
-        <div class="intro-copy">
+
+  <main id="main-content">
+    <section class="hero" aria-labelledby="home-title">
+      <p class="eyebrow">写作 / 系统 / 实验</p>
+      <div class="hero__grid">
+        <h1 id="home-title" class="hero__title">
+          写给那些必须真正跑起来的东西。
+        </h1>
+        <div class="hero__copy">
           <p>
-            I write about software, AI and the practical decisions behind
-            products in progress. The archive stays close to the work: what
-            shipped, what changed and what I learned when an idea met reality.
+            关于软件、AI
+            与产品落地过程中的取舍。档案尽量贴着真实工作：交付了什么、改动了什么、当一个想法撞上现实时发生了什么。
           </p>
-          <nav aria-label="Primary home links">
-            <a href="/projects/"
-              >Explore projects <span aria-hidden="true">↗</span></a
+          <nav class="hero__links" aria-label="首页主导航">
+            <a href="/posts/">进入完整归档 <span aria-hidden="true">↗</span></a
             >
-            <a href="/rss.xml"
-              >Follow via RSS <span aria-hidden="true">↗</span></a
-            >
+            <a href="/projects/">查看项目 <span aria-hidden="true">↗</span></a>
+            <a href="/rss.xml">订阅 RSS <span aria-hidden="true">↗</span></a>
           </nav>
         </div>
       </div>
+
+      <dl class="stat-row">
+        {
+          stats.map(s => (
+            <div class:list={["stat", { "stat--accent": s.accent }]}>
+              <dt class="stat__label">{s.label}</dt>
+              <dd class="stat__value">{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
     </section>
 
     {
       featuredPosts.length > 0 && (
-        <section class="writing-section" aria-labelledby="featured-title">
-          <div class="section-heading">
-            <h2 id="featured-title">Featured writing</h2>
-            <span>{featuredPosts.length.toString().padStart(2, "0")}</span>
-          </div>
+        <section class="block-section" aria-labelledby="featured-title">
+          <SectionHeader
+            id="featured-title"
+            eyebrow="重点"
+            title="精选文章"
+            count={featuredPosts.length}
+          />
           <ul class="post-list">
             {featuredPosts.map(({ data, slug }) => (
               <Card
                 href={`/posts/${slug}/`}
                 frontmatter={data}
-                secHeading={false}
+                headingLevel={3}
+                featured={true}
               />
             ))}
           </ul>
@@ -64,195 +99,67 @@ const recentPosts = sortedPosts
 
     {
       recentPosts.length > 0 && (
-        <section class="writing-section" aria-labelledby="recent-title">
-          <div class="section-heading">
-            <h2 id="recent-title">Latest notes</h2>
-            <span>{recentPosts.length.toString().padStart(2, "0")}</span>
-          </div>
+        <section class="block-section" aria-labelledby="recent-title">
+          <SectionHeader
+            id="recent-title"
+            eyebrow="最近"
+            title="最新记录"
+            count={recentPosts.length}
+            action={{ href: "/posts/", label: "浏览完整归档" }}
+          />
           <ul class="post-list">
             {recentPosts.map(({ data, slug }) => (
               <Card
                 href={`/posts/${slug}/`}
                 frontmatter={data}
-                secHeading={false}
+                headingLevel={3}
               />
             ))}
           </ul>
-          <a class="section-link" href="/posts/">
-            Browse the full archive <span aria-hidden="true">↗</span>
-          </a>
         </section>
       )
     }
 
-    <section class="work-note" aria-labelledby="work-title">
-      <div>
-        <p class="eyebrow">Selected work</p>
-        <h2 id="work-title">The projects behind the notes.</h2>
+    <section class="block-section" aria-labelledby="work-title">
+      <SectionHeader id="work-title" eyebrow="作品" title="笔记背后的项目" />
+      <div class="work-grid">
+        <p>
+          产品、开发者工具与实验，包含那些没能走下去的版本。每个案例都记录了最初的问题、实现方式，以及它现在停在哪里。
+        </p>
+        <a class="btn btn-solid" href="/projects/">
+          查看项目 <span aria-hidden="true">↗</span>
+        </a>
       </div>
-      <p>
-        Products, developer tools and experiments, including the honest
-        archives. Each case study records the question, the implementation and
-        where the work stands now.
-      </p>
-      <a href="/projects/">View projects <span aria-hidden="true">↗</span></a>
     </section>
   </main>
+
   <Footer />
 </Layout>
 
 <style>
-  .home-page {
-    --editorial-line: rgb(var(--color-text-base) / 0.18);
-    --editorial-muted: rgb(var(--color-text-base) / 0.68);
-    padding-bottom: 4rem;
-  }
-
-  .home-intro,
-  .writing-section,
-  .work-note {
-    max-width: 72rem;
-    margin: 0 auto;
-    padding-inline: 1rem;
-  }
-
-  .home-intro {
-    padding-top: 3.75rem;
-    padding-bottom: 3.5rem;
-    border-bottom: 1px solid var(--editorial-line);
-  }
-
-  .eyebrow {
-    margin: 0;
-    color: var(--editorial-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1.4;
-    text-transform: uppercase;
-  }
-
-  .intro-grid {
+  .work-grid {
     display: grid;
-    gap: 2rem;
-    margin-top: 1.25rem;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 2rem 0 0;
   }
 
-  .intro-grid h1 {
-    max-width: 16ch;
+  .work-grid p {
+    max-width: 42em;
     margin: 0;
-    font-size: clamp(2.5rem, 6.5vw, 4.75rem);
-    font-weight: 600;
-    line-height: 0.98;
-    letter-spacing: 0;
-  }
-
-  .intro-copy {
-    align-self: end;
-  }
-
-  .intro-copy > p {
-    max-width: 36rem;
-    margin: 0;
-    color: var(--editorial-muted);
-    font-size: 1rem;
+    color: var(--muted);
+    font-size: var(--step-body);
     line-height: 1.75;
   }
 
-  .intro-copy nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
+  .work-grid .btn {
+    justify-self: start;
   }
 
-  .intro-copy a,
-  .section-link,
-  .work-note > a {
-    border-bottom: 1px solid currentColor;
-    color: inherit;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .writing-section {
-    padding-top: 4rem;
-  }
-
-  .section-heading {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--editorial-line);
-  }
-
-  .section-heading h2 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  .section-heading span {
-    color: var(--editorial-muted);
-    font-size: 0.75rem;
-  }
-
-  .post-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .section-link {
-    display: inline-block;
-    margin-top: 2rem;
-  }
-
-  .work-note {
-    display: grid;
-    gap: 1.5rem;
-    margin-top: 5rem;
-    padding-top: 2.25rem;
-    padding-bottom: 2.25rem;
-    border-top: 1px solid var(--editorial-line);
-    border-bottom: 1px solid var(--editorial-line);
-  }
-
-  .work-note h2 {
-    max-width: 16ch;
-    margin: 0.65rem 0 0;
-    font-size: 1.75rem;
-    line-height: 1.15;
-  }
-
-  .work-note > p {
-    max-width: 40rem;
-    margin: 0;
-    color: var(--editorial-muted);
-    font-size: 0.9rem;
-    line-height: 1.7;
-  }
-
-  .work-note > a {
-    width: max-content;
-    align-self: end;
-  }
-
-  @media (min-width: 640px) {
-    .home-intro,
-    .writing-section,
-    .work-note {
-      padding-inline: 2rem;
-    }
-
-    .intro-grid {
-      grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
-    }
-
-    .work-note {
-      grid-template-columns: minmax(14rem, 0.75fr) minmax(0, 1.1fr) auto;
-      align-items: start;
+  @media (min-width: 768px) {
+    .work-grid {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 3rem;
     }
   }
 </style>

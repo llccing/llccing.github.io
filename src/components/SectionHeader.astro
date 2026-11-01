@@ -1,0 +1,82 @@
+---
+export interface Props {
+  id: string;
+  title: string;
+  count?: string | number;
+  eyebrow?: string;
+  action?: { href: string; label: string };
+}
+
+const { id, title, count, eyebrow, action } = Astro.props;
+---
+
+<div class="section-head">
+  {eyebrow && <p class="eyebrow section-head__eyebrow">{eyebrow}</p>}
+  <div class="section-head__row">
+    <h2 id={id} class="section-head__title">{title}</h2>
+    {
+      count !== undefined && (
+        <span class="section-head__count">
+          {typeof count === "number"
+            ? count.toString().padStart(2, "0")
+            : count}
+        </span>
+      )
+    }
+  </div>
+  {
+    action && (
+      <a class="section-head__action" href={action.href}>
+        {action.label} <span aria-hidden="true">↗</span>
+      </a>
+    )
+  }
+</div>
+
+<style>
+  .section-head {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .section-head__eyebrow {
+    margin-bottom: 0.75rem;
+  }
+
+  .section-head__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .section-head__title {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  .section-head__count {
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: var(--step-meta);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+  }
+
+  .section-head__action {
+    display: inline-block;
+    margin-top: 1rem;
+    border-bottom: 1px solid var(--accent-rule);
+    color: var(--ink);
+    font-size: var(--step-meta);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .section-head__action:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+</style>

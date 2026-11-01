@@ -19,30 +19,60 @@ const { props } = Astro;
 
 <Breadcrumbs />
 <main id="main-content">
-  {
-    "titleTransition" in props ? (
-      <h1>
-        {props.pageTitle[0]}
-        <span transition:name={props.titleTransition}>
-          {props.pageTitle[1]}
-        </span>
-      </h1>
-    ) : (
-      <h1>{props.pageTitle}</h1>
-    )
-  }
-  <p>{props.pageDesc}</p>
-  <slot />
+  <header class="page-head">
+    <p class="eyebrow">索引</p>
+    {
+      "titleTransition" in props ? (
+        <h1>
+          {props.pageTitle[0]}
+          <span transition:name={props.titleTransition}>
+            {props.pageTitle[1]}
+          </span>
+        </h1>
+      ) : (
+        <h1>{props.pageTitle}</h1>
+      )
+    }
+    {props.pageDesc && <p class="page-desc">{props.pageDesc}</p>}
+  </header>
+  <div class="page-body">
+    <slot />
+  </div>
 </main>
 
 <style>
-  #main-content {
-    @apply mx-auto w-full max-w-3xl px-4 pb-4;
+  main {
+    width: 100%;
+    max-width: var(--measure-wide);
+    margin: 0 auto;
+    padding: 0 var(--gutter) 4rem;
   }
-  #main-content h1 {
-    @apply text-2xl font-semibold sm:text-3xl;
+
+  .page-head {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 2.5rem;
   }
-  #main-content p {
-    @apply mb-6 mt-2 italic;
+
+  h1 {
+    margin: 0.75rem 0 0;
+    font-size: var(--step-h1);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: -0.02em;
+  }
+
+  .page-desc {
+    margin: 1rem 0 0;
+    max-width: 44em;
+    color: var(--muted);
+    font-size: var(--step-lede);
+    line-height: 1.72;
+  }
+
+  .page-body ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 </style>

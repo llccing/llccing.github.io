@@ -3,40 +3,38 @@ import { SITE } from "@config";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import LinkButton from "@components/LinkButton.astro";
 ---
 
 <Layout title={`404 Not Found | ${SITE.title}`}>
   <Header />
 
   <main id="main-content">
-    <div class="not-found-wrapper">
-      <h1 aria-label="404 Not Found">404</h1>
-      <span aria-hidden="true">¯\_(ツ)_/¯</span>
-      <p>Page Not Found</p>
-      <LinkButton
-        href="/"
-        className="my-6 text-lg underline decoration-dashed underline-offset-8"
-      >
-        Go back home
-      </LinkButton>
-    </div>
+    <section class="hero">
+      <p class="eyebrow">错误 / 404</p>
+      <div class="hero__grid">
+        <h1 class="hero__title nf-code">404</h1>
+        <div class="hero__copy">
+          <p>这个地址没有对应的文档。它可能改过路径，也可能从未存在过。</p>
+          <nav class="hero__links" aria-label="返回导航">
+            <a href="/">回到首页 <span aria-hidden="true">↗</span></a>
+            <a href="/posts/">浏览完整归档 <span aria-hidden="true">↗</span></a
+            >
+            <a href="/search/">搜索文章 <span aria-hidden="true">↗</span></a>
+          </nav>
+        </div>
+      </div>
+    </section>
   </main>
 
   <Footer />
 </Layout>
 
 <style>
-  #main-content {
-    @apply mx-auto flex max-w-3xl flex-1 items-center justify-center;
+  main {
+    width: 100%;
   }
-  .not-found-wrapper {
-    @apply mb-14 flex flex-col items-center justify-center;
-  }
-  .not-found-wrapper h1 {
-    @apply text-9xl font-bold text-skin-accent;
-  }
-  .not-found-wrapper p {
-    @apply mt-4 text-2xl sm:text-3xl;
+
+  .nf-code {
+    color: var(--accent);
   }
 </style>

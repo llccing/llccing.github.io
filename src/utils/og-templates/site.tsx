@@ -1,85 +1,103 @@
 import { SITE } from "@config";
 
+/* OG 卡沿用站点语言：纸底 / 墨字 / 朱砂批注 / 直角 / 分割线 */
+
+const CANVAS = "#f6f5f2";
+const INK = "#1a1a18";
+const MUTED = "#6e6c66";
+const ACCENT = "#b8322a";
+const LINE = "#dedbd4";
+
+const fontFamily = '"System UI"';
+
 export default () => {
   return (
     <div
       style={{
-        background: "#fefbfb",
+        display: "flex",
         width: "100%",
         height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        background: CANVAS,
+        color: INK,
+        fontFamily,
+        padding: "56px 64px",
       }}
     >
       <div
         style={{
-          position: "absolute",
-          top: "-1px",
-          right: "-1px",
-          border: "4px solid #000",
-          background: "#ecebeb",
-          opacity: "0.9",
-          borderRadius: "4px",
           display: "flex",
-          justifyContent: "center",
-          margin: "2.5rem",
-          width: "88%",
-          height: "80%",
-        }}
-      />
-
-      <div
-        style={{
-          border: "4px solid #000",
-          background: "#fefbfb",
-          borderRadius: "4px",
-          display: "flex",
-          justifyContent: "center",
-          margin: "2rem",
-          width: "88%",
-          height: "80%",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          width: "100%",
+          height: "100%",
+          borderTop: `6px solid ${ACCENT}`,
+          paddingTop: "40px",
         }}
       >
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 22,
+              letterSpacing: "0.18em",
+              color: MUTED,
+              textTransform: "uppercase",
+            }}
+          >
+            Technical Dossier
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              marginTop: "28px",
+              marginBottom: "32px",
+              borderBottom: `1px solid ${LINE}`,
+              width: "100%",
+            }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              fontSize: 76,
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+              color: INK,
+            }}
+          >
+            {SITE.title}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              marginTop: "24px",
+              fontSize: 30,
+              lineHeight: 1.5,
+              color: MUTED,
+            }}
+          >
+            {SITE.desc}
+          </div>
+        </div>
+
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            alignItems: "flex-end",
             justifyContent: "space-between",
-            margin: "20px",
-            width: "90%",
-            height: "90%",
+            width: "100%",
+            paddingTop: "24px",
+            borderTop: `1px solid ${LINE}`,
+            fontSize: 26,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "90%",
-              maxHeight: "90%",
-              overflow: "hidden",
-              textAlign: "center",
-            }}
-          >
-            <p style={{ fontSize: 72, fontWeight: "bold" }}>{SITE.title}</p>
-            <p style={{ fontSize: 28 }}>{SITE.desc}</p>
+          <div style={{ display: "flex", color: ACCENT, fontWeight: 700 }}>
+            {new URL(SITE.website).hostname}
           </div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              width: "100%",
-              marginBottom: "8px",
-              fontSize: 28,
-            }}
-          >
-            <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-              {new URL(SITE.website).hostname}
-            </span>
-          </div>
+          <div style={{ display: "flex", color: MUTED }}>{SITE.author}</div>
         </div>
       </div>
     </div>

@@ -19,10 +19,60 @@ const { frontmatter } = Astro.props;
   <Header activeNav="about" />
   <Breadcrumbs />
   <main id="main-content">
-    <section id="about" class="prose mb-28 max-w-3xl prose-img:border-0">
-      <h1 class="text-2xl tracking-wider sm:text-3xl">{frontmatter.title}</h1>
+    <header class="about-head">
+      <p class="eyebrow about-head__eyebrow">关于</p>
+      <h1 class="about-head__title">{frontmatter.title}</h1>
+      {
+        frontmatter.description && (
+          <p class="about-head__desc">{frontmatter.description}</p>
+        )
+      }
+    </header>
+    <article id="about" class="prose about-body">
       <slot />
-    </section>
+    </article>
   </main>
   <Footer />
 </Layout>
+
+<style>
+  main {
+    width: 100%;
+    max-width: var(--measure-wide);
+    margin: 0 auto;
+    padding: 0 var(--gutter) 4rem;
+  }
+
+  .about-head {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .about-head__eyebrow {
+    color: var(--accent);
+  }
+
+  .about-head__title {
+    margin: 0.75rem 0 0;
+    font-size: var(--step-h1);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: -0.02em;
+  }
+
+  .about-head__desc {
+    margin: 1rem 0 0;
+    max-width: 44em;
+    color: var(--muted);
+    font-size: var(--step-lede);
+    line-height: 1.72;
+  }
+
+  .about-body {
+    max-width: var(--measure-post);
+    padding-top: 2.5rem;
+  }
+  .about-body :global(img) {
+    border: 0;
+  }
+</style>

@@ -58,10 +58,10 @@ export default function AnnotationOwnerPanel() {
 
   if (!session) {
     return (
-      <div className="border-y border-skin-line py-6">
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      <div className="border-y border-line py-6">
+        {error && <p className="mb-4 text-sm text-accent">{error}</p>}
         <button
-          className="inline-flex items-center gap-2 rounded bg-skin-accent px-4 py-2 font-medium text-skin-inverted"
+          className="inline-flex items-center gap-2 rounded-control bg-accent px-4 py-2 font-medium text-accent-ink"
           onClick={() => {
             const authorizeUrl = new URL(
               "/auth/github/start",
@@ -81,15 +81,15 @@ export default function AnnotationOwnerPanel() {
   }
 
   return (
-    <div className="border-y border-skin-line py-6">
+    <div className="border-y border-line py-6">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
-          <div className="text-xs opacity-70">已登录</div>
+          <div className="text-xs text-muted">已登录</div>
           <div className="font-semibold">@{session.login}</div>
         </div>
         <button
           aria-label="退出作者登录"
-          className="inline-flex h-9 w-9 items-center justify-center rounded border border-skin-line hover:border-red-600 hover:text-red-600"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-control border border-line hover:border-accent hover:text-accent"
           onClick={() => void logout()}
           title="退出作者登录"
           type="button"
@@ -97,10 +97,10 @@ export default function AnnotationOwnerPanel() {
           <LogOut aria-hidden="true" size={17} />
         </button>
       </div>
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-accent">{error}</p>}
       <button
         aria-pressed={annotationMode}
-        className={`inline-flex items-center gap-2 rounded px-4 py-2 font-medium ${annotationMode ? "bg-skin-accent text-skin-inverted" : "border border-skin-line hover:border-skin-accent"}`}
+        className={`inline-flex items-center gap-2 rounded-control px-4 py-2 font-medium ${annotationMode ? "bg-accent text-accent-ink" : "border border-line hover:border-accent"}`}
         onClick={toggleAnnotationMode}
         type="button"
       >

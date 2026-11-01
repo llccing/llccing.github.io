@@ -18,11 +18,16 @@ function shortDate(value: Date | undefined) {
   {
     sources.map((source, i) => (
       <li>
-        {numbered && <span class="index">[{i + 1}]</span>}
-        <a href={source.url} target="_blank" rel="noopener noreferrer">
+        {numbered && <span class="source-list__index">[{i + 1}]</span>}
+        <a
+          href={source.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="source-list__link"
+        >
           {source.title}
         </a>
-        <span class="meta">
+        <span class="source-list__meta">
           {source.label}
           {source.publishedAt && ` · ${shortDate(source.publishedAt)}`}
         </span>
@@ -33,18 +38,50 @@ function shortDate(value: Date | undefined) {
 
 <style>
   .source-list {
-    @apply my-2 space-y-2;
+    display: grid;
+    gap: 0;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
   }
+
   .source-list li {
-    @apply flex flex-col text-sm sm:flex-row sm:items-baseline sm:gap-2;
+    display: grid;
+    gap: 0.15rem 0.75rem;
+    padding: 0.65rem 0;
+    border-bottom: var(--hairline);
   }
-  .index {
-    @apply shrink-0 font-mono text-xs opacity-60;
+
+  .source-list__index {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: var(--step-eyebrow);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
-  .source-list a {
-    @apply underline decoration-dashed underline-offset-4 hover:text-skin-accent;
+
+  .source-list__link {
+    color: var(--ink);
+    font-size: var(--step-meta);
+    font-weight: 500;
+    line-height: 1.6;
+    text-decoration-color: var(--accent-rule);
   }
-  .meta {
-    @apply shrink-0 text-xs opacity-60;
+  .source-list__link:hover {
+    color: var(--accent);
+  }
+
+  .source-list__meta {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: var(--step-eyebrow);
+    letter-spacing: 0.08em;
+  }
+
+  @media (min-width: 768px) {
+    .source-list li {
+      grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+      align-items: baseline;
+    }
   }
 </style>

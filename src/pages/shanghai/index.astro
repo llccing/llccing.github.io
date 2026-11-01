@@ -7,7 +7,7 @@ import { ALL_COMPANY } from "../../data/company-data";
 <!-- https://www.kzix.com/luohu/4576.html -->
 <Layout title="上海重点企业 415家">
   <Main pageTitle="Shanghai" pageDesc="Companies in Shanghai">
-    <p class="text-gray-400">数据源 https://www.kzix.com/luohu/4576.html</p>
+    <p class="text-faint">数据源 https://www.kzix.com/luohu/4576.html</p>
 
     <nav class="text-bold mt-2 flex flex-col">
       <a href="#session1">-- #欧洲公司 -- </a>
@@ -19,7 +19,7 @@ import { ALL_COMPANY } from "../../data/company-data";
       <h3 id="session1">欧洲公司</h3>
       {
         ALL_COMPANY.filter(item => item.tag.includes("eu")).map((item, idx) => (
-          <div class="border-b border-gray-200 p-2">
+          <div class="border-b border-line p-2">
             <div class="flex">
               <div>
                 {idx + 1}. {item.name}
@@ -68,7 +68,7 @@ import { ALL_COMPANY } from "../../data/company-data";
       <h3 id="session2">美国公司</h3>
       {
         ALL_COMPANY.filter(item => item.tag.includes("us")).map((item, idx) => (
-          <div class="border-b border-gray-200 p-2">
+          <div class="border-b border-line p-2">
             {idx + 1}. {item.name}
           </div>
         ))
@@ -81,12 +81,12 @@ import { ALL_COMPANY } from "../../data/company-data";
         type="text"
         id="searchInput"
         placeholder="Search companies..."
-        class="mb-4 w-full rounded border border-gray-300 p-2 text-slate-950"
+        class="mb-4 w-full rounded-control border border-line p-2 text-ink"
       />
       <div id="companyList">
         {
           ALL_COMPANY.map((item, idx) => (
-            <div class="border-b border-gray-200 p-2">
+            <div class="border-b border-line p-2">
               {idx + 1}. {item.name}
             </div>
           ))

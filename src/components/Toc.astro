@@ -1,0 +1,161 @@
+---
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+  headings: MarkdownHeading[];
+  label?: string;
+}
+
+const { headings, label = "本文结构" } = Astro.props;
+
+const items = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+---
+
+{
+  items.length > 0 && (
+    <nav class="toc" aria-labelledby="toc-heading" data-toc>
+      <p class="toc__label" id="toc-heading">
+        {label}
+      </p>
+      <ol class="toc__list">
+        {items.map(h => (
+          <li class={`toc__item toc__item--d${h.depth}`}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug} class="toc__link">
+              <span class="toc__num" aria-hidden="true">
+                {h.slug.slice(0, 2)}
+              </span>
+              <span class="toc__text">{h.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+<style>
+  .toc {
+    padding: 1rem 0 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .toc__label {
+    margin: 0 0 0.75rem;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: var(--step-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .toc__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: toc;
+  }
+
+  .toc__item {
+    counter-increment: toc;
+    border-top: 1px solid var(--line);
+  }
+  .toc__item:first-child {
+    border-top: 0;
+  }
+
+  .toc__link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.6rem 0.5rem 0.6rem 0;
+    font-size: var(--step-meta);
+    line-height: 1.5;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+  }
+  .toc__link:hover {
+    color: var(--accent);
+  }
+  .toc__link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .toc__item--d3 .toc__link {
+    padding-left: 1.25rem;
+    font-size: 0.8125rem;
+  }
+
+  .toc__num {
+    flex: none;
+    width: 1.25rem;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: var(--step-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* 当前所在小节：朱批线 + 提亮 */
+  .toc__link[aria-current="true"] {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .toc__link[aria-current="true"] .toc__num {
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  function setupTocHighlight() {
+    const toc = document.querySelector<HTMLElement>("[data-toc]");
+    if (!toc) return;
+
+    const links = Array.from(
+      toc.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")
+    );
+    if (links.length === 0) return;
+
+    const targets = links
+      .map(link => {
+        const slug = link.dataset.tocLink ?? "";
+        const el = document.getElementById(slug);
+        return el ? { slug, el, link } : null;
+      })
+      .filter(
+        (v): v is { slug: string; el: HTMLElement; link: HTMLAnchorElement } =>
+          v !== null
+      );
+
+    if (targets.length === 0) return;
+
+    const setActive = (slug: string) => {
+      targets.forEach(t => {
+        const on = t.slug === slug;
+        t.link.setAttribute("aria-current", on ? "true" : "false");
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) {
+          const hit = targets.find(t => t.el === visible[0].target);
+          if (hit) setActive(hit.slug);
+        }
+      },
+      { rootMargin: "-88px 0px -70% 0px", threshold: 0 }
+    );
+
+    targets.forEach(t => observer.observe(t.el));
+    setActive(targets[0].slug);
+  }
+
+  setupTocHighlight();
+  document.addEventListener("astro:after-swap", setupTocHighlight);
+</script>

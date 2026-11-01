@@ -5,8 +5,9 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Breadcrumbs from "@components/Breadcrumbs.astro";
 import Pagination from "@components/Pagination.astro";
-import Card from "@components/Card";
-import { SITE } from "@config";
+import SectionHeader from "@components/SectionHeader.astro";
+import Card from "@components/Card.astro";
+import { LOCALE, SITE } from "@config";
 
 export interface Props {
   currentPage: number;
@@ -36,6 +37,7 @@ const showPagination = !useAllPosts && _showPagination;
 
 const basePath = collection === "short-stories" ? "/short-stories" : "/posts";
 const showFilters = collection === "blog" && useAllPosts;
+const isShortStories = collection === "short-stories";
 
 const getDirectoryKey = (id: string) => {
   const parts = id.split("/");
@@ -58,70 +60,134 @@ const tagOptions = showFilters
       )
     ).sort()
   : [];
+
+/* ── 按年份分组：给 180 篇平铺列表一个可导航的骨架 ────────── */
+type Grouped = { year: string; items: typeof renderPosts };
+const groups: Grouped[] = [];
+for (const post of renderPosts) {
+  const d = new Date(
+    post.data.modDatetime && post.data.modDatetime > post.data.pubDatetime
+      ? post.data.modDatetime
+      : post.data.pubDatetime
+  );
+  const year = d.toLocaleDateString(LOCALE.langTag, { year: "numeric" });
+  const last = groups[groups.length - 1];
+  if (last && last.year === year) last.items.push(post);
+  else groups.push({ year, items: [post] });
+}
+
+const years = renderPosts.map(p => new Date(p.data.pubDatetime).getFullYear());
+const span =
+  years.length > 0 ? `${Math.min(...years)}–${Math.max(...years)}` : "—";
+
+const stats = [
+  {
+    label: "存档篇数",
+    value: String(renderPosts.length).padStart(3, "0"),
+    accent: true,
+  },
+  { label: "领域", value: String(dirOptions.length || 1).padStart(2, "0") },
+  { label: "标签", value: String(tagOptions.length || 0).padStart(2, "0") },
+  { label: "跨度", value: span },
+];
 ---
 
-<Layout
-  title={`${collection === "short-stories" ? "Short Stories" : "Posts"} | ${SITE.title}`}
->
-  <Header activeNav={collection === "short-stories" ? undefined : "posts"} />
+<Layout title={`${isShortStories ? "Short Stories" : "Posts"} | ${SITE.title}`}>
+  <Header activeNav={isShortStories ? undefined : "posts"} />
   <Breadcrumbs />
-  <main id="main-content" class="posts-page">
-    <section class="posts-intro">
+
+  <main id="main-content">
+    <section class="hero" aria-labelledby="posts-title">
       <p class="eyebrow">
-        {
-          collection === "short-stories"
-            ? "Fiction / archive"
-            : "Writing / archive"
-        }
+        {isShortStories ? "虚构 / 存档" : "写作 / 存档"}
       </p>
-      <div class="intro-grid">
-        <h1>{collection === "short-stories" ? "Short Stories" : "Posts"}</h1>
-        <p>
-          {
-            collection === "short-stories"
-              ? "A complete archive of the short fiction published here."
-              : "Long-form notes on software, AI, research and the practical work of building systems."
-          }
-        </p>
+      <div class="hero__grid">
+        <h1 id="posts-title" class="hero__title">
+          {isShortStories ? "短篇故事" : "全部写作"}
+        </h1>
+        <div class="hero__copy">
+          <p>
+            {
+              isShortStories
+                ? "这里收录发布过的短篇小说，按时间倒序排列。"
+                : "关于软件、AI 与构建系统的长文记录。每篇都尽量给出可核验的依据，而不是结论。"
+            }
+          </p>
+          <nav class="hero__links" aria-label="归档导航">
+            <a href="/tags/">按标签浏览 <span aria-hidden="true">↗</span></a>
+            <a href="/rss.xml">订阅 RSS <span aria-hidden="true">↗</span></a>
+          </nav>
+        </div>
       </div>
+
+      <dl class="stat-row">
+        {
+          stats.map(s => (
+            <div class:list={["stat", { "stat--accent": s.accent }]}>
+              <dt class="stat__label">{s.label}</dt>
+              <dd class="stat__value">{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
     </section>
 
-    <section class="archive-section" aria-labelledby="archive-title">
-      <div class="section-heading">
-        <h2 id="archive-title">Full archive</h2>
-        <span>{renderPosts.length.toString().padStart(2, "0")}</span>
-      </div>
+    <section class="block-section" aria-labelledby="archive-title">
+      <SectionHeader
+        id="archive-title"
+        title="完整归档"
+        count={renderPosts.length}
+      />
+
       {
         showFilters && (
           <div class="filter-bar" data-post-filter-root>
-            {/* Directory pills */}
             <div class="filter-row">
-              <span class="filter-label">目录</span>
-              <div class="dir-pills">
-                <button class="dir-pill is-active" data-dir-btn="">
+              <span class="filter-label">领域</span>
+              <div class="filter-pills">
+                <button
+                  class="pill is-active"
+                  data-dir-btn=""
+                  aria-pressed="true"
+                  type="button"
+                >
                   全部
                 </button>
                 {dirOptions.map(d => (
-                  <button class="dir-pill" data-dir-btn={d}>
+                  <button
+                    class="pill"
+                    data-dir-btn={d}
+                    aria-pressed="false"
+                    type="button"
+                  >
                     {d}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Tag select + status */}
             <div class="filter-row">
               <span class="filter-label">标签</span>
-              <select class="tag-select" data-filter-tag>
+              <select
+                class="filter-select"
+                data-filter-tag
+                aria-label="按标签筛选"
+              >
                 <option value="">全部标签</option>
                 {tagOptions.map(t => (
                   <option value={t}>{t}</option>
                 ))}
               </select>
               <span class="filter-meta">
-                <span data-filter-summary>{renderPosts.length} 篇</span>
-                <button class="clear-btn is-hidden" data-filter-clear>
-                  × 清除
+                <span data-filter-summary aria-live="polite">
+                  {renderPosts.length} 篇
+                </span>
+                <button
+                  class="clear-btn is-hidden"
+                  data-filter-clear
+                  type="button"
+                >
+                  × 清除筛选
                 </button>
               </span>
             </div>
@@ -129,25 +195,38 @@ const tagOptions = showFilters
         )
       }
 
-      <ul class="post-list">
-        {
-          renderPosts.map(({ data, slug, id }) => {
-            const directory = getDirectoryKey(id);
-            const tags = data.tags.map(t => t.trim().toLowerCase()).join("|");
-            return (
-              <Card
-                href={`${basePath}/${slug}/`}
-                frontmatter={data}
-                itemClassName="post-item"
-                itemData={{
-                  "data-post-dir": directory,
-                  "data-post-tags": tags,
-                }}
-              />
-            );
-          })
-        }
-      </ul>
+      {
+        groups.length === 0 ? (
+          <p class="t-muted" style="padding-top:2rem">
+            这个归档暂时是空的。
+          </p>
+        ) : (
+          groups.map(group => (
+            <div class="year-group" data-year-group>
+              <div class="year-head">
+                <h3 class="year-head__num">{group.year}</h3>
+                <span class="year-head__count">{group.items.length} 篇</span>
+              </div>
+              <ul class="post-list">
+                {group.items.map(({ data, slug, id }) => (
+                  <Card
+                    href={`${basePath}/${slug}/`}
+                    frontmatter={data}
+                    headingLevel={4}
+                    itemClassName="post-item"
+                    itemData={{
+                      "data-post-dir": getDirectoryKey(id),
+                      "data-post-tags": data.tags
+                        .map(t => t.trim().toLowerCase())
+                        .join("|"),
+                    }}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))
+        )
+      }
     </section>
   </main>
 
@@ -164,158 +243,6 @@ const tagOptions = showFilters
 
   <Footer noMarginTop={showPagination && totalPages > 1} />
 </Layout>
-
-<style>
-  .posts-page {
-    --editorial-line: rgb(var(--color-text-base) / 0.18);
-    --editorial-muted: rgb(var(--color-text-base) / 0.68);
-    width: 100%;
-    overflow-x: clip;
-    padding-bottom: 4rem;
-  }
-
-  :global(html),
-  :global(body) {
-    overflow-x: clip;
-  }
-
-  .posts-intro,
-  .archive-section {
-    max-width: 72rem;
-    margin: 0 auto;
-    padding-inline: 1rem;
-  }
-
-  .posts-intro {
-    padding-top: 3.5rem;
-    padding-bottom: 4rem;
-    border-bottom: 1px solid var(--editorial-line);
-  }
-
-  .eyebrow {
-    margin: 0;
-    color: var(--editorial-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1.4;
-    text-transform: uppercase;
-  }
-
-  .intro-grid {
-    display: grid;
-    gap: 1.5rem;
-    margin-top: 1.25rem;
-  }
-
-  .intro-grid h1 {
-    margin: 0;
-    font-size: clamp(2.75rem, 7vw, 5.5rem);
-    font-weight: 600;
-    line-height: 0.98;
-    letter-spacing: 0;
-  }
-
-  .intro-grid > p {
-    max-width: 36rem;
-    margin: 0;
-    align-self: end;
-    color: var(--editorial-muted);
-    font-size: 1rem;
-    line-height: 1.75;
-  }
-
-  .archive-section {
-    padding-top: 4rem;
-  }
-
-  .section-heading {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--editorial-line);
-  }
-
-  .section-heading h2 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  .section-heading span {
-    color: var(--editorial-muted);
-    font-size: 0.75rem;
-  }
-
-  .post-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  /* ── Filter bar ──────────────────────────────────────── */
-  .filter-bar {
-    @apply flex flex-col gap-3 border-b border-skin-line py-5;
-  }
-  .filter-row {
-    @apply flex flex-wrap items-center gap-x-3 gap-y-2;
-  }
-  .filter-label {
-    @apply shrink-0 text-xs font-semibold uppercase tracking-widest opacity-50;
-  }
-
-  /* Directory pill buttons */
-  .dir-pills {
-    @apply flex flex-wrap gap-1.5;
-  }
-  .dir-pill {
-    @apply cursor-pointer rounded-full border border-skin-line px-3 py-0.5
-           text-sm transition-colors
-           hover:border-skin-accent hover:text-skin-accent;
-  }
-  .dir-pill.is-active {
-    @apply border-skin-accent bg-skin-accent/10 font-medium text-skin-accent;
-  }
-
-  /* Tag select */
-  .tag-select {
-    @apply cursor-pointer rounded border border-skin-line bg-skin-fill
-           px-2 py-1 text-sm text-skin-base outline-none
-           transition-colors hover:border-skin-accent;
-  }
-
-  /* Status + clear */
-  .filter-meta {
-    @apply flex items-center gap-2 text-sm;
-  }
-  [data-filter-summary] {
-    @apply opacity-50;
-  }
-  .clear-btn {
-    @apply cursor-pointer rounded border border-skin-line px-2 py-0.5
-           text-xs opacity-60 transition-all
-           hover:border-skin-accent hover:text-skin-accent hover:opacity-100;
-  }
-  .clear-btn.is-hidden {
-    display: none;
-  }
-
-  /* Hidden post items — Card.tsx renders the <li>, so needs :global() to escape Astro scoping */
-  :global(.post-item.is-hidden) {
-    display: none;
-  }
-
-  @media (min-width: 640px) {
-    .posts-intro,
-    .archive-section {
-      padding-inline: 2rem;
-    }
-
-    .intro-grid {
-      grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
-    }
-  }
-</style>
 
 <script>
   function setupPostFilters() {
@@ -334,6 +261,9 @@ const tagOptions = showFilters
     const items = Array.from(
       document.querySelectorAll<HTMLElement>(".post-item")
     );
+    const groups = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-year-group]")
+    );
 
     if (!tagSelect || !summary || !clearBtn || items.length === 0) return;
 
@@ -342,6 +272,7 @@ const tagOptions = showFilters
 
     const applyFilters = () => {
       let visible = 0;
+
       items.forEach(item => {
         const itemDir = item.getAttribute("data-post-dir") ?? "";
         const itemTags = (item.getAttribute("data-post-tags") ?? "").split("|");
@@ -352,6 +283,12 @@ const tagOptions = showFilters
         if (show) visible++;
       });
 
+      // 年份分组会整组清空，必须一起隐藏，否则留下空标题
+      groups.forEach(group => {
+        const anyVisible = group.querySelector(".post-item:not(.is-hidden)");
+        group.hidden = !anyVisible;
+      });
+
       const total = items.length;
       summary.textContent =
         activeDir || activeTag ? `${visible} / ${total} 篇` : `${total} 篇`;
@@ -360,8 +297,12 @@ const tagOptions = showFilters
 
     dirBtns.forEach(btn => {
       btn.addEventListener("click", () => {
-        dirBtns.forEach(b => b.classList.remove("is-active"));
+        dirBtns.forEach(b => {
+          b.classList.remove("is-active");
+          b.setAttribute("aria-pressed", "false");
+        });
         btn.classList.add("is-active");
+        btn.setAttribute("aria-pressed", "true");
         activeDir = btn.getAttribute("data-dir-btn") ?? "";
         applyFilters();
       });
@@ -376,8 +317,12 @@ const tagOptions = showFilters
       activeDir = "";
       activeTag = "";
       tagSelect.value = "";
-      dirBtns.forEach(b => b.classList.remove("is-active"));
+      dirBtns.forEach(b => {
+        b.classList.remove("is-active");
+        b.setAttribute("aria-pressed", "false");
+      });
       dirBtns[0]?.classList.add("is-active");
+      dirBtns[0]?.setAttribute("aria-pressed", "true");
       applyFilters();
     });
   }
