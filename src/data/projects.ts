@@ -1,4 +1,4 @@
-export type ProjectStatus = "active" | "exploring" | "archived";
+export type ProjectStatus = "active" | "archived";
 
 export interface ProjectLink {
   label: string;
@@ -14,7 +14,7 @@ export interface Project {
   statusLabel: string;
   year: string;
   featured: boolean;
-  accent: "cyan" | "green" | "red" | "yellow" | "blue";
+
   image?: string;
   imageAlt?: string;
   technologies: string[];
@@ -32,11 +32,11 @@ export const projects: Project[] = [
     kicker: "AI-native full-stack foundation",
     summary:
       "A Bun-first workspace for building type-safe AI products with provider switching, streaming responses and production-shaped infrastructure.",
-    status: "active",
-    statusLabel: "In development",
+    status: "archived",
+    statusLabel: "Archived",
     year: "2026",
-    featured: true,
-    accent: "red",
+    featured: false,
+
     image: "/assets/projects/fashion-ai-console.png",
     imageAlt:
       "Fashion AI Console showing infrastructure status and the chat workbench",
@@ -52,7 +52,7 @@ export const projects: Project[] = [
       "Added workspace-wide lint, typecheck and test tasks through Turborepo and CI.",
     ],
     outcome:
-      "The repository is a reusable, runnable base for AI workflows rather than a disconnected collection of demos. The next product milestone is validating a focused fashion workflow on top of it.",
+      "The repository is a reusable, runnable base for AI workflows rather than a disconnected collection of demos. No product workflow was validated on top of it, and development is parked, so it is recorded here as an engineering exercise rather than a shipped product.",
     links: [
       {
         label: "View repository",
@@ -70,7 +70,7 @@ export const projects: Project[] = [
     statusLabel: "Live",
     year: "2016–now",
     featured: true,
-    accent: "cyan",
+
     image: "/assets/projects/rowan-blog.png",
     imageAlt: "Rowan's Blog home page with featured and recent articles",
     technologies: ["Astro", "TypeScript", "Cloudflare", "D1", "GitHub Actions"],
@@ -100,11 +100,11 @@ export const projects: Project[] = [
     kicker: "Family-centered Chinese literacy",
     summary:
       "A private-source learning product that helps families turn character practice into short, guided sessions with a shared progress loop.",
-    status: "active",
-    statusLabel: "Live prototype",
+    status: "archived",
+    statusLabel: "Archived prototype",
     year: "2026",
-    featured: true,
-    accent: "green",
+    featured: false,
+
     image: "/assets/projects/magic-literacy-garden.png",
     imageAlt:
       "Magic Literacy Garden parent email login screen on words.rowanliu.com",
@@ -120,7 +120,7 @@ export const projects: Project[] = [
       "Deployed the frontend and API independently on Cloudflare Pages, Workers and D1.",
     ],
     outcome:
-      "The product is live as a private-source prototype at words.rowanliu.com. The current work is product validation: improving the learning loop and finding a practical path to reach families before expanding the feature set.",
+      "A short-lived prototype rather than a product. It was built quickly to test whether guided character practice could hold up for one family, and it is not being developed further. It stays in the archive as a record of the product decisions, not as a service anyone can rely on.",
     links: [
       {
         label: "Visit product",
@@ -134,11 +134,11 @@ export const projects: Project[] = [
     kicker: "Language learning exploration",
     summary:
       "An early product exploration around language learning, built to test how guided practice and an AI-assisted interface can fit together.",
-    status: "exploring",
-    statusLabel: "Prototype",
+    status: "archived",
+    statusLabel: "Archived",
     year: "2025",
     featured: false,
-    accent: "green",
+
     technologies: ["Next.js", "TypeScript", "Firebase", "AI"],
     overview:
       "LinguaLeap is an early-stage language learning experiment. It is preserved as a record of product exploration rather than presented as a finished service.",
@@ -168,7 +168,7 @@ export const projects: Project[] = [
     statusLabel: "Archived experiment",
     year: "2025",
     featured: false,
-    accent: "blue",
+
     technologies: ["React Native", "Expo", "Cloudflare Workers", "D1"],
     overview:
       "This experiment spans two public repositories: a cross-platform mobile client and a small edge backend. They are presented together because they form one product attempt.",
@@ -199,7 +199,7 @@ export const projects: Project[] = [
     statusLabel: "Archived",
     year: "2025–2026",
     featured: false,
-    accent: "yellow",
+
     image: "/assets/projects/otree-tools.png",
     imageAlt: "Original oTree service site banner",
     technologies: [
