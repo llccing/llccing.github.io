@@ -85,7 +85,7 @@ export const projects: Project[] = [
       "Kept build checks and deployment verification part of the publishing workflow.",
     ],
     outcome:
-      "The site remains the primary public entry point for writing and shipped work. This projects section is the next step in consolidating that identity under rowanliu.com.",
+      "The site remains the primary public entry point for writing and shipped work. Experiments that stopped are filed under the archive instead of being presented as live products, so the page stays an honest record of what is maintained and what is not.",
     links: [
       { label: "Visit site", href: "https://rowanliu.com" },
       {
