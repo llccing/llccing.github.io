@@ -14,7 +14,7 @@ function shortDate(value: Date | undefined) {
 }
 ---
 
-<ul class="source-list">
+<ul class:list={["source-list", numbered && "is-numbered"]}>
   {
     sources.map((source, i) => (
       <li>
@@ -78,10 +78,14 @@ function shortDate(value: Date | undefined) {
     letter-spacing: 0.08em;
   }
 
+  /* 列定义按是否有 [n] 索引分支：无索引时不能留 2.5rem 窄列，否则标题被挤成逐词折行 */
   @media (min-width: 768px) {
     .source-list li {
-      grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: baseline;
+    }
+    .source-list.is-numbered li {
+      grid-template-columns: 2.5rem minmax(0, 1fr) auto;
     }
   }
 </style>
