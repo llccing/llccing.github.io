@@ -19,7 +19,7 @@ const EqualizerIcon = () => (
     {[1, 2, 3].map(i => (
       <span
         key={i}
-        className="inline-block w-[3px] rounded-sm bg-accent dark:bg-accent"
+        className="inline-block w-[3px] rounded-sm bg-accent"
         style={{
           animation: `eq-bar 0.8s ease-in-out ${i * 0.15}s infinite alternate`,
         }}
@@ -268,19 +268,19 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
 
         {/* Info */}
         <div className="flex flex-1 flex-col items-center text-center sm:items-start sm:text-left">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-faint dark:text-muted">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-faint">
             Audiobook
           </p>
-          <h2 className="mt-1.5 text-2xl font-bold leading-tight text-ink dark:text-canvas sm:text-3xl">
+          <h2 className="mt-1.5 text-2xl font-bold leading-tight text-ink sm:text-3xl">
             {currentCategory?.title ?? "Select a collection"}
           </h2>
           {currentCategory?.author && (
-            <p className="mt-1 text-sm text-muted dark:text-faint">
+            <p className="mt-1 text-sm text-muted">
               by {currentCategory.author}
             </p>
           )}
           {currentCategory?.description && (
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted dark:text-faint">
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted">
               {currentCategory.description}
             </p>
           )}
@@ -297,9 +297,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
               </svg>
               Play All
             </button>
-            <span className="text-xs text-faint dark:text-muted">
-              {trackCount} chapters
-            </span>
+            <span className="text-xs text-faint">{trackCount} chapters</span>
           </div>
         </div>
       </div>
@@ -315,7 +313,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 cat.id === selectedCategoryId
                   ? "bg-ink text-canvas"
-                  : "bg-sunken text-muted hover:bg-sunken dark:bg-sunken dark:text-faint dark:hover:bg-sunken"
+                  : "bg-sunken text-muted hover:bg-sunken"
               }`}
             >
               {cat.title}
@@ -325,14 +323,14 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
       )}
 
       {/* ── Track List ── */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-line dark:border-line">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-line">
         {/* header */}
-        <div className="flex items-center gap-4 border-b border-line bg-sunken/60 px-4 py-2.5 text-xs font-medium uppercase tracking-wider text-faint dark:border-line dark:bg-sunken/60 dark:text-muted">
+        <div className="flex items-center gap-4 border-b border-line bg-sunken/60 px-4 py-2.5 text-xs font-medium uppercase tracking-wider text-faint">
           <span className="w-8 text-center">#</span>
           <span className="flex-1">Title</span>
           <span className="w-14 text-right">
             <svg
-              className="ml-auto h-3.5 w-3.5 text-faint dark:text-muted"
+              className="ml-auto h-3.5 w-3.5 text-faint"
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
@@ -345,7 +343,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
         </div>
 
         {/* rows */}
-        <div className="max-h-[60vh] divide-y divide-line overflow-y-auto dark:divide-line/60">
+        <div className="max-h-[60vh] divide-y divide-line overflow-y-auto">
           {currentCategory?.tracks.length ? (
             currentCategory.tracks.map((track, idx) => {
               const isActive = track.id === currentTrack?.id;
@@ -359,9 +357,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                   onMouseEnter={() => setHoveredTrackId(track.id)}
                   onMouseLeave={() => setHoveredTrackId(null)}
                   className={`flex w-full items-center gap-4 px-4 py-3 text-left transition-colors ${
-                    isActive
-                      ? "bg-sunken/70 dark:bg-sunken/10"
-                      : "hover:bg-sunken dark:hover:bg-sunken/40"
+                    isActive ? "bg-sunken/70" : "hover:bg-sunken"
                   }`}
                 >
                   {/* track number / icon */}
@@ -378,18 +374,14 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     ) : (
-                      <span className="text-xs text-faint dark:text-faint">
-                        {idx + 1}
-                      </span>
+                      <span className="text-xs text-faint">{idx + 1}</span>
                     )}
                   </span>
 
                   {/* title */}
                   <span
                     className={`flex-1 truncate text-sm font-medium ${
-                      isActive
-                        ? "text-accent dark:text-accent"
-                        : "text-ink dark:text-canvas"
+                      isActive ? "text-accent" : "text-ink"
                     }`}
                   >
                     {track.title}
@@ -398,11 +390,11 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                   {/* duration / now playing badge */}
                   <span className="w-14 text-right text-xs">
                     {isActive ? (
-                      <span className="font-semibold uppercase tracking-wide text-accent dark:text-accent">
+                      <span className="font-semibold uppercase tracking-wide text-accent">
                         {isPlaying ? "LIVE" : "PAUSED"}
                       </span>
                     ) : (
-                      <span className="text-faint dark:text-muted">
+                      <span className="text-faint">
                         {track.duration ?? "—"}
                       </span>
                     )}
@@ -411,7 +403,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
               );
             })
           ) : (
-            <p className="px-4 py-8 text-center text-sm text-faint dark:text-muted">
+            <p className="px-4 py-8 text-center text-sm text-faint">
               No chapters available for this collection yet.
             </p>
           )}
@@ -419,7 +411,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
       </div>
 
       {/* ── Persistent Bottom Player ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-line bg-white/80 backdrop-blur-xl dark:border-line dark:bg-sunken/80">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-line bg-surface/80 backdrop-blur-xl">
         <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6">
           {currentTrack && (isPlaying || isLoading || elapsedSeconds > 0) ? (
             <>
@@ -434,9 +426,9 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                 aria-valuemax={100}
                 tabIndex={0}
               >
-                <div className="relative h-1 w-full overflow-hidden rounded-full bg-sunken transition group-hover:h-2 dark:bg-sunken">
+                <div className="relative h-1 w-full overflow-hidden rounded-full bg-sunken transition group-hover:h-2">
                   <div
-                    className="absolute left-0 top-0 h-full rounded-full bg-accent transition-[width] duration-300 dark:bg-accent"
+                    className="absolute left-0 top-0 h-full rounded-full bg-accent transition-[width] duration-300"
                     style={{ width: `${Math.min(progressPercent, 100)}%` }}
                   />
                 </div>
@@ -448,7 +440,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                   <p className="truncate text-sm font-semibold text-ink">
                     {currentTrack.title}
                   </p>
-                  <p className="truncate text-xs text-muted dark:text-faint">
+                  <p className="truncate text-xs text-muted">
                     {currentCategory?.title}
                     {currentCategory?.author
                       ? ` · ${currentCategory.author}`
@@ -457,7 +449,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                 </div>
 
                 {/* time */}
-                <div className="hidden text-xs text-faint dark:text-muted sm:block">
+                <div className="hidden text-xs text-faint sm:block">
                   {formatDuration(elapsedSeconds)} /{" "}
                   {formatDuration(durationSeconds)}
                 </div>
@@ -468,7 +460,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                     type="button"
                     onClick={handlePrevious}
                     disabled={!getAdjacentTrackId("prev")}
-                    className="rounded-full p-2 text-muted transition hover:bg-sunken disabled:opacity-30 dark:text-faint dark:hover:bg-sunken"
+                    className="rounded-full p-2 text-muted transition hover:bg-sunken disabled:opacity-30"
                     aria-label="Previous"
                   >
                     <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -519,7 +511,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                     type="button"
                     onClick={handleNext}
                     disabled={!getAdjacentTrackId("next")}
-                    className="rounded-full p-2 text-muted transition hover:bg-sunken disabled:opacity-30 dark:text-faint dark:hover:bg-sunken"
+                    className="rounded-full p-2 text-muted transition hover:bg-sunken disabled:opacity-30"
                     aria-label="Next"
                   >
                     <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -538,7 +530,7 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
                       className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
                         playbackRate === rate
                           ? "bg-accent text-accent-ink"
-                          : "text-faint hover:text-muted dark:text-muted dark:hover:text-faint"
+                          : "text-faint hover:text-muted"
                       }`}
                     >
                       {rate === 1 ? "1x" : `${rate}x`}
@@ -551,13 +543,13 @@ const RadioPlayer = ({ categories, initialCategoryId }: RadioPlayerProps) => {
             /* idle state */
             <div className="flex items-center justify-center gap-3 py-1">
               <svg
-                className="h-5 w-5 text-faint dark:text-muted"
+                className="h-5 w-5 text-faint"
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55C7.79 13 6 14.79 6 17s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
               </svg>
-              <span className="text-sm text-faint dark:text-muted">
+              <span className="text-sm text-faint">
                 Select a chapter to begin listening
               </span>
             </div>
