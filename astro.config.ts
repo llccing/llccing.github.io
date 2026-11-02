@@ -19,7 +19,8 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     react(),
-    sitemap(),
+    // 简历页是未公开的草稿，不进 sitemap
+    sitemap({ filter: page => !page.includes("/portfolio/") }),
   ],
   markdown: {
     rehypePlugins: [rehypeCommentAnchors],

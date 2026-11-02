@@ -12,7 +12,10 @@
     "targetRole": "Full-Stack Software Engineer / Angular + Node.js Engineer",
     "summary": "10 years of front-end and full-stack development experience specializing in Angular, Vue, Node.js and complex customer-facing systems. Currently building Cathay Pacific's customer-facing online check-in with Angular and Node.js BFF in an English agile team.",
     "education": "B.S. Computer Science and Technology, Heilongjiang Bayi Agricultural University · 2012.09 — 2016.06",
-    "languages": ["English: CET-4 / able to use English as a working language", "Chinese: native"]
+    "languages": [
+      "English: CET-4 / able to use English as a working language",
+      "Chinese: native"
+    ]
   },
   "design": {
     "direction": "Tech Minimalism",
@@ -41,13 +44,7 @@
     { "value": "2w", "label": "Sprint cadence in English agile team" }
   ],
   "skills": {
-    "frontend": [
-      "Angular",
-      "Vue",
-      "TypeScript",
-      "RxJS",
-      "Tailwind CSS"
-    ],
+    "frontend": ["Angular", "Vue", "TypeScript", "RxJS", "Tailwind CSS"],
     "fullstack": [
       "Node.js",
       "NestJS",
@@ -125,6 +122,16 @@
       "name": "iCluster Web",
       "summary": "Angular + Tailwind + Spring Boot product delivery with design prototyping, Keycloak encapsulation and the Angular 13 → 15 upgrade.",
       "tags": ["Angular", "Tailwind", "Spring Boot", "Keycloak"]
+    },
+    {
+      "name": "Dynamic forms & ABP component library",
+      "summary": "Angular + NG-ZORRO + NestJS dynamic forms and AstraZeneca clinic mini programs, plus effort estimation, code review and mentoring.",
+      "tags": ["Angular", "NG-ZORRO", "RxJS", "NestJS", "ABP"]
+    },
+    {
+      "name": "Didi driver campaigns & mini programs",
+      "summary": "Driver-facing promotional H5 pages and WeChat mini programs delivered at roughly 99% design fidelity.",
+      "tags": ["Vue", "H5", "MPX", "Design fidelity"]
     }
   ],
   "experiences": [
@@ -352,6 +359,14 @@
       {
         "name": "iCluster Web",
         "summary": "Angular + Tailwind + Spring Boot 产品研发，含设计原型、Keycloak 封装与 Angular 13→15 升级规划。"
+      },
+      {
+        "name": "动态表单与 ABP 组件库",
+        "summary": "基于 Angular、NG-ZORRO、NestJS 的动态表单与阿斯利康诊所小程序，同时承担工作量评估、Code Review 与新人指导。"
+      },
+      {
+        "name": "滴滴司机端活动与小程序",
+        "summary": "司机端 C 端活动 H5 与微信小程序，与设计团队协作达成约 99% 设计还原度。"
       }
     ],
     "experiences": [
@@ -427,6 +442,34 @@
         "impact": "通过动手实践的框架搭建与工作流自动化，奠定坚实的前端基础。"
       }
     ],
+    "skills": {
+      "frontend": ["Angular", "Vue", "TypeScript", "RxJS", "Tailwind CSS"],
+      "fullstack": [
+        "Node.js",
+        "NestJS",
+        "Spring Boot",
+        "TypeORM",
+        "BFF / API",
+        "Keycloak",
+        "ABP"
+      ],
+      "engineeringAndAi": [
+        "单元测试",
+        "Code Review",
+        "架构升级",
+        "AI 辅助编码",
+        "AI 辅助测试生成",
+        "AI 辅助排障"
+      ],
+      "learningAndCollaboration": [
+        "Angular 新特性",
+        "AWS SAA 认证",
+        "英文敏捷协作",
+        "Sprint 计划 / 评审 / 复盘",
+        "新人指导",
+        "小程序 / MPX"
+      ]
+    },
     "personalLab": {
       "name": "个人项目与技术写作",
       "role": "业余项目 / 技术写作",
@@ -466,7 +509,7 @@
     ],
     "astroRepoImplementation": [
       "src/pages/portfolio.astro",
-      "src/components/portfolio/PortfolioExperience.tsx",
+      "src/components/portfolio/PortfolioDossier.astro",
       "src/data/portfolio.resume.json"
     ]
   }

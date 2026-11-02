@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>刘春峰 Rowan Liu · 简历 Portfolio</title>
+    <style>
+      /* ══════════════════════════════════════════════════════════
+         设计契约 · 「纸 × 朱批」简历变体
+         与博客主站同源令牌，唯一强调色朱砂，圆角 2 种，描边替代阴影
+         ══════════════════════════════════════════════════════════ */
+      :root {
+        --canvas: #f6f5f2;
+        --surface: #ffffff;
+        --sunken: #efeee9;
+        --ink: #1a1a18;
+        --muted: #6e6c66;
+        --faint: #8d8a83;
+        --accent: #b8322a;
+        --accent-ink: #ffffff;
+        --line: #dedbd4;
+        --mark: #f2e4c9;
+
+        --step-display: clamp(2.5rem, 7vw, 4.5rem);
+        --step-h2: 1.5rem;
+        --step-h3: 1.125rem;
+        --step-lede: clamp(1.05rem, 2vw, 1.1875rem);
+        --step-body: 1rem;
+        --step-meta: 0.875rem;
+        --step-eyebrow: 0.6875rem;
+
+        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          "Liberation Mono", monospace;
+
+        --s-1: 0.5rem;
+        --s-2: 0.75rem;
+        --s-3: 1rem;
+        --s-4: 1.5rem;
+        --s-5: 2rem;
+        --s-6: 3rem;
+        --s-7: 4.5rem;
+
+        --measure: 46rem;
+        --measure-wide: 72rem;
+        --gutter: 1rem;
+        --r-control: 8px;
+        --dur: 180ms;
+        --ease: cubic-bezier(0.2, 0.6, 0.3, 1);
+      }
+
+      [data-theme="dark"] {
+        --canvas: #131316;
+        --surface: #1b1b1f;
+        --sunken: #0d0d0f;
+        --ink: #edede8;
+        --muted: #9a978f;
+        --faint: #7c7972;
+        --accent: #ff6a4d;
+        --accent-ink: #14140f;
+        --line: #2e2e33;
+        --mark: #3a2c1c;
+      }
+
+      @media (min-width: 768px) {
+        :root {
+          --gutter: 2rem;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: var(--step-body);
+        line-height: 1.8;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .wrap {
+        max-width: var(--measure-wide);
+        margin: 0 auto;
+        padding-inline: var(--gutter);
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--accent);
+        font-family: var(--font-mono);
+        font-size: var(--step-eyebrow);
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      .mono {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ── 顶部工具条 ─────────────────────────────────────────── */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--canvas) 88%, transparent);
+        backdrop-filter: blur(8px);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--s-3);
+        min-height: 3.25rem;
+      }
+
+      .topbar-id {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        font-size: var(--step-meta);
+        font-weight: 700;
+      }
+
+      .topbar-id span {
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      .tools {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        min-height: 2.25rem;
+        padding: 0 0.7rem;
+        border: 1px solid var(--line);
+        border-radius: var(--r-control);
+        background: var(--surface);
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: var(--step-meta);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        transition:
+          border-color var(--dur) var(--ease),
+          color var(--dur) var(--ease);
+      }
+
+      .btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .btn[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .draft-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.15rem 0.5rem;
+        border: 1px dashed var(--faint);
+        border-radius: var(--r-control);
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: var(--step-eyebrow);
+        letter-spacing: 0.08em;
+      }
+
+      /* ── Hero ───────────────────────────────────────────────── */
+      .hero {
+        padding: var(--s-6) 0 var(--s-5);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .hero-name {
+        margin: var(--s-3) 0 0;
+        font-size: var(--step-display);
+        letter-spacing: -0.01em;
+      }
+
+      .hero-name small {
+        display: block;
+        margin-top: 0.35rem;
+        color: var(--muted);
+        font-size: 0.3em;
+        font-weight: 400;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .role-line {
+        margin-top: var(--s-3);
+        padding-left: 0.85rem;
+        border-left: 3px solid var(--accent);
+        color: var(--accent);
+        font-size: var(--step-h3);
+        font-weight: 700;
+      }
+
+      .lede {
+        max-width: 40em;
+        margin-top: var(--s-3);
+        font-size: var(--step-lede);
+        line-height: 1.75;
+      }
+
+      .contact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        margin-top: var(--s-4);
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: var(--step-meta);
+      }
+
+      .contact a {
+        color: var(--muted);
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .contact a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* ── 通用小节 ───────────────────────────────────────────── */
+      .section {
+        padding-top: var(--s-6);
+      }
+
+      .subhead {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .subhead h2 {
+        font-size: var(--step-h2);
+      }
+
+      .subhead .count {
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: var(--step-meta);
+      }
+
+      .subnote {
+        max-width: 44em;
+        margin-top: var(--s-2);
+        color: var(--muted);
+        font-size: var(--step-meta);
+        line-height: 1.75;
+      }
+
+      /* ── 数据宫格 ───────────────────────────────────────────── */
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        margin-top: var(--s-4);
+        border: 1px solid var(--line);
+        background: var(--line);
+      }
+
+      .metric {
+        padding: var(--s-3);
+        background: var(--surface);
+      }
+
+      .metric b {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      .metric span {
+        display: block;
+        margin-top: 0.35rem;
+        color: var(--muted);
+        font-size: var(--step-meta);
+        line-height: 1.5;
+      }
+
+      /* ── 核心系统卡 ─────────────────────────────────────────── */
+      .systems {
+        display: grid;
+        gap: 1px;
+        margin-top: var(--s-4);
+        border: 1px solid var(--line);
+        background: var(--line);
+      }
+
+      .sys {
+        padding: var(--s-3);
+        background: var(--surface);
+      }
+
+      .sys-no {
+        color: var(--accent);
+        font-family: var(--font-mono);
+        font-size: var(--step-eyebrow);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+      }
+
+      .sys h3 {
+        margin-top: 0.35rem;
+        font-size: var(--step-h3);
+      }
+
+      .sys p {
+        margin-top: 0.5rem;
+        color: var(--muted);
+        font-size: var(--step-meta);
+        line-height: 1.7;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.85rem;
+      }
+
+      .chip {
+        padding: 0.1rem 0.5rem;
+        border: 1px solid var(--line);
+        border-radius: var(--r-control);
+        color: var(--muted);
+        font-size: var(--step-eyebrow);
+        font-weight: 600;
+      }
+
+      /* ── 职业历程时间轴 ─────────────────────────────────────── */
+      .timeline {
+        margin-top: var(--s-4);
+      }
+
+      .job {
+        border-top: 1px solid var(--line);
+      }
+
+      .job:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .job-head {
+        display: grid;
+        gap: 0.25rem 1.5rem;
+        padding: var(--s-3) 0;
+      }
+
+      .job-period {
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: var(--step-meta);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .job-company {
+        font-size: var(--step-h3);
+        font-weight: 700;
+      }
+
+      .job-company em {
+        color: var(--muted);
+        font-size: var(--step-meta);
+        font-style: normal;
+        font-weight: 400;
+      }
+
+      .job-role {
+        color: var(--accent);
+        font-size: var(--step-meta);
+        font-weight: 700;
+      }
+
+      .job-summary {
+        margin-top: 0.5rem;
+        max-width: 44em;
+        color: var(--ink);
+        font-size: var(--step-meta);
+        line-height: 1.75;
+      }
+
+      .job details {
+        margin-top: 0.75rem;
+      }
+
+      .job summary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 2.25rem;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: var(--step-meta);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .job summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .job summary::after {
+        content: "＋";
+        color: var(--accent);
+      }
+
+      .job details[open] summary::after {
+        content: "－";
+      }
+
+      .job-details {
+        margin: 0.5rem 0 0;
+        padding-left: 1.1rem;
+        border-left: 1px solid var(--line);
+      }
+
+      .job-details li {
+        position: relative;
+        margin-bottom: 0.5rem;
+        color: var(--muted);
+        font-size: var(--step-meta);
+        line-height: 1.75;
+      }
+
+      .job-details li::before {
+        position: absolute;
+        left: -1.1rem;
+        color: var(--faint);
+        content: "—";
+      }
+
+      /* ── 技能 ───────────────────────────────────────────────── */
+      .skills {
+        display: grid;
+        gap: var(--s-4);
+        margin-top: var(--s-4);
+      }
+
+      .skill-group h3 {
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--line);
+        font-size: var(--step-meta);
+        letter-spacing: 0.04em;
+      }
+
+      .skill-group ul {
+        margin-top: 0.75rem;
+      }
+
+      /* ── 收尾区块 ───────────────────────────────────────────── */
+      .facts {
+        display: grid;
+        gap: var(--s-3);
+        margin-top: var(--s-4);
+        padding: var(--s-3);
+        border: 1px solid var(--line);
+        background: var(--sunken);
+      }
+
+      .fact h3 {
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: var(--step-eyebrow);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .fact p {
+        margin-top: 0.3rem;
+        font-size: var(--step-meta);
+        line-height: 1.7;
+      }
+
+      footer.foot {
+        margin-top: var(--s-7);
+        padding: var(--s-4) 0 var(--s-6);
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: var(--step-meta);
+      }
+
+      footer.foot a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      /* ── 断点：768 / 1200 ───────────────────────────────────── */
+      @media (min-width: 768px) {
+        .metrics {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        .systems {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .job-head {
+          grid-template-columns: 11rem minmax(0, 1fr);
+        }
+        .job-period {
+          padding-top: 0.15rem;
+        }
+        .skills {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .facts {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (min-width: 1200px) {
+        .systems {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        /* 5 张卡在 3 列下最后一行只有 1 张，让它跨 2 列补满，避免空格子 */
+        .systems .sys:last-child:nth-child(odd) {
+          grid-column: span 2;
+        }
+        .skills {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        .hero-split {
+          display: grid;
+          grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+          gap: var(--s-6);
+          align-items: end;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="topbar">
+      <div class="wrap topbar-inner">
+        <div class="topbar-id">
+          刘春峰 <span>Rowan Liu</span>
+        </div>
+        <div class="tools">
+          <span class="draft-chip" data-zh="草稿 · 未公开" data-en="Draft · not public"
+            >草稿 · 未公开</span
+          >
+          <button class="btn" id="langBtn" type="button" aria-pressed="false">EN</button>
+          <button class="btn" id="themeBtn" type="button">暗色</button>
+        </div>
+      </div>
+    </div>
+
+    <header class="hero wrap">
+      <p class="eyebrow" data-zh="简历 / 作品集" data-en="Resume / Portfolio">
+        简历 / 作品集
+      </p>
+      <div class="hero-split">
+        <div>
+          <h1 class="hero-name">
+            刘春峰
+            <small>Rowan Liu</small>
+          </h1>
+          <p
+            class="role-line"
+            data-zh="目标岗位：全栈开发工程师 / Angular + Node.js"
+            data-en="Target role: Full-Stack Software Engineer / Angular + Node.js"
+          >
+            目标岗位：全栈开发工程师 / Angular + Node.js
+          </p>
+          <p
+            class="lede"
+            data-zh="10 年前端与全栈经验，专注 Angular、Vue、Node.js 与复杂 C 端业务系统。当前在埃森哲以 Angular + Node.js BFF 构建国泰航空在线值机系统，在英文敏捷团队中交付。"
+            data-en="10 years of front-end and full-stack delivery focused on Angular, Vue, Node.js and complex customer-facing systems. Currently building Cathay Pacific's online check-in with Angular and Node.js BFF in an English agile team."
+          >
+            10 年前端与全栈经验，专注 Angular、Vue、Node.js 与复杂 C 端业务系统。当前在埃森哲以
+            Angular + Node.js BFF 构建国泰航空在线值机系统，在英文敏捷团队中交付。
+          </p>
+        </div>
+        <div class="contact">
+          <span class="mono">上海 · Shanghai</span>
+          <a class="mono" href="mailto:lcf33123@163.com">lcf33123@163.com</a>
+          <span class="mono">155 4246 1419</span>
+          <a class="mono" href="https://rowanliu.com">rowanliu.com</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="section" aria-labelledby="m-title">
+        <div class="subhead">
+          <h2 id="m-title" data-zh="关键数字" data-en="By the numbers">关键数字</h2>
+          <span class="count mono">04</span>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <b class="mono" data-zh="10 年" data-en="10y">10 年</b>
+            <span data-zh="前端 / 全栈交付" data-en="Front-end / full-stack delivery"
+              >前端 / 全栈交付</span
+            >
+          </div>
+          <div class="metric">
+            <b class="mono">80+</b>
+            <span data-zh="京东 IDC 重建页面数" data-en="Enterprise pages rebuilt at JD IDC"
+              >京东 IDC 重建页面数</span
+            >
+          </div>
+          <div class="metric">
+            <b class="mono" data-zh="10 万行" data-en="100k">10 万行</b>
+            <span data-zh="Vue 重写迁移代码量" data-en="Lines migrated in Vue rebuild"
+              >Vue 重写迁移代码量</span
+            >
+          </div>
+          <div class="metric">
+            <b class="mono" data-zh="2 周" data-en="2w">2 周</b>
+            <span data-zh="英文敏捷迭代周期" data-en="Sprint cadence in English agile team"
+              >英文敏捷迭代周期</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="s-title">
+        <div class="subhead">
+          <h2 id="s-title" data-zh="精选系统" data-en="Featured systems">精选系统</h2>
+          <span class="count mono">05</span>
+        </div>
+        <p
+          class="subnote"
+          data-zh="五个真正交付过的系统，按「规模与架构 / 技术领导力 / 设计还原度」三个维度挑，避免全部堆架构故事。"
+          data-en="Five shipped systems, selected across three dimensions — scale & architecture, technical leadership, and design fidelity — instead of repeating one story five times."
+        >
+          五个真正交付过的系统，按「规模与架构 / 技术领导力 / 设计还原度」三个维度挑，避免全部堆架构故事。
+        </p>
+        <div class="systems" id="systems"></div>
+      </section>
+
+      <section class="section" aria-labelledby="j-title">
+        <div class="subhead">
+          <h2 id="j-title" data-zh="职业历程" data-en="Career">职业历程</h2>
+          <span class="count mono">06</span>
+        </div>
+        <p
+          class="subnote"
+          data-zh="结果优先：每段先给一句影响，技术细节折叠在「查看细节」里，招聘方可以自己决定读多深。"
+          data-en="Impact first: one line of outcome per role, with technical detail folded behind “Details” so readers choose their own depth."
+        >
+          结果优先：每段先给一句影响，技术细节折叠在「查看细节」里，招聘方可以自己决定读多深。
+        </p>
+        <div class="timeline" id="timeline"></div>
+      </section>
+
+      <section class="section" aria-labelledby="k-title">
+        <div class="subhead">
+          <h2 id="k-title" data-zh="能力构成" data-en="Capabilities">能力构成</h2>
+          <span class="count mono">04</span>
+        </div>
+        <div class="skills" id="skills"></div>
+      </section>
+
+      <section class="section" aria-labelledby="f-title">
+        <div class="subhead">
+          <h2 id="f-title" data-zh="学历 · 认证 · 语言" data-en="Education · Certification · Languages">
+            学历 · 认证 · 语言
+          </h2>
+          <span class="count mono">03</span>
+        </div>
+        <div class="facts">
+          <div class="fact">
+            <h3 data-zh="学历" data-en="Education">学历</h3>
+            <p
+              data-zh="计算机科学与技术学士 · 黑龙江八一农垦大学 · 2012.09 — 2016.06"
+              data-en="B.S. Computer Science and Technology · Heilongjiang Bayi Agricultural University · 2012.09 — 2016.06"
+            >
+              计算机科学与技术学士 · 黑龙江八一农垦大学 · 2012.09 — 2016.06
+            </p>
+          </div>
+          <div class="fact">
+            <h3 data-zh="认证" data-en="Certification">认证</h3>
+            <p
+              data-zh="AWS Certified Solutions Architect – Associate（AWS SAA）"
+              data-en="AWS Certified Solutions Architect – Associate (AWS SAA)"
+            >
+              AWS Certified Solutions Architect – Associate（AWS SAA）
+            </p>
+          </div>
+          <div class="fact">
+            <h3 data-zh="语言" data-en="Languages">语言</h3>
+            <p
+              data-zh="中文母语 · 英语 CET-4，可作为工作语言"
+              data-en="Chinese: native · English: CET-4, usable as a working language"
+            >
+              中文母语 · 英语 CET-4，可作为工作语言
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot wrap">
+      <p>
+        <span data-zh="本页暂未加入导航，仅通过链接访问。" data-en="Not linked from the site navigation; reachable by URL only."
+          >本页暂未加入导航，仅通过链接访问。</span
+        >
+        <a href="/">← 返回 rowanliu.com</a>
+      </p>
+    </footer>
+
+    <script>
+      /* ── 数据：全部取自 src/data/portfolio.resume.json ───────── */
+      var SYSTEMS = [
+        {
+          name: { zh: "国泰航空在线值机", en: "Cathay Pacific online check-in" },
+          sum: {
+            zh: "以 Angular + Node.js BFF 构建的面向用户旅行工作流，含证件扫描与生产问题分析。",
+            en: "Customer-facing travel workflow built with Angular + Node.js BFF, including document scanning and production issue analysis.",
+          },
+          tech: ["Angular 20", "Node.js BFF", "Scandit", "Kibana", "Signals"],
+        },
+        {
+          name: { zh: "京东 IDC 基础设施平台", en: "JD IDC infrastructure platform" },
+          sum: {
+            zh: "以 Vue.js 从 0 到 1 重写的 IDC 运维平台，覆盖 80+ 页面、约 10 万行前端代码。",
+            en: "Vue.js rebuild from 0 to 1 of the IDC operations platform: 80+ pages, ~100k lines of front-end code.",
+          },
+          tech: ["Vue.js", "idc-cli", "埋点", "Enterprise platform"],
+        },
+        {
+          name: { zh: "iCluster Web", en: "iCluster Web" },
+          sum: {
+            zh: "Angular + Tailwind + Spring Boot 产品研发，含 Figma 原型、Keycloak 封装与 Angular 13→15 升级。",
+            en: "Angular + Tailwind + Spring Boot product delivery with Figma prototyping, Keycloak encapsulation and the Angular 13→15 upgrade.",
+          },
+          tech: ["Angular", "Tailwind CSS", "Spring Boot", "Keycloak"],
+        },
+        {
+          name: { zh: "动态表单与 ABP 组件库", en: "Dynamic forms & ABP component library" },
+          sum: {
+            zh: "Angular + NG-ZORRO + NestJS 动态表单与阿斯利康诊所小程序；同时承担工作量评估、任务分配、Code Review 与新人指导。",
+            en: "Angular + NG-ZORRO + NestJS dynamic forms and AstraZeneca clinic mini programs, plus effort estimation, task allocation, code review and mentoring.",
+          },
+          tech: ["Angular", "NG-ZORRO", "RxJS", "NestJS", "ABP"],
+        },
+        {
+          name: { zh: "滴滴司机端活动与小程序", en: "Didi driver campaigns & mini programs" },
+          sum: {
+            zh: "司机端 C 端活动 H5 与微信小程序，与设计团队协作达成约 99% 设计还原度。",
+            en: "Driver-facing promotional H5 pages and WeChat mini programs, reaching roughly 99% design fidelity with the design team.",
+          },
+          tech: ["Vue", "H5", "MPX", "Design fidelity"],
+        },
+      ];
+
+      var JOBS = [
+        {
+          period: "2024.10 — 至今",
+          periodEn: "2024.10 — Present",
+          company: { zh: "埃森哲（中国）有限公司", en: "Accenture (China) Co., Ltd." },
+          city: { zh: "上海", en: "Shanghai" },
+          role: { zh: "全栈开发工程师", en: "Full-Stack Software Engineer" },
+          summary: {
+            zh: "以 Angular + Node.js BFF，在英文敏捷团队中构建国泰航空面向用户的在线值机系统。",
+            en: "Building Cathay Pacific's customer-facing online check-in with Angular + Node.js BFF under an English agile workflow.",
+          },
+          details: [
+            {
+              zh: "负责国泰航空 C 端线上值机系统的 Angular 响应式页面、流程优化及线上问题修复。",
+              en: "Owned Angular responsive pages, workflow optimization and production issue fixes for Cathay Pacific's customer-facing check-in.",
+            },
+            {
+              zh: "开发 Node.js BFF 聚合接口，完成后端数据组合、过滤与适配，降低前端处理复杂度。",
+              en: "Built Node.js BFF aggregation APIs for data composition, filtering and adaptation, reducing front-end complexity.",
+            },
+            {
+              zh: "推进 Angular 12 → 20 升级，应用 Signal、Standalone Component，并封装 Scandit 多证件扫描组件。",
+              en: "Drove the Angular 12→20 upgrade with Signals and Standalone Components, and built a Scandit multi-document scanning component.",
+            },
+            {
+              zh: "通过埋点与 Kibana 定位证件识别异常并推动方案落地；参与英文会议与两周 Sprint 交付。",
+              en: "Used instrumentation and Kibana to pinpoint identity-recognition failures and drive fixes; worked in English meetings and two-week sprints.",
+            },
+            {
+              zh: "封装并复用单元测试、Code Review 等工程实践，并引入 Angular 官方 Skill 辅助团队按最佳实践开发。",
+              en: "Packaged reusable engineering practices (unit testing, code review) and introduced official Angular guidance to the team.",
+            },
+          ],
+          tech: ["Angular", "TypeScript", "Node.js", "BFF", "Scandit", "Kibana", "AWS SAA", "Agile"],
+        },
+        {
+          period: "2022.04 — 2024.09",
+          periodEn: "2022.04 — 2024.09",
+          company: { zh: "凌翔创意软件（北京）有限公司大连分公司", en: "Rocket Software (Beijing), Dalian Branch" },
+          city: { zh: "大连", en: "Dalian" },
+          role: { zh: "全栈开发工程师", en: "Full-Stack Software Engineer" },
+          summary: {
+            zh: "主导 iCluster Web 产品研发，覆盖 Angular、Tailwind CSS 与 Spring Boot，含产品原型与 Angular 升级。",
+            en: "Led iCluster Web product development across Angular, Tailwind CSS and Spring Boot, including prototyping and Angular upgrade work.",
+          },
+          details: [
+            {
+              zh: "使用 Angular、Tailwind CSS 与 Spring Boot 完成前后端功能交付。",
+              en: "Delivered front-end and back-end functionality with Angular, Tailwind CSS and Spring Boot.",
+            },
+            {
+              zh: "基于 JHipster 与 Spring Boot 封装 Keycloak 认证，简化业务系统接入。",
+              en: "Packaged Keycloak authentication with JHipster and Spring Boot, simplifying integration across business systems.",
+            },
+            {
+              zh: "使用 Figma 将需求转化为产品原型，支持功能评审与迭代决策。",
+              en: "Turned requirements into Figma prototypes to support feature reviews and iteration decisions.",
+            },
+            {
+              zh: "制定并实施 Angular 13 → 15 升级方案，完成风险评估、依赖适配与性能优化。",
+              en: "Planned and executed the Angular 13→15 upgrade: risk assessment, dependency adaptation, performance optimization.",
+            },
+          ],
+          tech: ["Angular", "Tailwind CSS", "Spring Boot", "JHipster", "Keycloak", "Figma"],
+        },
+        {
+          period: "2020.07 — 2022.04",
+          periodEn: "2020.07 — 2022.04",
+          company: { zh: "大连英诺瑞新科技有限公司", en: "Dalian Innocellence Technology Co., Ltd." },
+          city: { zh: "大连", en: "Dalian" },
+          role: { zh: "全栈开发工程师", en: "Full-Stack Software Engineer" },
+          summary: {
+            zh: "构建 Angular/NestJS 业务系统、动态表单、ABP 组件库及阿斯利康诊所小程序与 PC 端功能。",
+            en: "Built Angular/NestJS business systems, dynamic forms, ABP-based component libraries and AstraZeneca clinic mini-program / PC features.",
+          },
+          details: [
+            {
+              zh: "基于 Angular、NG-ZORRO、RxJS、NestJS 与 TypeORM 开发动态表单功能。",
+              en: "Developed dynamic form functionality with Angular, NG-ZORRO, RxJS, NestJS and TypeORM.",
+            },
+            {
+              zh: "为阿斯利康诊所项目开发小程序与 PC 端，使用 uni-app 沉淀基础代码与公共组件。",
+              en: "Built mini program and PC apps for AstraZeneca clinic projects, consolidating shared code with uni-app.",
+            },
+            {
+              zh: "基于 ABP 封装业务组件库与前端布局组件，提升复用。",
+              en: "Packaged business and layout component libraries on top of ABP to improve reuse.",
+            },
+            {
+              zh: "负责工作量评估、任务分配、代码审查及新人指导。",
+              en: "Owned effort estimation, task allocation, code review and mentoring new team members.",
+            },
+          ],
+          tech: ["Angular", "NG-ZORRO", "RxJS", "NestJS", "TypeORM", "Uniapp", "ABP"],
+        },
+        {
+          period: "2019.11 — 2020.07",
+          periodEn: "2019.11 — 2020.07",
+          company: { zh: "北京嘀嘀无限科技发展有限公司", en: "Beijing Didi Infinity Technology Development" },
+          city: { zh: "北京", en: "Beijing" },
+          role: { zh: "高级前端开发工程师", en: "Senior Front-End Software Engineer" },
+          summary: {
+            zh: "交付面向司机的 C 端 H5 与小程序活动页面，高度还原设计稿，快速上手新框架。",
+            en: "Delivered driver-side H5 and mini-program promotional pages with strong design fidelity and fast framework learning.",
+          },
+          details: [
+            {
+              zh: "负责司机端活动 H5 页面开发，与设计团队协作完成约 99% 设计还原度与交互实现。",
+              en: "Developed driver-side promotional H5 pages with the design team at roughly 99% design and interaction fidelity.",
+            },
+            {
+              zh: "升级团队 Vue CLI 公共插件以兼容 @vue/cli 4。",
+              en: "Upgraded the team's shared Vue CLI plugins for @vue/cli 4 compatibility.",
+            },
+            {
+              zh: "使用 MPX 完成微信小程序开发与交付。",
+              en: "Delivered WeChat mini programs with the MPX framework.",
+            },
+          ],
+          tech: ["Vue", "H5", "MPX", "WeChat Mini Program", "Vue CLI"],
+        },
+        {
+          period: "2017.09 — 2019.11",
+          periodEn: "2017.09 — 2019.11",
+          company: { zh: "北京京东尚科信息技术有限公司", en: "Beijing JD Shangke Information Technology" },
+          city: { zh: "北京", en: "Beijing" },
+          role: { zh: "前端开发工程师", en: "Front-End Software Engineer" },
+          summary: {
+            zh: "以 Vue.js 从 0 到 1 重构 IDC 基础设施平台：80+ 页面、10 万行代码、自建脚手架与数据埋点。",
+            en: "Rebuilt the IDC infrastructure platform with Vue.js from 0 to 1: 80+ pages, ~100k lines, own scaffolding and analytics.",
+          },
+          details: [
+            {
+              zh: "使用 Vue.js 从 0 到 1 重构 IDC 基础设施平台，覆盖 10 万行代码与 80 余个页面。",
+              en: "Rebuilt the IDC infrastructure platform from the ground up with Vue.js: 100k lines, 80+ pages.",
+            },
+            {
+              zh: "开发工单模块，以高级 Vue 模式解耦代码，支持团队协作。",
+              en: "Built the work-order module with advanced Vue patterns to decouple code and enable team collaboration.",
+            },
+            {
+              zh: "开发 idc-cli 脚手架，引入页面与位置埋点，并持续升级项目依赖。",
+              en: "Developed the idc-cli scaffolding, added page/position instrumentation, and kept dependencies upgraded.",
+            },
+          ],
+          tech: ["Vue.js", "JavaScript", "idc-cli", "Analytics", "Scaffolding"],
+        },
+        {
+          period: "2016.02 — 2017.08",
+          periodEn: "2016.02 — 2017.08",
+          company: { zh: "北京博图纵横科技有限责任公司", en: "Beijing Botu Zongheng Technology" },
+          city: { zh: "北京", en: "Beijing" },
+          role: { zh: "前端开发工程师", en: "Front-End Software Engineer" },
+          summary: {
+            zh: "以 RequireJS、Bootstrap、jQuery、HTML/CSS 及 Gulp/browser-sync 工具链搭建项目框架。",
+            en: "Built frontend foundations with RequireJS, Bootstrap, jQuery, HTML/CSS and Gulp/browser-sync tooling.",
+          },
+          details: [
+            {
+              zh: "使用 RequireJS、Bootstrap、jQuery、HTML 与 CSS3 搭建项目框架。",
+              en: "Built project frameworks with RequireJS, Bootstrap, jQuery, HTML and CSS3.",
+            },
+            {
+              zh: "引入 Gulp 和 browser-sync 提升开发效率。",
+              en: "Introduced Gulp and browser-sync to improve development efficiency.",
+            },
+          ],
+          tech: ["RequireJS", "Bootstrap", "jQuery", "CSS3", "Gulp"],
+        },
+      ];
+
+      var SKILLS = [
+        {
+          title: { zh: "核心前端", en: "Core front-end" },
+          items: ["Angular", "Vue", "TypeScript", "RxJS", "Tailwind CSS"],
+        },
+        {
+          title: { zh: "系统与后端", en: "Systems & back end" },
+          items: ["Node.js", "NestJS", "Spring Boot", "TypeORM", "BFF / API", "Keycloak", "ABP"],
+        },
+        {
+          title: { zh: "工程与 AI", en: "Engineering & AI" },
+          items: ["单元测试", "Code Review", "架构升级", "AI 辅助编码", "AI 辅助测试生成", "AI 辅助排障"],
+        },
+        {
+          title: { zh: "协作与流程", en: "Workflow" },
+          items: ["英文敏捷协作", "Sprint 计划/评审/复盘", "新人指导", "AWS SAA", "小程序 / MPX"],
+        },
+      ];
+
+      var LABELS = {
+        details: { zh: "查看细节", en: "Details" },
+        stack: { zh: "技术栈", en: "Stack" },
+      };
+
+      /* ── 渲染 ─────────────────────────────────────────────── */
+      var lang = "zh";
+
+      function t(v) {
+        return typeof v === "string" ? v : v[lang];
+      }
+
+      function esc(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      }
+
+      function render() {
+        document.getElementById("systems").innerHTML = SYSTEMS.map(function (s, i) {
+          return (
+            '<article class="sys">' +
+            '<p class="sys-no mono">No.' +
+            String(i + 1).padStart(2, "0") +
+            "</p>" +
+            "<h3>" +
+            esc(t(s.name)) +
+            "</h3>" +
+            "<p>" +
+            esc(t(s.sum)) +
+            "</p>" +
+            '<ul class="chips">' +
+            s.tech.map(function (x) {
+              return '<li class="chip">' + esc(x) + "</li>";
+            }).join("") +
+            "</ul>" +
+            "</article>"
+          );
+        }).join("");
+
+        document.getElementById("timeline").innerHTML = JOBS.map(function (j, i) {
+          return (
+            '<article class="job">' +
+            '<div class="job-head">' +
+            '<div class="job-period mono">' +
+            esc(lang === "zh" ? j.period : j.periodEn) +
+            "<br />" +
+            esc(t(j.city)) +
+            "</div>" +
+            "<div>" +
+            '<h3 class="job-company">' +
+            esc(t(j.company)) +
+            "</h3>" +
+            '<p class="job-role">' +
+            esc(t(j.role)) +
+            "</p>" +
+            '<p class="job-summary">' +
+            esc(t(j.summary)) +
+            "</p>" +
+            "<details" +
+            (i === 0 ? " open" : "") +
+            ">" +
+            "<summary>" +
+            esc(t(LABELS.details)) +
+            "</summary>" +
+            '<ul class="job-details">' +
+            j.details.map(function (d) {
+              return "<li>" + esc(t(d)) + "</li>";
+            }).join("") +
+            "</ul>" +
+            "</details>" +
+            '<ul class="chips" aria-label="' +
+            esc(t(LABELS.stack)) +
+            '">' +
+            j.tech.map(function (x) {
+              return '<li class="chip">' + esc(x) + "</li>";
+            }).join("") +
+            "</ul>" +
+            "</div>" +
+            "</div>" +
+            "</article>"
+          );
+        }).join("");
+
+        document.getElementById("skills").innerHTML = SKILLS.map(function (g) {
+          return (
+            '<div class="skill-group">' +
+            "<h3>" +
+            esc(t(g.title)) +
+            "</h3>" +
+            '<ul class="chips">' +
+            g.items.map(function (x) {
+              return '<li class="chip">' + esc(x) + "</li>";
+            }).join("") +
+            "</ul>" +
+            "</div>"
+          );
+        }).join("");
+      }
+
+      function applyLang() {
+        document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+        document.querySelectorAll("[data-zh][data-en]").forEach(function (el) {
+          el.textContent = el.getAttribute("data-" + lang);
+        });
+        render();
+      }
+
+      document.getElementById("langBtn").addEventListener("click", function () {
+        lang = lang === "zh" ? "en" : "zh";
+        this.textContent = lang === "zh" ? "EN" : "中";
+        this.setAttribute("aria-pressed", lang === "en" ? "true" : "false");
+        applyLang();
+      });
+
+      document.getElementById("themeBtn").addEventListener("click", function () {
+        var dark = document.documentElement.getAttribute("data-theme") === "dark";
+        document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+        this.textContent = dark ? "暗色" : "浅色";
+      });
+
+      applyLang();
+    </script>
+  </body>
+</html>
