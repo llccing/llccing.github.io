@@ -215,11 +215,23 @@ const { activeNav } = Astro.props;
     cursor: pointer;
     transition: border-color var(--dur) var(--ease);
   }
+  /* 汉堡按钮仅移动端可见：菜单列表在 ≥768px 常驻显示 */
+  @media (min-width: 768px) {
+    .hamburger-menu {
+      display: none;
+    }
+  }
   .hamburger-menu:hover {
     border-color: var(--accent);
   }
   .hamburger-menu svg {
     display: block;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   nav ul {
@@ -307,6 +319,12 @@ const { activeNav } = Astro.props;
   @media (max-width: 767px) {
     nav {
       width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+    .hamburger-menu {
+      align-self: flex-end;
     }
     nav ul {
       display: flex;
